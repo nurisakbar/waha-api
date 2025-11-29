@@ -305,7 +305,9 @@ $response = file_get_contents($url, false, stream_context_create($options));</te
         </div>
     </div>
 </div>
+@endsection
 
+@push('scripts')
 <script>
 $(document).ready(function() {
     const modal = $('#createApiKeyModal');
@@ -479,13 +481,6 @@ function copyApiKey(inputId, button) {
     const input = document.getElementById(inputId);
     if (input) {
         copyText(input.value, button);
-            }, 2000);
-            
-            showToast('{{ __('API Key copied to clipboard!') }}', 'success');
-        } catch (err) {
-            console.error('Failed to copy:', err);
-            showToast('{{ __('Failed to copy. Please try again.') }}', 'error');
-        }
     }
 }
 
@@ -527,5 +522,5 @@ if (!$('#toast-styles').length) {
     $('head').append('<style id="toast-styles">@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }</style>');
 }
 </script>
-@endsection
+@endpush
 
