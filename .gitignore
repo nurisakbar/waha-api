@@ -14,7 +14,7 @@ frontend/node_modules/
 !.env.example
 !docker.env.example
 frontend/.env
-frontend/.env.*
+frontend/.env
 
 # Laravel specific (frontend)
 frontend/.phpunit.cache
