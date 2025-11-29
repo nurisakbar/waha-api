@@ -1,0 +1,158 @@
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
+
+class User extends Authenticatable
+{
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory, Notifiable;
+
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
+     * The "type" of the primary key ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
+
+    /**
+     * Boot the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->id)) {
+                $model->id = (string) Str::uuid();
+            }
+        });
+    }
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'phone',
+        'avatar',
+        'role',
+        'subscription_plan_id',
+        'subscription_status',
+        'trial_ends_at',
+        'last_login_at',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'trial_ends_at' => 'datetime',
+            'last_login_at' => 'datetime',
+        ];
+    }
+
+    /**
+     * Get the user's subscription plan.
+     */
+    public function subscriptionPlan()
+    {
+        return $this->belongsTo(Plan::class, 'subscription_plan_id');
+    }
+
+    /**
+     * Get the user's subscriptions.
+     */
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    /**
+     * Get the user's active subscription.
+     */
+    public function activeSubscription()
+    {
+        return $this->hasOne(Subscription::class)->where('status', 'active');
+    }
+
+    /**
+     * Get the user's WhatsApp sessions.
+     */
+    public function whatsappSessions()
+    {
+        return $this->hasMany(WhatsAppSession::class);
+    }
+
+    /**
+     * Get the user's messages.
+     */
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    /**
+     * Get the user's webhooks.
+     */
+    public function webhooks()
+    {
+        return $this->hasMany(Webhook::class);
+    }
+
+    /**
+     * Get the user's API keys.
+     */
+    public function apiKeys()
+    {
+        return $this->hasMany(ApiKey::class);
+    }
+
+    /**
+     * Get the user's API usage logs.
+     */
+    public function apiUsageLogs()
+    {
+        return $this->hasMany(ApiUsageLog::class);
+    }
+
+    /**
+     * Get the user's templates.
+     */
+    public function templates()
+    {
+        return $this->hasMany(Template::class);
+    }
+}

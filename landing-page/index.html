@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WAHA Gateway - WhatsApp API untuk Developer</title>
+    <meta name="description" content="Platform WhatsApp Gateway API yang powerful untuk developer. Kirim pesan, kelola session, dan integrasikan WhatsApp ke aplikasi Anda dengan mudah.">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #10b981;
+            --primary-dark: #059669;
+            --primary-darker: #047857;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --bg-light: #f9fafb;
+            --border-color: #e5e7eb;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.98) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark) !important;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-dark) !important;
+            margin: 0 0.5rem;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 140px 0 120px;
+            margin-top: 76px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .hero-section .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-section h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero-section .lead {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+        
+        /* Feature Cards */
+        .feature-card {
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            height: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15);
+        }
+        
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-card h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        /* Pricing Cards */
+        .pricing-card {
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            height: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .pricing-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(16, 185, 129, 0.15);
+        }
+        
+        .pricing-card.featured {
+            border-color: var(--primary-color);
+            border-width: 3px;
+            position: relative;
+            transform: scale(1.05);
+        }
+        
+        .pricing-card.featured::before {
+            content: 'POPULER';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 24px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        .pricing-card .card-body {
+            padding: 2rem;
+        }
+        
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .pricing-card .display-4 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+        
+        .pricing-card ul {
+            margin: 1.5rem 0;
+        }
+        
+        .pricing-card ul li {
+            padding: 0.5rem 0;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+        
+        /* Code Block */
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 2rem;
+            border-radius: 12px;
+            font-family: 'Courier New', 'Monaco', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            border: 1px solid #333;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .code-block .keyword { color: #569cd6; }
+        .code-block .string { color: #ce9178; }
+        .code-block .number { color: #b5cea8; }
+        .code-block .comment { color: #6a9955; }
+        
+        /* Sections */
+        .section {
+            padding: 100px 0;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+        }
+        
+        /* Step Number */
+        .step-number {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .step-number + h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        /* Buttons */
+        .btn {
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            color: white;
+        }
+        
+        .btn-outline-success {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+        }
+        
+        .btn-outline-success:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn-light {
+            background: white;
+            color: var(--primary-color);
+            border: none;
+        }
+        
+        .btn-light:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+            color: var(--primary-color);
+        }
+        
+        .btn-outline-light {
+            border: 2px solid white;
+            color: white;
+            background: transparent;
+        }
+        
+        .btn-outline-light:hover {
+            background: white;
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        /* Gallery Cards */
+        .gallery-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .gallery-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(16, 185, 129, 0.2);
+        }
+        
+        .gallery-image-wrapper {
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            background: var(--bg-light);
+            position: relative;
+        }
+        
+        .gallery-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-card:hover .gallery-image {
+            transform: scale(1.05);
+        }
+        
+        .gallery-caption {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .gallery-caption h5 {
+            color: var(--text-dark);
+            font-size: 1.125rem;
+        }
+        
+        .gallery-caption p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        /* Company Cards */
+        .company-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .company-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
+        }
+        
+        .company-initial {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            margin: 0 auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .company-logo-img {
+            width: 120px;
+            height: 60px;
+            object-fit: contain;
+            margin: 0 auto;
+            display: block;
+            filter: grayscale(100%);
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .company-card:hover .company-logo-img {
+            filter: grayscale(0%);
+            opacity: 1;
+        }
+        
+        .company-card h5 {
+            color: var(--text-dark);
+            font-size: 1.125rem;
+        }
+        
+        .stats-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-item .display-4 {
+            font-size: 2.5rem;
+        }
+        
+        /* Demo Cards */
+        .demo-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .demo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
+        }
+        
+        .demo-card i {
+            color: var(--primary-color);
+        }
+        
+        /* Testimonial Section */
+        .testimonial-section {
+            padding: 100px 0;
+            background: var(--bg-light);
+        }
+        
+        .testimonial-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .testimonial-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(16, 185, 129, 0.2);
+        }
+        
+        .testimonial-card.php {
+            border-top: 4px solid #777bb4;
+        }
+        
+        .testimonial-card.php::before {
+            background: linear-gradient(90deg, #777bb4, #4f5b93);
+        }
+        
+        .testimonial-card.javascript {
+            border-top: 4px solid #f7df1e;
+        }
+        
+        .testimonial-card.javascript::before {
+            background: linear-gradient(90deg, #f7df1e, #d4b817);
+        }
+        
+        .testimonial-card.python {
+            border-top: 4px solid #3776ab;
+        }
+        
+        .testimonial-card.python::before {
+            background: linear-gradient(90deg, #3776ab, #2d5a87);
+        }
+        
+        .testimonial-card.nodejs {
+            border-top: 4px solid #339933;
+        }
+        
+        .testimonial-card.nodejs::before {
+            background: linear-gradient(90deg, #339933, #267326);
+        }
+        
+        .testimonial-card.java {
+            border-top: 4px solid #ed8b00;
+        }
+        
+        .testimonial-card.java::before {
+            background: linear-gradient(90deg, #ed8b00, #cc7700);
+        }
+        
+        .testimonial-quote {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .testimonial-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .testimonial-info h5 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+        
+        .testimonial-info p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+        
+        .testimonial-stack {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--bg-light);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-top: 0.5rem;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 80px 0;
+        }
+        
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        footer h5, footer h6 {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        
+        footer a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-size: 0.95rem;
+        }
+        
+        footer a:hover {
+            color: var(--primary-color);
+        }
+        
+        footer .text-muted {
+            color: #6b7280 !important;
+        }
+        
+        footer hr {
+            border-color: #374151;
+            margin: 2rem 0;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero-section h1 {
+                font-size: 2.5rem;
+            }
+            
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 100px 0 80px;
+                margin-top: 56px;
+            }
+            
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+            
+            .section {
+                padding: 60px 0;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .pricing-card .display-4 {
+                font-size: 2rem;
+            }
+            
+            .gallery-image-wrapper {
+                height: 250px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-section h1 {
+                font-size: 1.75rem;
+            }
+            
+            .btn-lg {
+                padding: 0.625rem 1.25rem;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-4" href="/">
+                <i class="fab fa-whatsapp text-success me-2"></i>
+                WAHA Gateway
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Fitur</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#pricing">Harga</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#gallery">Galeri</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#demo">Demo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="docs.html">Dokumentasi</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-primary text-white" href="/register">Daftar Akun</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">
+                        WhatsApp API Gateway<br>
+                        <span class="text-warning">untuk Developer</span>
+                    </h1>
+                    <p class="lead mb-4">
+                        Integrasikan WhatsApp messaging ke dalam aplikasi Anda dengan API yang powerful dan ramah developer. 
+                        Kirim pesan, kelola session, dan bangun pengalaman yang luar biasa.
+                    </p>
+                    <div class="d-flex gap-3 flex-wrap mb-4">
+                        <a href="/register" class="btn btn-light btn-lg">
+                            <i class="fas fa-rocket me-2"></i>Mulai Gratis
+                        </a>
+                        <a href="#demo" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-play-circle me-2"></i>Coba Demo
+                        </a>
+                    </div>
+                    <div>
+                        <p class="mb-2"><small><i class="fas fa-check-circle me-2"></i>Tidak perlu kartu kredit</small></p>
+                        <p class="mb-0"><small><i class="fas fa-check-circle me-2"></i>Paket gratis tersedia</small></p>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center mt-5 mt-lg-0">
+                    <div class="code-block text-start">
+                        <div class="mb-3">
+                            <span class="comment"># Kirim pesan WhatsApp via API</span>
+                        </div>
+                        <div>
+                            <span class="keyword">curl</span> -X POST <span class="string">https://api.wahagateway.com/v1/sessions/{id}/messages/text</span><br>
+                            &nbsp;&nbsp;-H <span class="string">"X-Api-Key: waha_your_key"</span><br>
+                            &nbsp;&nbsp;-H <span class="string">"Content-Type: application/json"</span><br>
+                            &nbsp;&nbsp;-d <span class="string">'{</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"to": "6281234567890",</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"message": "Halo dari API!"</span><br>
+                            &nbsp;&nbsp;<span class="string">}'</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Fitur Unggulan</h2>
+                <p class="section-subtitle">Semua yang Anda butuhkan untuk mengintegrasikan WhatsApp ke aplikasi Anda</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h4 class="mb-3 fw-bold">API Ramah Developer</h4>
+                        <p class="text-muted">
+                            RESTful API yang dirancang untuk developer. Dokumentasi lengkap, contoh kode, dan SDK dalam berbagai bahasa pemrograman.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <h4 class="mb-3 fw-bold">Multi Session</h4>
+                        <p class="text-muted">
+                            Kelola beberapa session WhatsApp secara bersamaan. Sempurna untuk bisnis dengan banyak akun atau departemen.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h4 class="mb-3 fw-bold">Webhook Real-Time</h4>
+                        <p class="text-muted">
+                            Terima notifikasi instan via webhook saat pesan masuk. Konfigurasi webhook mudah, dukungan multiple endpoint, dan retry mechanism untuk keandalan tinggi.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4 class="mb-3 fw-bold">Aman & Terpercaya</h4>
+                        <p class="text-muted">
+                            Autentikasi API key, rate limiting, dan SLA uptime 99.9%. Data Anda aman dan API selalu tersedia.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4 class="mb-3 fw-bold">Analitik & Monitoring</h4>
+                        <p class="text-muted">
+                            Lacak penggunaan API, tingkat pengiriman pesan, dan metrik performa. Buat keputusan berbasis data.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h4 class="mb-3 fw-bold">Integrasi Mudah</h4>
+                        <p class="text-muted">
+                            Mulai dalam hitungan menit. Autentikasi sederhana, dokumentasi jelas, dan contoh kode untuk integrasi cepat. Kirim pesan text, gambar, video, dan dokumen dengan mudah.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h4 class="mb-3 fw-bold">Template Management</h4>
+                        <p class="text-muted">
+                            Buat dan kelola template pesan dengan variabel dinamis. Sempurna untuk pesan otomatis, notifikasi, dan kampanye marketing.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4 class="mb-3 fw-bold">Personal & Group Chat</h4>
+                        <p class="text-muted">
+                            Kirim pesan ke personal chat atau grup WhatsApp. Dukungan lengkap untuk berbagai jenis pesan ke semua tipe chat.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                        <h4 class="mb-3 fw-bold">Berbagai Jenis Pesan</h4>
+                        <p class="text-muted">
+                            Kirim berbagai jenis pesan: <strong>Text</strong>, <strong>Gambar</strong>, <strong>Video</strong>, dan <strong>Dokumen</strong>. Dukungan lengkap untuk semua format media dengan caption dan metadata.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trusted By Section -->
+    <section class="section bg-white">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Dipercaya oleh Perusahaan Terkemuka</h2>
+                <p class="section-subtitle">Ribuan perusahaan telah mempercayai WAHA Gateway untuk kebutuhan WhatsApp API mereka</p>
+            </div>
+            <div class="row g-4 mb-5">
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="company-card text-center p-4">
+                        <div class="company-logo mb-3">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" 
+                                 alt="Bank Central Asia" 
+                                 class="company-logo-img">
+                        </div>
+                        <h5 class="fw-bold mb-2">Bank Central Asia</h5>
+                        <p class="text-muted small mb-0">Financial Services</p>
+                        <p class="text-muted small">50.000+ pesan/hari</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="company-card text-center p-4">
+                        <div class="company-logo mb-3">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" 
+                                 alt="TechCorp Indonesia" 
+                                 class="company-logo-img">
+                        </div>
+                        <h5 class="fw-bold mb-2">TechCorp Indonesia</h5>
+                        <p class="text-muted small mb-0">E-commerce Platform</p>
+                        <p class="text-muted small">10.000+ pesan/hari</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="company-card text-center p-4">
+                        <div class="company-logo mb-3">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" 
+                                 alt="RetailHub" 
+                                 class="company-logo-img">
+                        </div>
+                        <h5 class="fw-bold mb-2">RetailHub</h5>
+                        <p class="text-muted small mb-0">Retail Chain</p>
+                        <p class="text-muted small">5.000+ pesan/hari</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="company-card text-center p-4">
+                        <div class="company-logo mb-3">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" 
+                                 alt="MediCare Plus" 
+                                 class="company-logo-img">
+                        </div>
+                        <h5 class="fw-bold mb-2">MediCare Plus</h5>
+                        <p class="text-muted small mb-0">Healthcare Provider</p>
+                        <p class="text-muted small">8.000+ pesan/hari</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="company-card text-center p-4">
+                        <div class="company-logo mb-3">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" 
+                                 alt="EduTech Solutions" 
+                                 class="company-logo-img">
+                        </div>
+                        <h5 class="fw-bold mb-2">EduTech Solutions</h5>
+                        <p class="text-muted small mb-0">Education Platform</p>
+                        <p class="text-muted small">15.000+ pesan/hari</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="company-card text-center p-4">
+                        <div class="company-logo mb-3">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" 
+                                 alt="FoodDelivery Pro" 
+                                 class="company-logo-img">
+                        </div>
+                        <h5 class="fw-bold mb-2">FoodDelivery Pro</h5>
+                        <p class="text-muted small mb-0">Food Delivery</p>
+                        <p class="text-muted small">20.000+ pesan/hari</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="company-card text-center p-4">
+                        <div class="company-logo mb-3">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" 
+                                 alt="RideShare Indonesia" 
+                                 class="company-logo-img">
+                        </div>
+                        <h5 class="fw-bold mb-2">RideShare Indonesia</h5>
+                        <p class="text-muted small mb-0">Transportation</p>
+                        <p class="text-muted small">25.000+ pesan/hari</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="company-card text-center p-4">
+                        <div class="company-logo mb-3">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" 
+                                 alt="FinTech Global" 
+                                 class="company-logo-img">
+                        </div>
+                        <h5 class="fw-bold mb-2">FinTech Global</h5>
+                        <p class="text-muted small mb-0">Financial Services</p>
+                        <p class="text-muted small">12.000+ pesan/hari</p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="stats-container p-4 bg-light rounded-3 d-inline-block">
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <div class="display-4 fw-bold text-success mb-2">500+</div>
+                                <p class="text-muted mb-0">Perusahaan Aktif</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <div class="display-4 fw-bold text-success mb-2">10M+</div>
+                                <p class="text-muted mb-0">Pesan Terkirim</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <div class="display-4 fw-bold text-success mb-2">99.9%</div>
+                                <p class="text-muted mb-0">Uptime SLA</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Cara Kerja</h2>
+                <p class="section-subtitle">Mulai dalam 3 langkah sederhana</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4 text-center">
+                    <div class="step-number">1</div>
+                    <h4 class="fw-bold mb-3">Buat Akun</h4>
+                    <p class="text-muted">Daftar gratis dan dapatkan akses instan ke dashboard Anda.</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="step-number">2</div>
+                    <h4 class="fw-bold mb-3">Dapatkan API Key</h4>
+                    <p class="text-muted">Generate API key Anda dan hubungkan session WhatsApp.</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="step-number">3</div>
+                    <h4 class="fw-bold mb-3">Mulai Membangun</h4>
+                    <p class="text-muted">Integrasikan API kami ke aplikasi Anda dan mulai kirim pesan.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="section bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Harga Sederhana & Transparan</h2>
+                <p class="section-subtitle">Pilih paket yang sesuai dengan kebutuhan Anda</p>
+            </div>
+            <div class="row g-4 justify-content-center" id="pricing-container">
+                <!-- Paket Gratis -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card pricing-card h-100">
+                        <div class="card-body p-4">
+                            <h3 class="mb-2 fw-bold">Gratis</h3>
+                            <div class="mb-3">
+                                <span class="display-4 fw-bold">Rp 0</span>
+                            </div>
+                            <p class="text-muted mb-4">Paket gratis untuk memulai</p>
+                            <ul class="list-unstyled mb-4">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    1 Session
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    100 pesan teks/bulan
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-times text-danger me-2"></i>
+                                    Tidak bisa kirim gambar
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-times text-danger me-2"></i>
+                                    Tidak bisa kirim dokumen
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-times text-danger me-2"></i>
+                                    Tidak bisa kirim video
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-info-circle text-warning me-2"></i>
+                                    Ada watermark
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Basic support
+                                </li>
+                            </ul>
+                            <a href="/register" class="btn btn-primary w-100">Mulai Sekarang</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Paket Standar -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card pricing-card h-100 featured">
+                        <div class="card-body p-4">
+                            <h3 class="mb-2 fw-bold">Standar</h3>
+                            <div class="mb-3">
+                                <span class="display-4 fw-bold">Rp50.000</span>
+                                <span class="text-muted">/bulan</span>
+                            </div>
+                            <p class="text-muted mb-4">Untuk bisnis kecil</p>
+                            <ul class="list-unstyled mb-4">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    3 Sessions
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    1.000 pesan/bulan
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-times text-danger me-2"></i>
+                                    Tidak bisa kirim gambar
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-times text-danger me-2"></i>
+                                    Tidak bisa kirim dokumen
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-times text-danger me-2"></i>
+                                    Tidak bisa kirim video
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Tidak ada watermark
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Email support
+                                </li>
+                            </ul>
+                            <a href="/register" class="btn btn-primary w-100">Mulai Sekarang</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Paket Professional -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card pricing-card h-100">
+                        <div class="card-body p-4">
+                            <h3 class="mb-2 fw-bold">Professional</h3>
+                            <div class="mb-3">
+                                <span class="display-4 fw-bold">Rp160.000</span>
+                                <span class="text-muted">/bulan</span>
+                            </div>
+                            <p class="text-muted mb-4">Untuk bisnis menengah</p>
+                            <ul class="list-unstyled mb-4">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    10 Sessions
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    10.000 pesan/bulan
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Bisa kirim gambar
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Bisa kirim video
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Bisa kirim dokumen
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Priority support
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Advanced analytics
+                                </li>
+                            </ul>
+                            <a href="/register" class="btn btn-primary w-100">Mulai Sekarang</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Paket Ultra -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card pricing-card h-100">
+                        <div class="card-body p-4">
+                            <h3 class="mb-2 fw-bold">Ultra</h3>
+                            <div class="mb-3">
+                                <span class="display-4 fw-bold">Rp250.000</span>
+                                <span class="text-muted">/bulan</span>
+                            </div>
+                            <p class="text-muted mb-4">Untuk bisnis besar</p>
+                            <ul class="list-unstyled mb-4">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Unlimited Sessions
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Pesan unlimited
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    24/7 Dedicated support
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Custom integrations
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    SLA 99.9% uptime
+                                </li>
+                            </ul>
+                            <a href="/register" class="btn btn-primary w-100">Mulai Sekarang</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="section bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Galeri Fitur</h2>
+                <p class="section-subtitle">Lihat berbagai jenis pesan yang dapat Anda kirim melalui API kami</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="gallery-card">
+                        <div class="gallery-image-wrapper">
+                            <img src="https://waha.devlike.pro/docs/how-to/send-messages/whatsapp-list-message-phone.webp" 
+                                 alt="WhatsApp List Message" 
+                                 class="gallery-image"
+                                 loading="lazy">
+                        </div>
+                        <div class="gallery-caption">
+                            <h5 class="fw-bold mb-2">List Message</h5>
+                            <p class="text-muted mb-0">Kirim pesan dengan format list interaktif untuk pengalaman pengguna yang lebih baik</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="gallery-card">
+                        <div class="gallery-image-wrapper">
+                            <img src="https://waha.devlike.pro/docs/how-to/send-messages/messages_hu_faa60729236c6257.webp" 
+                                 alt="WhatsApp Messages" 
+                                 class="gallery-image"
+                                 loading="lazy">
+                        </div>
+                        <div class="gallery-caption">
+                            <h5 class="fw-bold mb-2">Berbagai Jenis Pesan</h5>
+                            <p class="text-muted mb-0">Dukung berbagai format pesan: text, gambar, video, dokumen, dan lainnya</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="gallery-card">
+                        <div class="gallery-image-wrapper">
+                            <img src="https://waha.devlike.pro/docs/how-to/polls/poll-example_hu_92f52ad82ce574f2.webp" 
+                                 alt="WhatsApp Poll" 
+                                 class="gallery-image"
+                                 loading="lazy">
+                        </div>
+                        <div class="gallery-caption">
+                            <h5 class="fw-bold mb-2">Poll Message</h5>
+                            <p class="text-muted mb-0">Buat polling interaktif untuk mengumpulkan feedback dan pendapat dari pengguna</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" class="section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Demo & Dokumentasi</h2>
+                <p class="section-subtitle">Lihat bagaimana API kami bekerja dan pelajari cara menggunakannya</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card demo-card h-100 p-4 text-center">
+                        <i class="fas fa-play-circle mb-3" style="font-size: 3rem;"></i>
+                        <h4 class="fw-bold mb-3">Demo Interaktif</h4>
+                        <p class="text-muted mb-4">Coba fitur-fitur API kami secara langsung dengan demo interaktif.</p>
+                        <a href="/register" class="btn btn-outline-success mt-auto">Daftar untuk Demo</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card demo-card h-100 p-4 text-center">
+                        <i class="fas fa-book mb-3" style="font-size: 3rem;"></i>
+                        <h4 class="fw-bold mb-3">Referensi API</h4>
+                        <p class="text-muted mb-4">Dokumentasi API lengkap dengan semua endpoint, parameter, dan format response.</p>
+                        <a href="/register" class="btn btn-outline-success mt-auto">Mulai Sekarang</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card demo-card h-100 p-4 text-center">
+                        <i class="fas fa-code mb-3" style="font-size: 3rem;"></i>
+                        <h4 class="fw-bold mb-3">Contoh Kode</h4>
+                        <p class="text-muted mb-4">Contoh kode siap pakai dalam PHP, JavaScript, Python, dan lainnya.</p>
+                        <a href="/register" class="btn btn-outline-success mt-auto">Mulai Sekarang</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonial Section -->
+    <section class="testimonial-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Apa Kata Developer?</h2>
+                <p class="section-subtitle">Dengarkan pengalaman developer yang menggunakan API kami</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="testimonial-card php">
+                        <div class="testimonial-quote">
+                            "Integrasi sangat mudah dengan Laravel. Dokumentasi jelas dan API responsif. Setup hanya butuh 5 menit!"
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">AB</div>
+                            <div class="testimonial-info">
+                                <h5>Andi Budiman</h5>
+                                <p>Full Stack Developer</p>
+                                <span class="testimonial-stack">PHP / Laravel</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="testimonial-card javascript">
+                        <div class="testimonial-quote">
+                            "Perfect untuk project React kami! Webhook real-time sangat membantu. Performa API sangat stabil."
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">SD</div>
+                            <div class="testimonial-info">
+                                <h5>Sari Dewi</h5>
+                                <p>Frontend Developer</p>
+                                <span class="testimonial-stack">JavaScript / React</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="testimonial-card python">
+                        <div class="testimonial-quote">
+                            "Menggunakan Django, integrasi sangat smooth. Rate limiting yang jelas dan error handling yang baik."
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">RP</div>
+                            <div class="testimonial-info">
+                                <h5>Rizki Pratama</h5>
+                                <p>Backend Engineer</p>
+                                <span class="testimonial-stack">Python / Django</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="testimonial-card nodejs">
+                        <div class="testimonial-quote">
+                            "Node.js integration sangat cepat! Async/await support sempurna. Webhook handling sangat mudah."
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">MA</div>
+                            <div class="testimonial-info">
+                                <h5>Maya Astuti</h5>
+                                <p>Full Stack Developer</p>
+                                <span class="testimonial-stack">Node.js / Express</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="testimonial-card java">
+                        <div class="testimonial-quote">
+                            "Spring Boot integration sangat baik. RESTful API design yang clean dan dokumentasi lengkap."
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">BS</div>
+                            <div class="testimonial-info">
+                                <h5>Budi Santoso</h5>
+                                <p>Senior Developer</p>
+                                <span class="testimonial-stack">Java / Spring Boot</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="testimonial-card php">
+                        <div class="testimonial-quote">
+                            "Menggunakan CodeIgniter, API sangat mudah diimplementasikan. Response time sangat cepat!"
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">LS</div>
+                            <div class="testimonial-info">
+                                <h5>Lisa Sari</h5>
+                                <p>Web Developer</p>
+                                <span class="testimonial-stack">PHP / CodeIgniter</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container text-center">
+            <h2 class="display-5 fw-bold mb-4">Siap untuk Memulai?</h2>
+            <p class="lead mb-5" style="opacity: 0.95;">Bergabunglah dengan ribuan developer yang membangun aplikasi luar biasa dengan WhatsApp</p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="/register" class="btn btn-light btn-lg">
+                    <i class="fas fa-rocket me-2"></i>Mulai Trial Gratis
+                </a>
+                <a href="#demo" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-play-circle me-2"></i>Coba Demo
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5 class="mb-3">
+                        <i class="fab fa-whatsapp text-success me-2"></i>
+                        WAHA Gateway
+                    </h5>
+                    <p class="text-muted mb-4">Platform WhatsApp Gateway API yang powerful untuk developer. Bangun aplikasi luar biasa dengan integrasi WhatsApp.</p>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Produk</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#features">Fitur</a></li>
+                        <li class="mb-2"><a href="#pricing">Harga</a></li>
+                        <li class="mb-2"><a href="#demo">Demo</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Perusahaan</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#">Tentang</a></li>
+                        <li class="mb-2"><a href="#">Blog</a></li>
+                        <li class="mb-2"><a href="#">Kontak</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Legal</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#">Privasi</a></li>
+                        <li class="mb-2"><a href="#">Syarat</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Terhubung</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#"><i class="fab fa-twitter me-2"></i>Twitter</a></li>
+                        <li class="mb-2"><a href="#"><i class="fab fa-github me-2"></i>GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-secondary">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="text-muted mb-0">&copy; 2025 WAHA Gateway. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Smooth Scroll -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offsetTop = target.offsetTop - 80;
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

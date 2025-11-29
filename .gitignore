@@ -1,0 +1,99 @@
+# Vendor directories (Composer)
+/vendor/
+frontend/vendor/
+**/vendor/
+
+# Node modules
+/node_modules/
+frontend/node_modules/
+**/node_modules/
+
+# Environment files
+.env
+.env.*
+!.env.example
+frontend/.env
+frontend/.env.*
+
+# Laravel specific (frontend)
+frontend/.phpunit.cache
+frontend/.phpunit.result.cache
+frontend/bootstrap/cache/*
+!frontend/bootstrap/cache/.gitignore
+frontend/storage/*.key
+frontend/storage/pail
+frontend/storage/logs/*.log
+frontend/storage/framework/cache/*
+!frontend/storage/framework/cache/.gitignore
+frontend/storage/framework/sessions/*
+!frontend/storage/framework/sessions/.gitignore
+frontend/storage/framework/testing/*
+!frontend/storage/framework/testing/.gitignore
+frontend/storage/framework/views/*
+!frontend/storage/framework/views/.gitignore
+frontend/public/hot
+frontend/public/storage
+frontend/public/build
+
+# Build assets
+frontend/public/build
+frontend/public/mix-manifest.json
+
+# IDE & Editors
+/.idea
+/.vscode
+/.fleet
+/.nova
+/.phpactor.json
+/.zed
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+*.log
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Docker
+docker-compose.override.yml
+.docker/
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+frontend/database/*.sqlite
+frontend/database/*.sqlite3
+
+# Testing
+/.phpunit.result.cache
+/phpunit.xml.bak
+/coverage
+frontend/.phpunit.result.cache
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# Cache
+.cache/
+*.cache
+

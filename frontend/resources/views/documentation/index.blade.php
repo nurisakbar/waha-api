@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dokumentasi - WAHA Gateway</title>
+    <meta name="description" content="Dokumentasi lengkap untuk WAHA Gateway API. Pelajari cara mengintegrasikan WhatsApp ke aplikasi Anda.">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #10b981;
+            --primary-dark: #059669;
+            --primary-darker: #047857;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --bg-light: #f9fafb;
+            --border-color: #e5e7eb;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.98) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark) !important;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-dark) !important;
+            margin: 0 0.5rem;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 140px 0 80px;
+            margin-top: 76px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .hero-section .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Code Block */
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 2rem;
+            border-radius: 12px;
+            font-family: 'Courier New', 'Monaco', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            border: 1px solid #333;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 1.5rem 0;
+        }
+        
+        .code-block .keyword { color: #569cd6; }
+        .code-block .string { color: #ce9178; }
+        .code-block .number { color: #b5cea8; }
+        .code-block .comment { color: #6a9955; }
+        
+        /* Sections */
+        .section {
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+        }
+        
+        .docs-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .docs-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
+        }
+        
+        .docs-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .docs-card h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .endpoint-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-right: 0.75rem;
+        }
+        
+        .badge-get { background: #10b981; color: white; }
+        .badge-post { background: #3b82f6; color: white; }
+        .badge-put { background: #f59e0b; color: white; }
+        .badge-delete { background: #ef4444; color: white; }
+        
+        .endpoint-url {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+        
+        /* Buttons */
+        .btn {
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            color: white;
+        }
+        
+        .btn-outline-light {
+            border: 2px solid white;
+            color: white;
+            background: transparent;
+        }
+        
+        .btn-outline-light:hover {
+            background: white;
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        footer h5, footer h6 {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        
+        footer a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-size: 0.95rem;
+        }
+        
+        footer a:hover {
+            color: var(--primary-color);
+        }
+        
+        footer .text-muted {
+            color: #6b7280 !important;
+        }
+        
+        footer hr {
+            border-color: #374151;
+            margin: 2rem 0;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 100px 0 60px;
+                margin-top: 56px;
+            }
+            
+            .section {
+                padding: 60px 0;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-4" href="/">
+                <i class="fab fa-whatsapp text-success me-2"></i>
+                WAHA Gateway
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#features">Fitur</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#pricing">Harga</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#gallery">Galeri</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/docs">Dokumentasi</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-primary text-white" href="/register">Daftar Akun</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="text-center">
+                <h1 class="display-4 fw-bold mb-4">Dokumentasi API</h1>
+                <p class="lead mb-4">Panduan lengkap untuk mengintegrasikan WhatsApp ke aplikasi Anda</p>
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a href="/register" class="btn btn-light btn-lg">
+                        <i class="fas fa-rocket me-2"></i>Mulai Gratis
+                    </a>
+                    <a href="/#demo" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-play-circle me-2"></i>Coba Demo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Documentation Content -->
+    <section class="section">
+        <div class="container">
+            <!-- Overview -->
+            <div class="docs-card">
+                <h2 class="section-title mb-4">Overview</h2>
+                <p>
+                    WAHA Gateway menyediakan RESTful API yang powerful untuk mengintegrasikan WhatsApp ke dalam aplikasi Anda. 
+                    API ini dirancang khusus untuk developer dengan dokumentasi lengkap dan contoh kode yang mudah dipahami.
+                </p>
+                <div class="alert alert-info mt-4">
+                    <h5 class="mb-2"><i class="fas fa-info-circle me-2"></i>Base URL</h5>
+                    <p class="mb-0">
+                        <code>{{ $baseUrl }}/api/v1</code>
+                    </p>
+                </div>
+                <h3 class="mt-4">Fitur Utama</h3>
+                <ul class="mt-3">
+                    <li>RESTful API yang mudah digunakan</li>
+                    <li>Dukungan berbagai jenis pesan (text, image, video, document, poll, button, list)</li>
+                    <li>Webhook real-time untuk pesan masuk</li>
+                    <li>Multi-session management</li>
+                    <li>Rate limiting untuk keamanan</li>
+                    <li>Dokumentasi lengkap dengan contoh kode</li>
+                </ul>
+            </div>
+
+            <!-- Authentication -->
+            <div class="docs-card">
+                <h2 class="section-title mb-4">Autentikasi</h2>
+                <p>
+                    Semua request ke API memerlukan API Key yang dapat Anda buat di dashboard setelah mendaftar.
+                </p>
+                <h3>Cara Menggunakan API Key</h3>
+                <p>Kirim API Key di header HTTP dengan format berikut:</p>
+                <div class="code-block">
+                    <code>X-Api-Key: waha_your_api_key_here</code>
+                </div>
+                <div class="alert alert-warning mt-3">
+                    <strong>Penting:</strong> Jangan pernah membagikan API Key Anda kepada pihak lain. 
+                    Simpan API Key dengan aman dan jangan commit ke repository publik.
+                </div>
+            </div>
+
+            <!-- Endpoints -->
+            <div class="docs-card">
+                <h2 class="section-title mb-4">Endpoints</h2>
+                <p>Berikut adalah daftar endpoint utama yang tersedia:</p>
+                
+                <div class="mt-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-get">GET</span>
+                        <span class="endpoint-url">/sessions</span>
+                    </div>
+                    <p class="text-muted">Mendapatkan daftar semua session WhatsApp yang terhubung.</p>
+                </div>
+
+                <div class="mt-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-post">POST</span>
+                        <span class="endpoint-url">/messages</span>
+                    </div>
+                    <p class="text-muted">Mengirim pesan WhatsApp. Mendukung berbagai jenis pesan.</p>
+                </div>
+
+                <div class="mt-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-get">GET</span>
+                        <span class="endpoint-url">/messages</span>
+                    </div>
+                    <p class="text-muted">Mendapatkan daftar pesan yang telah dikirim atau diterima.</p>
+                </div>
+
+                <div class="mt-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-post">POST</span>
+                        <span class="endpoint-url">/sessions/{session}/messages/sync</span>
+                    </div>
+                    <p class="text-muted">Sinkronisasi pesan masuk dari WAHA ke database.</p>
+                </div>
+            </div>
+
+            <!-- Sending Messages -->
+            <div class="docs-card">
+                <h2 class="section-title mb-4">Mengirim Pesan</h2>
+                <p>Untuk mengirim pesan, gunakan endpoint <code>POST /api/v1/messages</code> dengan format berikut:</p>
+                
+                <h3>Format Request</h3>
+                <div class="code-block">
+<code>{
+  <span class="string">"session_id"</span>: <span class="string">"session_xxx"</span>,
+  <span class="string">"to"</span>: <span class="string">"6281234567890"</span>,
+  <span class="string">"message_type"</span>: <span class="string">"text"</span>,
+  <span class="string">"text"</span>: <span class="string">"Halo, ini pesan dari API!"</span>
+}</code>
+                </div>
+
+                <h3>Format Response</h3>
+                <div class="code-block">
+<code>{
+  <span class="string">"success"</span>: <span class="keyword">true</span>,
+  <span class="string">"data"</span>: {
+    <span class="string">"message_id"</span>: <span class="string">"uuid"</span>,
+    <span class="string">"whatsapp_message_id"</span>: <span class="string">"3EB0..."</span>,
+    <span class="string">"status"</span>: <span class="string">"sent"</span>,
+    <span class="string">"to"</span>: <span class="string">"6281234567890"</span>
+  }
+}</code>
+                </div>
+            </div>
+
+            <!-- Message Types -->
+            <div class="docs-card">
+                <h2 class="section-title mb-4">Jenis Pesan yang Didukung</h2>
+                <p>WAHA Gateway mendukung berbagai jenis pesan WhatsApp:</p>
+                
+                <h3>1. Text Message</h3>
+                <p>Pesan teks biasa.</p>
+                <div class="code-block">
+<code>{
+  <span class="string">"message_type"</span>: <span class="string">"text"</span>,
+  <span class="string">"text"</span>: <span class="string">"Pesan teks"</span>
+}</code>
+                </div>
+
+                <h3>2. Image Message</h3>
+                <p>Mengirim gambar dengan URL.</p>
+                <div class="code-block">
+<code>{
+  <span class="string">"message_type"</span>: <span class="string">"image"</span>,
+  <span class="string">"image"</span>: <span class="string">"https://example.com/image.jpg"</span>,
+  <span class="string">"caption"</span>: <span class="string">"Caption gambar"</span>
+}</code>
+                </div>
+
+                <h3>3. Video Message</h3>
+                <p>Mengirim video dengan URL.</p>
+                <div class="code-block">
+<code>{
+  <span class="string">"message_type"</span>: <span class="string">"video"</span>,
+  <span class="string">"video"</span>: <span class="string">"https://example.com/video.mp4"</span>,
+  <span class="string">"caption"</span>: <span class="string">"Caption video"</span>
+}</code>
+                </div>
+
+                <h3>4. Document Message</h3>
+                <p>Mengirim dokumen (PDF, DOC, dll).</p>
+                <div class="code-block">
+<code>{
+  <span class="string">"message_type"</span>: <span class="string">"document"</span>,
+  <span class="string">"document"</span>: <span class="string">"https://example.com/file.pdf"</span>
+}</code>
+                </div>
+
+                <h3>5. Poll Message</h3>
+                <p>Mengirim polling interaktif.</p>
+                <div class="code-block">
+<code>{
+  <span class="string">"message_type"</span>: <span class="string">"poll"</span>,
+  <span class="string">"poll_name"</span>: <span class="string">"Pertanyaan?"</span>,
+  <span class="string">"poll_options"</span>: [<span class="string">"Opsi 1"</span>, <span class="string">"Opsi 2"</span>]
+}</code>
+                </div>
+
+                <h3>6. List Message</h3>
+                <p>Mengirim pesan dengan format list interaktif.</p>
+                <div class="code-block">
+<code>{
+  <span class="string">"message_type"</span>: <span class="string">"list"</span>,
+  <span class="string">"message"</span>: {
+    <span class="string">"title"</span>: <span class="string">"Judul"</span>,
+    <span class="string">"description"</span>: <span class="string">"Deskripsi"</span>,
+    <span class="string">"button"</span>: <span class="string">"Pilih"</span>,
+    <span class="string">"sections"</span>: [...]
+  }
+}</code>
+                </div>
+            </div>
+
+            <!-- Examples -->
+            <div class="docs-card">
+                <h2 class="section-title mb-4">Contoh Kode</h2>
+                
+                <h3>PHP (cURL)</h3>
+                <div class="code-block">
+<code><span class="comment">// Kirim pesan text</span>
+<span class="keyword">$ch</span> = <span class="keyword">curl_init</span>(<span class="string">'{{ $baseUrl }}/api/v1/messages'</span>);
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+    <span class="string">'X-Api-Key: waha_your_key'</span>,
+    <span class="string">'Content-Type: application/json'</span>
+]);
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="keyword">json_encode</span>([
+    <span class="string">'session_id'</span> => <span class="string">'session_xxx'</span>,
+    <span class="string">'to'</span> => <span class="string">'6281234567890'</span>,
+    <span class="string">'message_type'</span> => <span class="string">'text'</span>,
+    <span class="string">'text'</span> => <span class="string">'Halo dari API!'</span>
+]));
+<span class="keyword">$response</span> = <span class="keyword">curl_exec</span>(<span class="keyword">$ch</span>);
+<span class="keyword">curl_close</span>(<span class="keyword">$ch</span>);</code>
+                </div>
+
+                <h3>JavaScript (Fetch)</h3>
+                <div class="code-block">
+<code><span class="comment">// Kirim pesan text</span>
+<span class="keyword">fetch</span>(<span class="string">'{{ $baseUrl }}/api/v1/messages'</span>, {
+    <span class="keyword">method</span>: <span class="string">'POST'</span>,
+    <span class="keyword">headers</span>: {
+        <span class="string">'X-Api-Key'</span>: <span class="string">'waha_your_key'</span>,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    },
+    <span class="keyword">body</span>: <span class="keyword">JSON.stringify</span>({
+        <span class="string">session_id</span>: <span class="string">'session_xxx'</span>,
+        <span class="string">to</span>: <span class="string">'6281234567890'</span>,
+        <span class="string">message_type</span>: <span class="string">'text'</span>,
+        <span class="string">text</span>: <span class="string">'Halo dari API!'</span>
+    })
+})
+.<span class="keyword">then</span>(<span class="keyword">response</span> => <span class="keyword">response.json</span>())
+.<span class="keyword">then</span>(<span class="keyword">data</span> => <span class="keyword">console.log</span>(<span class="keyword">data</span>));</code>
+                </div>
+
+                <h3>Python (Requests)</h3>
+                <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="comment"># Kirim pesan text</span>
+<span class="keyword">url</span> = <span class="string">'{{ $baseUrl }}/api/v1/messages'</span>
+<span class="keyword">headers</span> = {
+    <span class="string">'X-Api-Key'</span>: <span class="string">'waha_your_key'</span>,
+    <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+}
+<span class="keyword">data</span> = {
+    <span class="string">'session_id'</span>: <span class="string">'session_xxx'</span>,
+    <span class="string">'to'</span>: <span class="string">'6281234567890'</span>,
+    <span class="string">'message_type'</span>: <span class="string">'text'</span>,
+    <span class="string">'text'</span>: <span class="string">'Halo dari API!'</span>
+}
+<span class="keyword">response</span> = <span class="keyword">requests.post</span>(<span class="keyword">url</span>, <span class="keyword">json</span>=<span class="keyword">data</span>, <span class="keyword">headers</span>=<span class="keyword">headers</span>)
+<span class="keyword">print</span>(<span class="keyword">response.json</span>())</code>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="alert alert-success mt-5">
+                <h5 class="mb-2"><i class="fas fa-rocket me-2"></i>Siap untuk Memulai?</h5>
+                <p class="mb-3">Daftar sekarang dan dapatkan akses ke API lengkap dengan paket gratis!</p>
+                <a href="/register" class="btn btn-primary">Daftar Sekarang</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5 class="mb-3">
+                        <i class="fab fa-whatsapp text-success me-2"></i>
+                        WAHA Gateway
+                    </h5>
+                    <p class="text-muted mb-4">Platform WhatsApp Gateway API yang powerful untuk developer. Bangun aplikasi luar biasa dengan integrasi WhatsApp.</p>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Produk</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/#features">Fitur</a></li>
+                        <li class="mb-2"><a href="/#pricing">Harga</a></li>
+                        <li class="mb-2"><a href="/#gallery">Galeri</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Perusahaan</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#">Tentang</a></li>
+                        <li class="mb-2"><a href="#">Blog</a></li>
+                        <li class="mb-2"><a href="#">Kontak</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Legal</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#">Privasi</a></li>
+                        <li class="mb-2"><a href="#">Syarat</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="mb-3">Terhubung</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#"><i class="fab fa-twitter me-2"></i>Twitter</a></li>
+                        <li class="mb-2"><a href="#"><i class="fab fa-github me-2"></i>GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-secondary">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="text-muted mb-0">&copy; 2025 WAHA Gateway. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
