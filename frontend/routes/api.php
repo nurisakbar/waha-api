@@ -61,6 +61,11 @@ Route::middleware(['api.key'])->prefix('v1')->group(function () {
     Route::patch('/templates/{template}', [App\Http\Controllers\Api\TemplateApiController::class, 'update']);
     Route::delete('/templates/{template}', [App\Http\Controllers\Api\TemplateApiController::class, 'destroy']);
     Route::post('/templates/{template}/preview', [App\Http\Controllers\Api\TemplateApiController::class, 'preview']);
+    
+    // OTP
+    Route::post('/messages/otp', [App\Http\Controllers\Api\OtpApiController::class, 'send']);
+    Route::post('/messages/verify-otp', [App\Http\Controllers\Api\OtpApiController::class, 'verify']);
+    Route::get('/messages/otp/{otp}/status', [App\Http\Controllers\Api\OtpApiController::class, 'status']);
 });
 
 

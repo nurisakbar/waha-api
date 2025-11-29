@@ -686,13 +686,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
+                        <a class="nav-link" href="index.html">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#features">Fitur</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#pricing">Harga</a>
+                        <a class="nav-link" href="#pay-as-you-go">Biaya Langganan</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#gallery">Galeri</a>
@@ -732,10 +732,6 @@
                             <i class="fas fa-play-circle me-2"></i>Coba Demo
                         </a>
                     </div>
-                    <div>
-                        <p class="mb-2"><small><i class="fas fa-check-circle me-2"></i>Tidak perlu kartu kredit</small></p>
-                        <p class="mb-0"><small><i class="fas fa-check-circle me-2"></i>Paket gratis tersedia</small></p>
-                    </div>
                 </div>
                 <div class="col-lg-6 text-center mt-5 mt-lg-0">
                     <div class="code-block text-start">
@@ -744,11 +740,15 @@
                         </div>
                         <div>
                             <span class="keyword">curl</span> -X POST <span class="string">https://api.wahagateway.com/v1/sessions/{id}/messages/text</span><br>
-                            &nbsp;&nbsp;-H <span class="string">"X-Api-Key: waha_your_key"</span><br>
+                            &nbsp;&nbsp;-H <span class="string">"X-Api-Key: API_KEY_ANDA"</span><br>
                             &nbsp;&nbsp;-H <span class="string">"Content-Type: application/json"</span><br>
                             &nbsp;&nbsp;-d <span class="string">'{</span><br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"to": "6281234567890",</span><br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"message": "Halo dari API!"</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"to": "62812345xxxxx",</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"device_id": "device_id_anda",</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"message_type": "document",</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"document": "https://example.com/document.pdf",</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"filename": "document.pdf",</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"caption": "Dokumen contoh"</span><br>
                             &nbsp;&nbsp;<span class="string">}'</span>
                         </div>
                     </div>
@@ -765,6 +765,7 @@
                 <p class="section-subtitle">Semua yang Anda butuhkan untuk mengintegrasikan WhatsApp ke aplikasi Anda</p>
             </div>
             <div class="row g-4">
+                <!-- 1. API Ramah Developer -->
                 <div class="col-md-4">
                     <div class="card feature-card h-100 p-4">
                         <div class="feature-icon">
@@ -776,17 +777,19 @@
                         </p>
                     </div>
                 </div>
+                <!-- 2. Berbagai Jenis Pesan -->
                 <div class="col-md-4">
                     <div class="card feature-card h-100 p-4">
                         <div class="feature-icon">
-                            <i class="fas fa-layer-group"></i>
+                            <i class="fas fa-paper-plane"></i>
                         </div>
-                        <h4 class="mb-3 fw-bold">Multi Session</h4>
+                        <h4 class="mb-3 fw-bold">Mendukung Berbagai Jenis Pesan</h4>
                         <p class="text-muted">
-                            Kelola beberapa session WhatsApp secara bersamaan. Sempurna untuk bisnis dengan banyak akun atau departemen.
+                            Kirim berbagai jenis pesan: <strong>Text</strong>, <strong>Gambar</strong>, <strong>Video</strong>, dan <strong>Dokumen</strong>. Dukungan lengkap untuk semua format media dengan caption dan metadata.
                         </p>
                     </div>
                 </div>
+                <!-- 3. Webhook Real-Time -->
                 <div class="col-md-4">
                     <div class="card feature-card h-100 p-4">
                         <div class="feature-icon">
@@ -798,39 +801,7 @@
                         </p>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card feature-card h-100 p-4">
-                        <div class="feature-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h4 class="mb-3 fw-bold">Aman & Terpercaya</h4>
-                        <p class="text-muted">
-                            Autentikasi API key, rate limiting, dan SLA uptime 99.9%. Data Anda aman dan API selalu tersedia.
-                        </p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card feature-card h-100 p-4">
-                        <div class="feature-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <h4 class="mb-3 fw-bold">Analitik & Monitoring</h4>
-                        <p class="text-muted">
-                            Lacak penggunaan API, tingkat pengiriman pesan, dan metrik performa. Buat keputusan berbasis data.
-                        </p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card feature-card h-100 p-4">
-                        <div class="feature-icon">
-                            <i class="fas fa-rocket"></i>
-                        </div>
-                        <h4 class="mb-3 fw-bold">Integrasi Mudah</h4>
-                        <p class="text-muted">
-                            Mulai dalam hitungan menit. Autentikasi sederhana, dokumentasi jelas, dan contoh kode untuk integrasi cepat. Kirim pesan text, gambar, video, dan dokumen dengan mudah.
-                        </p>
-                    </div>
-                </div>
+                <!-- 4. Template Management -->
                 <div class="col-md-4">
                     <div class="card feature-card h-100 p-4">
                         <div class="feature-icon">
@@ -842,6 +813,45 @@
                         </p>
                     </div>
                 </div>
+                <!-- 5. OTP Management -->
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <h4 class="mb-3 fw-bold">OTP Management</h4>
+                        <p class="text-muted">
+                            Sistem One Time Password (OTP) terintegrasi dengan template. Generate, kirim, dan verifikasi kode OTP dengan mudah.
+                        </p>
+                    </div>
+                </div>
+                <!-- 6. Analitik & Monitoring -->
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4 class="mb-3 fw-bold">Analitik & Monitoring</h4>
+                        <p class="text-muted">
+                            Lacak penggunaan API, tingkat pengiriman pesan, dan metrik performa. Buat keputusan berbasis data.
+                        </p>
+                    </div>
+                </div>
+                <!-- 7. Multi Device -->
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <h4 class="mb-3 fw-bold">Multi Device</h4>
+                        <p class="text-muted">
+                            Kelola beberapa device WhatsApp secara bersamaan. Sempurna untuk bisnis dengan banyak akun atau departemen.
+                        </p>
+                    </div>
+                </div>
+                <!-- 8. Aman & Terpercaya -->
+
+                <!-- 10. Personal & Group Chat -->
                 <div class="col-md-4">
                     <div class="card feature-card h-100 p-4">
                         <div class="feature-icon">
@@ -853,15 +863,95 @@
                         </p>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card feature-card h-100 p-4">
-                        <div class="feature-icon">
-                            <i class="fas fa-paper-plane"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pay as You Go Section -->
+    <section id="pay-as-you-go" class="section bg-white">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Biaya Langganan</h2>
+                <p class="section-subtitle">Top up quota pesan sesuai kebutuhan Anda. Tidak ada komitmen bulanan, bayar hanya untuk yang Anda gunakan.</p>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body p-5">
+                            <div class="row align-items-center">
+                                <div class="col-md-6 text-center mb-4 mb-md-0">
+                                    <div class="display-1 text-primary mb-3">
+                                        <i class="fas fa-wallet"></i>
+                                    </div>
+                                    <h3 class="fw-bold mb-3">Top Up Quota Pesan</h3>
+                                    <p class="text-muted">
+                                        Beli quota pesan kapan saja sesuai kebutuhan. Quota tidak akan kadaluarsa dan dapat digunakan kapan saja.
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="pricing-detail">
+                                        <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded">
+                                            <div>
+                                                <h5 class="fw-bold mb-1">Pesan Text</h5>
+                                                <p class="text-muted mb-0 small">Pesan teks</p>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="display-6 fw-bold text-primary">Rp 45</span>
+                                                <span class="text-muted">/pesan</span>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded">
+                                            <div>
+                                                <h5 class="fw-bold mb-1">Pesan Multimedia</h5>
+                                                <p class="text-muted mb-0 small">Gambar, Video, Dokumen</p>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="display-6 fw-bold text-primary">Rp 85</span>
+                                                <span class="text-muted">/pesan</span>
+                                            </div>
+                                        </div>
+                                        <div class="alert alert-success mb-0">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-gift fa-2x me-3 text-success"></i>
+                                                <div>
+                                                    <h6 class="fw-bold mb-1">Bonus Bulanan</h6>
+                                                    <p class="mb-0">Setiap bulan Anda akan mendapatkan <strong>100 quota gratis</strong> untuk pesan text dengan watermark.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="my-4">
+                            <div class="row text-center">
+                                <div class="col-md-4 mb-3 mb-md-0">
+                                    <div class="feature-benefit">
+                                        <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
+                                        <h6 class="fw-bold">Tidak Ada Komitmen</h6>
+                                        <p class="text-muted small mb-0">Bayar hanya untuk yang Anda gunakan</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3 mb-md-0">
+                                    <div class="feature-benefit">
+                                        <i class="fas fa-infinity text-primary fa-2x mb-2"></i>
+                                        <h6 class="fw-bold">Quota Tidak Kadaluarsa</h6>
+                                        <p class="text-muted small mb-0">Quota yang dibeli dapat digunakan kapan saja</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="feature-benefit">
+                                        <i class="fas fa-credit-card text-info fa-2x mb-2"></i>
+                                        <h6 class="fw-bold">Pembayaran Mudah</h6>
+                                        <p class="text-muted small mb-0">Top up via Xendit atau transfer manual</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center mt-4">
+                                <a href="/register" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-rocket me-2"></i>Mulai Sekarang
+                                </a>
+                            </div>
                         </div>
-                        <h4 class="mb-3 fw-bold">Berbagai Jenis Pesan</h4>
-                        <p class="text-muted">
-                            Kirim berbagai jenis pesan: <strong>Text</strong>, <strong>Gambar</strong>, <strong>Video</strong>, dan <strong>Dokumen</strong>. Dukungan lengkap untuk semua format media dengan caption dan metadata.
-                        </p>
                     </div>
                 </div>
             </div>
@@ -869,7 +959,7 @@
     </section>
 
     <!-- Trusted By Section -->
-    <section class="section bg-white">
+    <section class="section bg-light">
         <div class="container">
             <div class="text-center mb-5">
                 <h2 class="section-title">Dipercaya oleh Perusahaan Terkemuka</h2>
@@ -1028,7 +1118,7 @@
     </section>
 
     <!-- Pricing Section -->
-    <section id="pricing" class="section bg-light">
+    <section id="pricing" class="section bg-light" style="display: none;">
         <div class="container">
             <div class="text-center mb-5">
                 <h2 class="section-title">Harga Sederhana & Transparan</h2>
@@ -1429,6 +1519,7 @@
                     <h6 class="mb-3">Produk</h6>
                     <ul class="list-unstyled">
                         <li class="mb-2"><a href="#features">Fitur</a></li>
+                        <li class="mb-2"><a href="#pay-as-you-go">Pay as You Go</a></li>
                         <li class="mb-2"><a href="#pricing">Harga</a></li>
                         <li class="mb-2"><a href="#demo">Demo</a></li>
                     </ul>

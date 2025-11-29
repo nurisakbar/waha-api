@@ -92,7 +92,7 @@
                             </tr>
                         @endif
                         <tr>
-                            <th>{{ __('Session') }}</th>
+                            <th>{{ __('Device') }}</th>
                             <td>{{ $message->session->session_name }}</td>
                         </tr>
                         <tr>

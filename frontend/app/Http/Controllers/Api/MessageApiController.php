@@ -6,12 +6,17 @@ use App\Helpers\PhoneNumberHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\SendMessageRequest;
 use App\Models\Message;
+use App\Models\MessagePricingSetting;
+use App\Models\QuotaUsageLog;
 use App\Models\Template;
+use App\Models\UserQuota;
 use App\Models\WhatsAppSession;
 use App\Services\ApiUsageService;
 use App\Services\TemplateService;
+use App\Services\WatermarkService;
 use App\Services\WahaService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -36,17 +41,17 @@ class MessageApiController extends Controller
         $startTime = microtime(true);
         
         // Support both formats:
-        // 1. /api/v1/messages (session_id in body)
+        // 1. /api/v1/messages (device_id in body)
         // 2. /api/v1/sessions/{session}/messages (session in URL)
         
-        // If session is provided in URL, use it; otherwise use from request body
-        $sessionId = $session ?? $request->session_id;
+        // If session is provided in URL, use it; otherwise use device_id from request body
+        $sessionId = $session ?? $request->device_id;
         
         if (!$sessionId) {
             $this->usageService->log($request, 400, $startTime);
             return response()->json([
                 'success' => false,
-                'error' => 'Session ID is required (either in URL or request body)',
+                'error' => 'Device ID is required (either in URL or request body as device_id)',
             ], 400);
         }
 
@@ -147,6 +152,17 @@ class MessageApiController extends Controller
             // Use template content if template is provided
             $messageType = $template ? $processedTemplate['message_type'] : $request->message_type;
 
+            // Get pricing settings and quota
+            $pricing = MessagePricingSetting::getActive();
+            $watermarkService = app(WatermarkService::class);
+            $userQuota = UserQuota::getOrCreateForUser($request->user->id);
+            
+            // Variables for quota tracking
+            $quotaDeducted = false;
+            $quotaType = null;
+            $quotaAmount = 0;
+            $messageId = null; // Will be set after message is created
+
             // Handle different message types
             switch ($messageType) {
                 case 'text':
@@ -157,18 +173,62 @@ class MessageApiController extends Controller
                         $textContent = $request->input('text') ?? $request->input('message');
                     }
                     
+                    // Determine if should use watermark (free) or premium
+                    $watermarkPrice = $pricing->getPriceForMessageType('text', true);
+                    $premiumPrice = $pricing->getPriceForMessageType('text', false);
+                    $finalContent = $textContent;
+                    
+                    // If watermark is free (price = 0), use watermark with free_text_quota
+                    if ($watermarkPrice == 0) {
+                        // Free message with watermark - deduct free_text_quota
+                        if ($userQuota->hasFreeTextQuota(1)) {
+                            if (!$userQuota->deductFreeTextQuota(1)) {
+                                throw new \Exception('Insufficient free text quota. Please wait until next month or purchase premium quota.');
+                            }
+                            $quotaDeducted = true;
+                            $quotaType = 'free_text_quota';
+                            $quotaAmount = 1;
+                            $finalContent = $watermarkService->addWatermark($textContent, $pricing->watermark_text);
+                        } else {
+                            throw new \Exception('Free text quota telah habis. Silakan beli Text Premium Quota atau tunggu reset bulan depan (tanggal 1).');
+                        }
+                    } else {
+                        // Premium message - must deduct quota
+                        $price = $premiumPrice;
+                        
+                        // Check quota BEFORE sending
+                        if ($userQuota->text_quota > 0) {
+                            if (!$userQuota->deductTextQuota(1)) {
+                                throw new \Exception('Insufficient text quota');
+                            }
+                            $quotaDeducted = true;
+                            $quotaType = 'text_quota';
+                            $quotaAmount = 1;
+                        } elseif ($userQuota->hasEnoughBalance($price)) {
+                            if (!$userQuota->deductBalance($price)) {
+                                throw new \Exception('Insufficient balance');
+                            }
+                            $quotaDeducted = true;
+                            $quotaType = 'balance';
+                            $quotaAmount = $price;
+                        } else {
+                            throw new \Exception('Insufficient quota or balance. Please purchase quota first.');
+                        }
+                    }
+                    
                     // Log the request details for debugging
                     \Log::info('API: Sending text message', [
                         'session_id' => $session->session_id,
                         'chat_id' => $chatId,
-                        'text_length' => strlen($textContent),
+                        'text_length' => strlen($finalContent),
                         'user_id' => $request->user->id,
+                        'quota_type' => $quotaType,
                     ]);
                     
                     $result = $this->wahaService->sendText(
                         $session->session_id,
                         $chatId,
-                        $textContent
+                        $finalContent
                     );
                     
                     // Log the result
@@ -178,7 +238,7 @@ class MessageApiController extends Controller
                         'data' => $result['data'] ?? null,
                     ]);
                     
-                    $messageData['content'] = $textContent;
+                    $messageData['content'] = $finalContent;
                     break;
 
                 case 'image':
@@ -191,12 +251,35 @@ class MessageApiController extends Controller
                         $caption = $request->caption;
                     }
                     
+                    // Multimedia message - charge user
+                    $price = $pricing->getPriceForMessageType('image');
+                    
+                    // Check quota BEFORE sending
+                    if ($userQuota->multimedia_quota > 0) {
+                        if (!$userQuota->deductMultimediaQuota(1)) {
+                            throw new \Exception('Insufficient multimedia quota');
+                        }
+                        $quotaDeducted = true;
+                        $quotaType = 'multimedia_quota';
+                        $quotaAmount = 1;
+                    } elseif ($userQuota->hasEnoughBalance($price)) {
+                        if (!$userQuota->deductBalance($price)) {
+                            throw new \Exception('Insufficient balance');
+                        }
+                        $quotaDeducted = true;
+                        $quotaType = 'balance';
+                        $quotaAmount = $price;
+                    } else {
+                        throw new \Exception('Insufficient quota or balance. Please purchase quota first.');
+                    }
+                    
                     \Log::info('API: Sending image message', [
                         'session_id' => $session->session_id,
                         'chat_id' => $chatId,
                         'user_id' => $request->user->id,
                         'image_url' => $imageUrl,
                         'has_caption' => !empty($caption),
+                        'quota_type' => $quotaType,
                     ]);
                     
                     $result = $this->wahaService->sendImageByUrl(
@@ -221,6 +304,28 @@ class MessageApiController extends Controller
                     $originalMaxExecutionTime = ini_get('max_execution_time');
                     set_time_limit(120);
                     
+                    // Multimedia message - charge user
+                    $price = $pricing->getPriceForMessageType('video');
+                    
+                    // Check quota BEFORE sending
+                    if ($userQuota->multimedia_quota > 0) {
+                        if (!$userQuota->deductMultimediaQuota(1)) {
+                            throw new \Exception('Insufficient multimedia quota');
+                        }
+                        $quotaDeducted = true;
+                        $quotaType = 'multimedia_quota';
+                        $quotaAmount = 1;
+                    } elseif ($userQuota->hasEnoughBalance($price)) {
+                        if (!$userQuota->deductBalance($price)) {
+                            throw new \Exception('Insufficient balance');
+                        }
+                        $quotaDeducted = true;
+                        $quotaType = 'balance';
+                        $quotaAmount = $price;
+                    } else {
+                        throw new \Exception('Insufficient quota or balance. Please purchase quota first.');
+                    }
+                    
                     \Log::info('API: Sending video message', [
                         'session_id' => $session->session_id,
                         'chat_id' => $chatId,
@@ -229,6 +334,7 @@ class MessageApiController extends Controller
                         'has_caption' => !empty($request->caption),
                         'as_note' => $request->as_note ?? false,
                         'convert' => $request->convert ?? false,
+                        'quota_type' => $quotaType,
                     ]);
                     
                     $result = $this->wahaService->sendVideoByUrl(
@@ -256,10 +362,33 @@ class MessageApiController extends Controller
                     break;
 
                 case 'document':
+                    // Multimedia message - charge user
+                    $price = $pricing->getPriceForMessageType('document');
+                    
+                    // Check quota BEFORE sending
+                    if ($userQuota->multimedia_quota > 0) {
+                        if (!$userQuota->deductMultimediaQuota(1)) {
+                            throw new \Exception('Insufficient multimedia quota');
+                        }
+                        $quotaDeducted = true;
+                        $quotaType = 'multimedia_quota';
+                        $quotaAmount = 1;
+                    } elseif ($userQuota->hasEnoughBalance($price)) {
+                        if (!$userQuota->deductBalance($price)) {
+                            throw new \Exception('Insufficient balance');
+                        }
+                        $quotaDeducted = true;
+                        $quotaType = 'balance';
+                        $quotaAmount = $price;
+                    } else {
+                        throw new \Exception('Insufficient quota or balance. Please purchase quota first.');
+                    }
+                    
                     \Log::info('API: Sending document message', [
                         'session_id' => $session->session_id,
                         'chat_id' => $chatId,
                         'user_id' => $request->user->id,
+                        'quota_type' => $quotaType,
                     ]);
                     
                     $result = $this->wahaService->sendDocumentByUrl(
@@ -487,6 +616,19 @@ class MessageApiController extends Controller
                 $messageData['sent_at'] = now();
 
                 $message = Message::create($messageData);
+                $messageId = $message->id;
+
+                // Log quota usage after successful send
+                if ($quotaDeducted && $quotaType && $quotaAmount > 0) {
+                    QuotaUsageLog::create([
+                        'user_id' => $request->user->id,
+                        'message_id' => $messageId,
+                        'quota_type' => $quotaType,
+                        'amount' => $quotaAmount,
+                        'message_type' => $messageType,
+                        'description' => $this->getQuotaDescription($messageType, $quotaType),
+                    ]);
+                }
 
                 $this->usageService->log($request, 200, $startTime);
 
@@ -495,6 +637,7 @@ class MessageApiController extends Controller
                     'whatsapp_message_id' => $whatsappId,
                     'status' => $status,
                     'ack' => $ack,
+                    'quota_type' => $quotaType,
                 ]);
 
                 return response()->json([
@@ -511,6 +654,20 @@ class MessageApiController extends Controller
                 // Log error details
                 $errorMessage = $result['error'] ?? 'Failed to send message';
                 
+                // If quota was deducted but message failed, refund it
+                if ($quotaDeducted && $quotaType && $quotaAmount > 0) {
+                    // Create message first to get ID for log deletion
+                    $messageData['status'] = 'failed';
+                    $messageData['error_message'] = is_array($errorMessage) ? json_encode($errorMessage) : $errorMessage;
+                    $failedMessage = Message::create($messageData);
+                    $this->refundQuota($userQuota, $quotaType, $quotaAmount, $failedMessage->id);
+                } else {
+                    // Create message even if no quota was deducted
+                    $messageData['status'] = 'failed';
+                    $messageData['error_message'] = is_array($errorMessage) ? json_encode($errorMessage) : $errorMessage;
+                    Message::create($messageData);
+                }
+                
                 // Check if error indicates feature not supported by WAHA engine
                 if (stripos($errorMessage, 'not implemented') !== false || 
                     stripos($errorMessage, 'not supported') !== false ||
@@ -523,11 +680,8 @@ class MessageApiController extends Controller
                     'result' => $result,
                     'session_id' => $session->session_id,
                     'chat_id' => $chatId,
+                    'quota_refunded' => $quotaDeducted,
                 ]);
-                
-                $messageData['status'] = 'failed';
-                $messageData['error_message'] = is_array($errorMessage) ? json_encode($errorMessage) : $errorMessage;
-                Message::create($messageData);
                 
                 $this->usageService->log($request, 500, $startTime);
                 return response()->json([
@@ -536,6 +690,19 @@ class MessageApiController extends Controller
                 ], 500);
             }
         } catch (\Exception $e) {
+            // If quota was deducted but exception occurred, refund it
+            if (isset($quotaDeducted) && $quotaDeducted && isset($quotaType) && isset($quotaAmount) && isset($userQuota)) {
+                try {
+                    $this->refundQuota($userQuota, $quotaType, $quotaAmount);
+                } catch (\Exception $refundException) {
+                    \Log::error('API: Failed to refund quota', [
+                        'error' => $refundException->getMessage(),
+                        'quota_type' => $quotaType,
+                        'quota_amount' => $quotaAmount,
+                    ]);
+                }
+            }
+            
             $this->usageService->log($request, 500, $startTime);
             return response()->json([
                 'success' => false,
@@ -546,6 +713,63 @@ class MessageApiController extends Controller
     }
 
     /**
+     * Refund quota to user
+     */
+    protected function refundQuota(UserQuota $userQuota, string $quotaType, float $quotaAmount, ?string $messageId = null): void
+    {
+        if ($quotaType === 'free_text_quota') {
+            $userQuota->addFreeTextQuota($quotaAmount);
+            if ($messageId) {
+                QuotaUsageLog::where('quota_type', 'free_text_quota')
+                    ->where('message_id', $messageId)
+                    ->delete();
+            }
+        } elseif ($quotaType === 'text_quota') {
+            $userQuota->addTextQuota($quotaAmount);
+            if ($messageId) {
+                QuotaUsageLog::where('quota_type', 'text_quota')
+                    ->where('message_id', $messageId)
+                    ->delete();
+            }
+        } elseif ($quotaType === 'multimedia_quota') {
+            $userQuota->addMultimediaQuota($quotaAmount);
+            if ($messageId) {
+                QuotaUsageLog::where('quota_type', 'multimedia_quota')
+                    ->where('message_id', $messageId)
+                    ->delete();
+            }
+        } elseif ($quotaType === 'balance') {
+            $userQuota->addBalance($quotaAmount);
+            if ($messageId) {
+                QuotaUsageLog::where('quota_type', 'balance')
+                    ->where('message_id', $messageId)
+                    ->delete();
+            }
+        }
+        
+        \Log::info('API: Quota refunded', [
+            'quota_type' => $quotaType,
+            'amount' => $quotaAmount,
+            'message_id' => $messageId,
+        ]);
+    }
+
+    /**
+     * Get quota description for logging
+     */
+    protected function getQuotaDescription(string $messageType, string $quotaType): string
+    {
+        $descriptions = [
+            'free_text_quota' => 'Free text message with watermark',
+            'text_quota' => 'Premium text message (without watermark)',
+            'multimedia_quota' => ucfirst($messageType) . ' message',
+            'balance' => ucfirst($messageType) . ' message paid with balance',
+        ];
+        
+        return $descriptions[$quotaType] ?? ucfirst($messageType) . ' message';
+    }
+
+    /**
      * Get messages for a session
      */
     public function index(Request $request, $session = null)
@@ -553,16 +777,16 @@ class MessageApiController extends Controller
         $startTime = microtime(true);
         
         // Support both formats:
-        // 1. /api/v1/messages?session_id=xxx (session_id in query)
+        // 1. /api/v1/messages?device_id=xxx (device_id in query)
         // 2. /api/v1/sessions/{session}/messages (session in URL)
         
-        $sessionId = $session ?? $request->input('session_id');
+        $sessionId = $session ?? $request->input('device_id');
         
         if (!$sessionId) {
             $this->usageService->log($request, 400, $startTime);
             return response()->json([
                 'success' => false,
-                'error' => 'Session ID is required (either in URL or query parameter)',
+                'error' => 'Device ID is required (either in URL or query parameter as device_id)',
             ], 400);
         }
         

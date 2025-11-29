@@ -1,52 +1,139 @@
 @extends('layouts.base')
 
-@section('title', 'Create Session')
+@section('title', 'Create Device')
 
 @section('content')
 <div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Create New WhatsApp Session') }}</div>
-
+    <div class="row">
+        <!-- Form Column -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-plus-circle mr-2"></i>Buat Device WhatsApp Baru
+                    </h6>
+                </div>
                 <div class="card-body">
                     <form method="POST" action="{{ route('sessions.store') }}">
                         @csrf
 
-                        <div class="mb-3">
-                            <label for="session_name" class="form-label">{{ __('Session Name') }}</label>
-                            <input type="text" class="form-control @error('session_name') is-invalid @enderror" 
-                                   id="session_name" name="session_name" value="{{ old('session_name') }}" 
-                                   required autofocus placeholder="{{ __('e.g., My Business WhatsApp') }}">
-                            
-                            @error('session_name')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                            
-                            <small class="form-text text-muted">
-                                {{ __('Give your session a descriptive name to easily identify it later.') }}
-                            </small>
+                        <div class="row">
+                            <div class="col-md-12 mb-6">
+                                <label for="session_name" class="form-label">Nama Device <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control @error('session_name') is-invalid @enderror" 
+                                       id="session_name" name="session_name" value="{{ old('session_name') }}" 
+                                       required autofocus placeholder="Contoh: WhatsApp Bisnis Saya">
+                                
+                                @error('session_name')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                                
+                                <small class="form-text text-muted">
+                                    Berikan nama yang mudah diingat untuk session ini.
+                                </small>
+                            </div>
+
+                            <div class="col-md-12 mb-6" style="margin-bottom: 20px;margin-top: 20px;">
+                                <label for="phone_number" class="form-label">Nomor Telepon <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">+62</span>
+                                    </div>
+                                    <input type="text" 
+                                           class="form-control @error('phone_number') is-invalid @enderror" 
+                                           id="phone_number" 
+                                           name="phone_number" 
+                                           value="{{ old('phone_number') }}" 
+                                           required 
+                                           placeholder="81234567890"
+                                           pattern="[0-9]{9,13}"
+                                           maxlength="13">
+                                </div>
+                                
+                                @error('phone_number')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                                
+                                <small class="form-text text-muted">
+                                    Masukkan nomor tanpa angka 0 di depan. Contoh: 81234567890
+                                </small>
+                            </div>
                         </div>
 
                         <div class="mb-3">
                             <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i>
-                                <strong>{{ __('Note:') }}</strong>
-                                {{ __('After creating the session, you will need to scan a QR code with your WhatsApp to pair the session.') }}
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <strong>Catatan:</strong>
+                                Setelah membuat session, Anda perlu memindai QR code dengan WhatsApp untuk menghubungkan session.
                             </div>
                         </div>
 
+                        <hr class="my-4">
+
                         <div class="d-flex justify-content-between">
                             <a href="{{ route('sessions.index') }}" class="btn btn-secondary">
-                                {{ __('Cancel') }}
+                                <i class="fas fa-arrow-left mr-2"></i>Batal
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> {{ __('Create Session') }}
+                                <i class="fas fa-plus mr-2"></i>Buat Session
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Column -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4 border-left-info">
+                <div class="card-body">
+                    <h6 class="mb-3">
+                        <i class="fas fa-info-circle text-info mr-2"></i>Informasi
+                    </h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-3">
+                            <i class="fas fa-check-circle text-success mr-2"></i>
+                            <strong>Nama Session:</strong> Gunakan nama yang deskriptif untuk memudahkan identifikasi.
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-phone text-primary mr-2"></i>
+                            <strong>Nomor Telepon:</strong> Masukkan nomor WhatsApp aktif yang akan digunakan untuk session ini.
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-qrcode text-warning mr-2"></i>
+                            <strong>QR Code:</strong> Setelah membuat session, scan QR code yang muncul untuk menghubungkan WhatsApp.
+                        </li>
+                        <li class="mb-0">
+                            <i class="fas fa-shield-alt text-success mr-2"></i>
+                            <strong>Keamanan:</strong> Setiap session terhubung ke nomor telepon yang berbeda.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4 border-left-warning">
+                <div class="card-body">
+                    <h6 class="mb-3">
+                        <i class="fas fa-lightbulb text-warning mr-2"></i>Tips
+                    </h6>
+                    <ul class="list-unstyled mb-0 small">
+                        <li class="mb-2">
+                            <i class="fas fa-circle text-muted mr-2" style="font-size: 6px;"></i>
+                            Pastikan nomor telepon aktif dan dapat menerima pesan WhatsApp
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-circle text-muted mr-2" style="font-size: 6px;"></i>
+                            QR code akan expired setelah beberapa menit, refresh jika perlu
+                        </li>
+                        <li class="mb-0">
+                            <i class="fas fa-circle text-muted mr-2" style="font-size: 6px;"></i>
+                            Satu nomor telepon hanya bisa digunakan untuk satu session aktif
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

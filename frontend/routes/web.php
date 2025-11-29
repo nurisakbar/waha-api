@@ -42,10 +42,14 @@ Route::middleware('auth')->group(function () {
     
     // Messages - DataTables route must be before resource route
     Route::get('messages/data', [App\Http\Controllers\MessageController::class, 'index'])->name('messages.data');
+    Route::post('messages/bulk', [App\Http\Controllers\MessageController::class, 'storeBulk'])->name('messages.storeBulk');
     Route::resource('messages', App\Http\Controllers\MessageController::class)->except(['edit', 'update']);
     
     // Webhooks
     Route::resource('webhooks', App\Http\Controllers\WebhookController::class);
+    
+    // Templates
+    Route::resource('templates', App\Http\Controllers\TemplateController::class);
     
     // API Keys - Only 1 per user, can be regenerated
     Route::get('/api-keys', [App\Http\Controllers\ApiKeyController::class, 'index'])->name('api-keys.index');
@@ -70,7 +74,36 @@ Route::middleware('auth')->group(function () {
     // Profile
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    
+    // Quota Management
+    Route::get('/quota', [App\Http\Controllers\QuotaController::class, 'index'])->name('quota.index');
+    Route::get('/quota/create', [App\Http\Controllers\QuotaController::class, 'create'])->name('quota.create');
+    Route::post('/quota/purchase', [App\Http\Controllers\QuotaController::class, 'purchase'])->name('quota.purchase');
+    Route::get('/quota/purchase/{purchase}/confirm-payment', [App\Http\Controllers\QuotaController::class, 'showConfirmPayment'])->name('quota.confirm-payment');
+    Route::post('/quota/purchase/{purchase}/confirm-payment', [App\Http\Controllers\QuotaController::class, 'confirmPayment'])->name('quota.confirm-payment.store');
+    Route::post('/quota/purchase/{purchase}/complete', [App\Http\Controllers\QuotaController::class, 'completePurchase'])->name('quota.complete');
+    Route::get('/quota/payment/{purchase}/success', [App\Http\Controllers\QuotaController::class, 'paymentSuccess'])->name('quota.payment.success');
+    Route::get('/quota/payment/{purchase}/failure', [App\Http\Controllers\QuotaController::class, 'paymentFailure'])->name('quota.payment.failure');
+    
+    // Referral
+    Route::get('/referral', [App\Http\Controllers\ReferralController::class, 'index'])->name('referral.index');
+    
+    // Admin routes
+    Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard.index');
+        Route::get('/pricing', [App\Http\Controllers\Admin\PricingController::class, 'index'])->name('pricing.index');
+        Route::put('/pricing', [App\Http\Controllers\Admin\PricingController::class, 'update'])->name('pricing.update');
+        Route::get('/referral-settings', [App\Http\Controllers\Admin\ReferralSettingController::class, 'index'])->name('referral-settings.index');
+        Route::put('/referral-settings', [App\Http\Controllers\Admin\ReferralSettingController::class, 'update'])->name('referral-settings.update');
+        Route::get('/quota-purchases', [App\Http\Controllers\Admin\QuotaPurchaseController::class, 'index'])->name('quota-purchases.index');
+        Route::get('/quota-purchases/{quotaPurchase}', [App\Http\Controllers\Admin\QuotaPurchaseController::class, 'show'])->name('quota-purchases.show');
+        Route::post('/quota-purchases/{quotaPurchase}/approve', [App\Http\Controllers\Admin\QuotaPurchaseController::class, 'approve'])->name('quota-purchases.approve');
+        Route::post('/quota-purchases/{quotaPurchase}/reject', [App\Http\Controllers\Admin\QuotaPurchaseController::class, 'reject'])->name('quota-purchases.reject');
+    });
 });
 
 // Webhook receiver (public endpoint)
 Route::post('/webhook/receive/{session}', [App\Http\Controllers\WebhookController::class, 'receive'])->name('webhook.receive');
+
+// Xendit webhook (public endpoint)
+Route::post('/webhook/xendit', [App\Http\Controllers\QuotaController::class, 'webhook'])->name('webhook.xendit');

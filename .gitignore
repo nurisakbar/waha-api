@@ -1,5 +1,6 @@
 # Vendor directories (Composer)
 /vendor/
+/tests/*
 frontend/vendor/
 
 # Node modules

@@ -4,20 +4,36 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
+    <div class="row">
+        <div class="col-12">
             <div class="card">
-                <div class="card-header">{{ __('Send Message') }}</div>
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="messageTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="single-tab" data-toggle="tab" href="#single-message" role="tab" aria-controls="single-message" aria-selected="true">
+                                <i class="fas fa-envelope"></i> {{ __('Single Message') }}
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="bulk-tab" data-toggle="tab" href="#bulk-message" role="tab" aria-controls="bulk-message" aria-selected="false">
+                                <i class="fas fa-file-excel"></i> {{ __('Bulk Message (Excel)') }}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('messages.store') }}" enctype="multipart/form-data" id="message-form" novalidate>
-                        @csrf
+                    <div class="tab-content" id="messageTabsContent">
+                        <!-- Single Message Tab -->
+                        <div class="tab-pane fade show active" id="single-message" role="tabpanel" aria-labelledby="single-tab">
+                            <form method="POST" action="{{ route('messages.store') }}" enctype="multipart/form-data" id="message-form" novalidate>
+                                @csrf
 
                         <div class="mb-3">
-                            <label for="session_id" class="form-label">{{ __('Select Session') }}</label>
+                            <label for="session_id" class="form-label">{{ __('Select Device') }}</label>
                             <select class="form-select @error('session_id') is-invalid @enderror" 
                                     id="session_id" name="session_id" required>
-                                <option value="">{{ __('Choose a session...') }}</option>
+                                <option value="">{{ __('Choose a device...') }}</option>
                                 @foreach($sessions as $session)
                                     <option value="{{ $session->id }}" 
                                             {{ ($selectedSession && $selectedSession->id == $session->id) || request('session_id') == $session->id ? 'selected' : '' }}>
@@ -33,19 +49,28 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="to_number" class="form-label">{{ __('Phone Number') }}</label>
-                            <input type="text" class="form-control @error('to_number') is-invalid @enderror" 
-                                   id="to_number" name="to_number" value="{{ old('to_number', request('to_number')) }}" 
-                                   required placeholder="081234567890 atau 6281234567890">
+                            <label for="to_number" class="form-label">{{ __('Phone Number') }} <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">+62</span>
+                                </div>
+                                <input type="text" 
+                                       class="form-control @error('to_number') is-invalid @enderror" 
+                                       id="to_number" 
+                                       name="to_number" 
+                                       value="{{ old('to_number', request('to_number')) }}" 
+                                       required 
+                                       placeholder="81234567890"
+                                       pattern="[0-9]{9,13}"
+                                       maxlength="13">
+                            </div>
                             @error('to_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
                             <small class="form-text text-muted">
-                                {{ __('Masukkan nomor HP tujuan. Format: 08xxxxxxxxxx atau 628xxxxxxxxxx (tanpa spasi atau tanda +)') }}
-                                <br>
-                                <strong>Contoh:</strong> 081234567890 atau 6281234567890
+                                {{ __('Masukkan nomor tanpa angka 0 di depan. Contoh: 81234567890') }}
                             </small>
                         </div>
 
@@ -133,15 +158,111 @@
                             @enderror
                         </div>
 
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ route('messages.index') }}" class="btn btn-secondary">
-                                {{ __('Cancel') }}
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-paper-plane"></i> {{ __('Send Message') }}
-                            </button>
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ route('messages.index') }}" class="btn btn-secondary">
+                                        {{ __('Cancel') }}
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane"></i> {{ __('Send Message') }}
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                    </form>
+
+                        <!-- Bulk Message Tab -->
+                        <div class="tab-pane fade" id="bulk-message" role="tabpanel" aria-labelledby="bulk-tab">
+                            <form method="POST" action="{{ route('messages.storeBulk') }}" enctype="multipart/form-data" id="bulk-message-form" novalidate>
+                                @csrf
+
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> 
+                                    <strong>{{ __('Format Excel:') }}</strong> 
+                                    {{ __('File Excel harus memiliki kolom: nomor (phone number), pesan (message content). Baris pertama adalah header.') }}
+                                    <br>
+                                    <strong>{{ __('Contoh:') }}</strong>
+                                    <table class="table table-sm table-bordered mt-2" style="max-width: 500px;">
+                                        <thead>
+                                            <tr>
+                                                <th>nomor</th>
+                                                <th>pesan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>081234567890</td>
+                                                <td>Halo, ini pesan pertama</td>
+                                            </tr>
+                                            <tr>
+                                                <td>6281234567890</td>
+                                                <td>Halo, ini pesan kedua</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="bulk_session_id" class="form-label">{{ __('Select Device') }}</label>
+                                    <select class="form-select @error('bulk_session_id') is-invalid @enderror" 
+                                            id="bulk_session_id" name="session_id" required>
+                                        <option value="">{{ __('Choose a device...') }}</option>
+                                        @foreach($sessions as $session)
+                                            <option value="{{ $session->id }}" 
+                                                    {{ ($selectedSession && $selectedSession->id == $session->id) || request('session_id') == $session->id ? 'selected' : '' }}>
+                                                {{ $session->session_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('bulk_session_id')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="excel_file" class="form-label">{{ __('Excel File') }} <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control @error('excel_file') is-invalid @enderror" 
+                                           id="excel_file" name="excel_file" accept=".xlsx,.xls" required>
+                                    @error('excel_file')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                    <small class="form-text text-muted">
+                                        {{ __('Format: .xlsx atau .xls. Max file size: 10MB') }}
+                                    </small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="delay_enabled" name="delay_enabled" value="1">
+                                        <label class="form-check-label" for="delay_enabled">
+                                            {{ __('Enable delay between messages') }}
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3" id="delay-field" style="display: none;">
+                                    <label for="delay_seconds" class="form-label">{{ __('Delay (seconds)') }}</label>
+                                    <input type="number" class="form-control" 
+                                           id="delay_seconds" name="delay_seconds" 
+                                           value="2" min="1" max="60">
+                                    <small class="form-text text-muted">
+                                        {{ __('Delay antara setiap pesan (1-60 detik)') }}
+                                    </small>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ route('messages.index') }}" class="btn btn-secondary">
+                                        {{ __('Cancel') }}
+                                    </a>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-file-excel"></i> {{ __('Send Bulk Messages') }}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -220,6 +341,16 @@ function toggleMessageFields() {
 
 // Initialize on page load
 toggleMessageFields();
+
+// Handle delay checkbox
+document.getElementById('delay_enabled').addEventListener('change', function() {
+    const delayField = document.getElementById('delay-field');
+    if (this.checked) {
+        delayField.style.display = 'block';
+    } else {
+        delayField.style.display = 'none';
+    }
+});
 </script>
 @endsection
 

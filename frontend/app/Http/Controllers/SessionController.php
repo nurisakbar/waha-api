@@ -49,6 +49,10 @@ class SessionController extends Controller
         // Security: Validate request
         $request->validate([
             'session_name' => 'required|string|max:255',
+            'phone_number' => 'required|string|regex:/^[0-9]{9,13}$/',
+        ], [
+            'phone_number.required' => 'Nomor telepon wajib diisi.',
+            'phone_number.regex' => 'Nomor telepon harus 9-13 digit angka (tanpa 0 di depan).',
         ]);
 
         $user = Auth::user();
@@ -65,12 +69,16 @@ class SessionController extends Controller
             ]);
         }
 
-        // WAHA Plus supports multiple sessions - use unique session ID
-        $sessionId = 'session_' . $user->id . '_' . time() . '_' . uniqid();
+        // Format phone number with +62 prefix
+        $phoneNumber = '+62' . ltrim($request->phone_number, '0');
+        
+        // WAHA Plus supports multiple sessions - use unique random token
+        $sessionId = Str::random(16);
 
         \Log::info('SessionController: Starting session creation', [
             'user_id' => Auth::id(),
             'session_id' => $sessionId,
+            'phone_number' => $phoneNumber,
         ]);
 
         // Check if session already exists in WAHA (optimized - single check)
@@ -118,6 +126,7 @@ class SessionController extends Controller
         $session = WhatsAppSession::create([
             'user_id' => Auth::id(),
             'session_name' => $request->session_name,
+            'phone_number' => $phoneNumber,
             'session_id' => $sessionId,
             'status' => $status,
             'waha_instance_url' => config('services.waha.url', 'http://localhost:3000'),
@@ -230,6 +239,33 @@ class SessionController extends Controller
         }
 
         return view('sessions.show', compact('session'));
+    }
+
+    /**
+     * Update the specified session.
+     */
+    public function update(Request $request, WhatsAppSession $session)
+    {
+        $this->authorize('update', $session);
+
+        $request->validate([
+            'session_name' => 'required|string|max:255',
+        ]);
+
+        $session->update([
+            'session_name' => $request->session_name,
+        ]);
+
+        // Always return JSON if Accept header is application/json or if it's an AJAX request
+        if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Nama session berhasil diperbarui.',
+                'session_name' => $session->session_name,
+            ]);
+        }
+
+        return back()->with('success', 'Nama session berhasil diperbarui.');
     }
 
     /**

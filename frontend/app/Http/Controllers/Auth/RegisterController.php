@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\ReferralSetting;
 use App\Models\User;
+use App\Models\UserQuota;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
@@ -54,9 +58,11 @@ class RegisterController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'captcha' => ['required', 'string'],
             'captcha_answer' => ['required', 'integer'],
+            'referral_code' => ['nullable', 'string', 'exists:users,referral_code'],
         ], [
             'captcha.required' => 'Captcha harus diisi.',
             'captcha_answer.required' => 'Captcha answer harus ada.',
+            'referral_code.exists' => 'Kode referral tidak valid.',
         ]);
 
         // Validate captcha
@@ -80,10 +86,68 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        return DB::transaction(function () use ($data) {
+            // Find referrer if referral code is provided (from form or URL parameter)
+            $referredBy = null;
+            $referralCode = strtoupper(trim($data['referral_code'] ?? ''));
+            
+            if (!empty($referralCode)) {
+                $referrer = User::where('referral_code', $referralCode)->first();
+                if ($referrer && $referrer->id !== null) {
+                    $referredBy = $referrer->id;
+                }
+            }
+
+            // Create user
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'referred_by' => $referredBy,
+            ]);
+
+            // Give bonus quota to referrer if referral code is valid
+            if ($referredBy) {
+                $this->giveReferralBonus($referrer);
+            }
+
+            return $user;
+        });
+    }
+
+    /**
+     * Give referral bonus to referrer
+     */
+    protected function giveReferralBonus(User $referrer): void
+    {
+        try {
+            $settings = ReferralSetting::getActive();
+            
+            if (!$settings || !$settings->is_active) {
+                return;
+            }
+
+            $userQuota = UserQuota::getOrCreateForUser($referrer->id);
+
+            // Add bonus quota
+            if ($settings->text_quota_bonus > 0) {
+                $userQuota->addTextQuota($settings->text_quota_bonus);
+            }
+
+            if ($settings->multimedia_quota_bonus > 0) {
+                $userQuota->addMultimediaQuota($settings->multimedia_quota_bonus);
+            }
+
+            Log::info('Referral bonus given', [
+                'referrer_id' => $referrer->id,
+                'text_quota_bonus' => $settings->text_quota_bonus,
+                'multimedia_quota_bonus' => $settings->multimedia_quota_bonus,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to give referral bonus', [
+                'referrer_id' => $referrer->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

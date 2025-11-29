@@ -33,6 +33,26 @@ class Template extends Model
             if (empty($model->id)) {
                 $model->id = (string) Str::uuid();
             }
+            
+            // Auto-add kode_otp variable for OTP templates
+            if ($model->template_type === 'otp') {
+                $variables = $model->variables ?? [];
+                if (!in_array('kode_otp', $variables)) {
+                    $variables[] = 'kode_otp';
+                    $model->variables = $variables;
+                }
+            }
+        });
+        
+        static::updating(function ($model) {
+            // Auto-add kode_otp variable for OTP templates on update
+            if ($model->template_type === 'otp') {
+                $variables = $model->variables ?? [];
+                if (!in_array('kode_otp', $variables)) {
+                    $variables[] = 'kode_otp';
+                    $model->variables = $variables;
+                }
+            }
         });
     }
 
@@ -41,6 +61,7 @@ class Template extends Model
         'name',
         'content',
         'message_type',
+        'template_type',
         'variables',
         'description',
         'is_active',
@@ -104,5 +125,21 @@ class Template extends Model
         }
         
         return $this->replaceVariables($variables);
+    }
+
+    /**
+     * Check if template is OTP type.
+     */
+    public function isOtpTemplate(): bool
+    {
+        return $this->template_type === 'otp';
+    }
+
+    /**
+     * Check if template is message type.
+     */
+    public function isMessageTemplate(): bool
+    {
+        return $this->template_type === 'message' || empty($this->template_type);
     }
 }

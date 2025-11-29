@@ -42,6 +42,7 @@ class WhatsAppSession extends Model
     protected $fillable = [
         'user_id',
         'session_name',
+        'phone_number',
         'session_id',
         'status',
         'qr_code',

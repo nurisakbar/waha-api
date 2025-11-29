@@ -18,7 +18,19 @@
                     @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+
+                    @if (session('error_details'))
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            <strong>{{ __('Error Details:') }}</strong>
+                            <pre class="mb-0 mt-2" style="white-space: pre-wrap; font-size: 0.9em;">{{ session('error_details') }}</pre>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
                     @endif
 
@@ -27,7 +39,7 @@
                         <div class="row g-3">
                             <div class="col-md-3">
                                 <select name="session_id" id="filter_session_id" class="form-select">
-                                    <option value="">{{ __('All Sessions') }}</option>
+                                    <option value="">{{ __('All Devices') }}</option>
                                     @foreach($sessions as $session)
                                         <option value="{{ $session->id }}" {{ request('session_id') == $session->id ? 'selected' : '' }}>
                                             {{ $session->session_name }}
@@ -59,7 +71,7 @@
                                     <th>{{ __('From/To') }}</th>
                                     <th>{{ __('Content') }}</th>
                                     <th>{{ __('Status') }}</th>
-                                    <th>{{ __('Session') }}</th>
+                                    <th>{{ __('Device') }}</th>
                                     <th>{{ __('Date') }}</th>
                                     <th>{{ __('Actions') }}</th>
                                 </tr>

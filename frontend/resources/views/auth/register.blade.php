@@ -74,6 +74,22 @@
             </div>
 
             <div class="form-group">
+                <label for="referral_code" class="form-label">Kode Referral (Opsional)</label>
+                <input id="referral_code" type="text"
+                       class="form-control @error('referral_code') is-invalid @enderror"
+                       name="referral_code" 
+                       value="{{ old('referral_code', request('ref')) }}"
+                       placeholder="Masukan kode referral jika ada"
+                       style="text-transform: uppercase;">
+                <small class="form-text text-muted">Dapatkan bonus quota dengan menggunakan kode referral</small>
+                @error('referral_code')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
+            </div>
+
+            <div class="form-group">
                 <label class="form-label">Masukan Hasil Penjumlahan Berikut</label>
                 <div class="captcha-container">
                     <div class="captcha-question">

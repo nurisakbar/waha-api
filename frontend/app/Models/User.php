@@ -38,7 +38,24 @@ class User extends Authenticatable
             if (empty($model->id)) {
                 $model->id = (string) Str::uuid();
             }
+            
+            // Generate referral code if not set
+            if (empty($model->referral_code)) {
+                $model->referral_code = static::generateReferralCode();
+            }
         });
+    }
+
+    /**
+     * Generate unique referral code
+     */
+    public static function generateReferralCode(): string
+    {
+        do {
+            $code = strtoupper(Str::random(8));
+        } while (static::where('referral_code', $code)->exists());
+        
+        return $code;
     }
 
     /**
@@ -57,6 +74,8 @@ class User extends Authenticatable
         'subscription_status',
         'trial_ends_at',
         'last_login_at',
+        'referral_code',
+        'referred_by',
     ];
 
     /**
@@ -154,5 +173,53 @@ class User extends Authenticatable
     public function templates()
     {
         return $this->hasMany(Template::class);
+    }
+
+    /**
+     * Get the user's quota.
+     */
+    public function quota()
+    {
+        return $this->hasOne(UserQuota::class);
+    }
+
+    /**
+     * Get the user's quota purchases.
+     */
+    public function quotaPurchases()
+    {
+        return $this->hasMany(QuotaPurchase::class);
+    }
+
+    /**
+     * Get or create user quota
+     */
+    public function getQuota()
+    {
+        return UserQuota::getOrCreateForUser($this->id);
+    }
+
+    /**
+     * Get the user who referred this user
+     */
+    public function referrer()
+    {
+        return $this->belongsTo(User::class, 'referred_by');
+    }
+
+    /**
+     * Get users referred by this user
+     */
+    public function referrals()
+    {
+        return $this->hasMany(User::class, 'referred_by');
+    }
+
+    /**
+     * Get count of successful referrals
+     */
+    public function getReferralCountAttribute()
+    {
+        return $this->referrals()->count();
     }
 }

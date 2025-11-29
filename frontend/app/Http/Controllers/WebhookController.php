@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\WebhookDelivery;
 use App\Models\Message;
 use App\Models\Webhook;
 use App\Models\WhatsAppSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
@@ -108,7 +108,7 @@ class WebhookController extends Controller
             $this->handleMessageAck($session, $payload);
         }
 
-        // Forward to user's webhooks
+        // Forward to user's webhooks using jobs
         $webhooks = Webhook::where('user_id', $session->user_id)
             ->where('is_active', true)
             ->where(function($q) use ($session) {
@@ -120,14 +120,23 @@ class WebhookController extends Controller
             })
             ->get();
 
+        // Prepare payload for webhook
+        $payload = [
+            'event' => $event,
+            'session' => $sessionId,
+            'payload' => $payload,
+            'timestamp' => now()->toIso8601String(),
+        ];
+
         foreach ($webhooks as $webhook) {
-            try {
-                Http::timeout(10)->post($webhook->url, $request->all());
-                $webhook->update(['last_triggered_at' => now()]);
-            } catch (\Exception $e) {
-                Log::error('Webhook delivery failed: ' . $e->getMessage());
-                $webhook->increment('failure_count');
-            }
+            // Dispatch webhook delivery job
+            WebhookDelivery::dispatch($webhook->id, $payload, $event);
+            
+            Log::info('Webhook delivery job dispatched', [
+                'webhook_id' => $webhook->id,
+                'url' => $webhook->url,
+                'event' => $event,
+            ]);
         }
 
         return response()->json(['success' => true]);

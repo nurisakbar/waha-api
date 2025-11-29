@@ -368,7 +368,7 @@
                         <span class="endpoint-badge badge-get">GET</span>
                         <span class="endpoint-url">/sessions</span>
                     </div>
-                    <p class="text-muted">Mendapatkan daftar semua session WhatsApp yang terhubung.</p>
+                    <p class="text-muted">Mendapatkan daftar semua device WhatsApp yang terhubung.</p>
                 </div>
 
                 <div class="mt-4">

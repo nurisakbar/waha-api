@@ -1,6 +1,6 @@
 @extends('layouts.base')
 
-@section('title', 'Session Details')
+@section('title', 'Device Details')
 
 @section('content')
 <div class="container-fluid">
@@ -14,12 +14,12 @@
             @endif
 
             <div class="row">
-                <!-- Session Information Card -->
+                <!-- Device Information Card -->
                 <div class="col-md-8 mb-4">
                     <div class="card">
                         <div class="card-header bg-primary text-white">
                             <h5 class="mb-0">
-                                <i class="fas fa-info-circle"></i> {{ __('Session Information') }}
+                                <i class="fas fa-info-circle"></i> Informasi Device
                             </h5>
                         </div>
                         <div class="card-body">
@@ -27,13 +27,44 @@
                                 <table class="table table-hover mb-0">
                                     <tbody>
                                         <tr>
-                                            <th width="35%" class="text-muted">{{ __('Session Name') }}</th>
+                                            <th width="35%" class="text-muted">Nama Device</th>
                                             <td>
-                                                <strong>{{ $session->session_name }}</strong>
+                                                <div id="session-name-display">
+                                                    <div class="d-flex align-items-center">
+                                                        <strong id="session-name-text">{{ $session->session_name }}</strong>
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-outline-primary ml-2" 
+                                                                id="edit-session-name-btn"
+                                                                onclick="editSessionName()">
+                                                            <i class="fas fa-edit"></i> Edit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div id="session-name-edit" style="display: none;">
+                                                    <form id="session-name-form" onsubmit="saveSessionName(event)">
+                                                        <div class="input-group">
+                                                            <input type="text" 
+                                                                   class="form-control" 
+                                                                   id="session-name-input" 
+                                                                   name="session_name" 
+                                                                   value="{{ $session->session_name }}" 
+                                                                   required 
+                                                                   maxlength="255">
+                                                            <div class="input-group-append">
+                                                                <button type="submit" class="btn btn-success" id="save-session-name-btn">
+                                                                    <i class="fas fa-check"></i>
+                                                                </button>
+                                                                <button type="button" class="btn btn-secondary" onclick="cancelEditSessionName()">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="text-muted">{{ __('Session ID') }}</th>
+                                            <th class="text-muted">Device ID</th>
                                             <td>
                                                 <div class="input-group">
                                                     <input type="text" 
@@ -47,70 +78,79 @@
                                                             id="copySessionIdBtn"
                                                             data-bs-toggle="tooltip" 
                                                             data-bs-placement="top" 
-                                                            title="Copy to clipboard">
+                                                            title="Salin ke clipboard">
                                                         <i class="fas fa-copy"></i>
                                                     </button>
                                                 </div>
                                                 <small class="text-muted mt-1 d-block">
-                                                    <i class="fas fa-info-circle"></i> Click the copy button to copy Session ID
+                                                    <i class="fas fa-info-circle"></i> Klik tombol salin untuk menyalin Device ID
                                                 </small>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="text-muted">{{ __('Status') }}</th>
+                                            <th class="text-muted">Status</th>
                                             <td>
                                                 @if ($session->status === 'connected')
                                                     <span class="badge bg-success fs-6">
-                                                        <i class="fas fa-check-circle"></i> {{ __('Connected') }}
+                                                        <i class="fas fa-check-circle"></i> Terhubung
                                                     </span>
                                                 @elseif ($session->status === 'pairing')
                                                     <span class="badge bg-warning fs-6">
-                                                        <i class="fas fa-qrcode"></i> {{ __('Pairing') }}
+                                                        <i class="fas fa-qrcode"></i> Pairing
                                                     </span>
                                                 @elseif ($session->status === 'disconnected')
                                                     <span class="badge bg-secondary fs-6">
-                                                        <i class="fas fa-times-circle"></i> {{ __('Disconnected') }}
+                                                        <i class="fas fa-times-circle"></i> Terputus
                                                     </span>
                                                 @else
                                                     <span class="badge bg-danger fs-6">
-                                                        <i class="fas fa-exclamation-circle"></i> {{ __('Failed') }}
+                                                        <i class="fas fa-exclamation-circle"></i> Gagal
                                                     </span>
                                                 @endif
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="text-muted">{{ __('Last Activity') }}</th>
+                                            <th class="text-muted">Aktivitas Terakhir</th>
                                             <td>
                                                 @if ($session->last_activity_at)
+                                                    @php
+                                                        \Carbon\Carbon::setLocale('id');
+                                                    @endphp
                                                     <i class="fas fa-clock text-muted"></i>
                                                     {{ $session->last_activity_at->diffForHumans() }}
                                                     <small class="text-muted d-block">
-                                                        ({{ $session->last_activity_at->format('Y-m-d H:i:s') }})
+                                                        ({{ $session->last_activity_at->format('d/m/Y H:i') }})
                                                     </small>
                                                 @else
-                                                    <span class="text-muted">{{ __('Never') }}</span>
+                                                    <span class="text-muted">Belum pernah</span>
                                                 @endif
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="text-muted">{{ __('Connected At') }}</th>
+                                            <th class="text-muted">Terhubung Pada</th>
                                             <td>
                                                 @if ($session->connected_at)
+                                                    @php
+                                                        \Carbon\Carbon::setLocale('id');
+                                                    @endphp
                                                     <i class="fas fa-link text-success"></i>
-                                                    {{ $session->connected_at->format('Y-m-d H:i:s') }}
+                                                    {{ $session->connected_at->format('d/m/Y H:i') }}
                                                     <small class="text-muted d-block">
                                                         ({{ $session->connected_at->diffForHumans() }})
                                                     </small>
                                                 @else
-                                                    <span class="text-muted">{{ __('Not connected yet') }}</span>
+                                                    <span class="text-muted">Belum terhubung</span>
                                                 @endif
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="text-muted">{{ __('Created At') }}</th>
+                                            <th class="text-muted">Dibuat Pada</th>
                                             <td>
+                                                @php
+                                                    \Carbon\Carbon::setLocale('id');
+                                                @endphp
                                                 <i class="fas fa-calendar text-muted"></i>
-                                                {{ $session->created_at->format('Y-m-d H:i:s') }}
+                                                {{ $session->created_at->format('d/m/Y H:i') }}
                                                 <small class="text-muted d-block">
                                                     ({{ $session->created_at->diffForHumans() }})
                                                 </small>
@@ -128,33 +168,33 @@
                     <div class="card">
                         <div class="card-header bg-secondary text-white">
                             <h5 class="mb-0">
-                                <i class="fas fa-cog"></i> {{ __('Actions') }}
+                                <i class="fas fa-cog"></i> Aksi
                             </h5>
                         </div>
                         <div class="card-body">
                             <div class="d-grid gap-2">
                                 <!-- Back Button -->
                                 <a href="{{ route('sessions.index') }}" class="btn btn-outline-secondary w-100">
-                                    <i class="fas fa-arrow-left"></i> {{ __('Back to Sessions') }}
+                                    <i class="fas fa-arrow-left"></i> Kembali ke Devices
                                 </a>
 
                                 <!-- Send Message Button (Always visible if connected) -->
                                 @if ($session->status === 'connected')
                                     <a href="{{ route('messages.create') }}?session_id={{ $session->id }}" class="btn btn-primary w-100">
-                                        <i class="fas fa-paper-plane"></i> {{ __('Send Message') }}
+                                        <i class="fas fa-paper-plane"></i> Kirim Pesan
                                     </a>
                                 @endif
 
-                                <!-- Pairing/Stop Session Button -->
+                                <!-- Pairing/Stop Device Button -->
                                 @if ($session->status === 'pairing')
                                     <a href="{{ route('sessions.pair', $session) }}" class="btn btn-warning w-100">
-                                        <i class="fas fa-qrcode"></i> {{ __('Continue Pairing') }}
+                                        <i class="fas fa-qrcode"></i> Lanjutkan Pairing
                                     </a>
                                 @elseif ($session->status === 'connected')
                                     <form action="{{ route('sessions.stop', $session) }}" method="POST" class="mb-0">
                                         @csrf
-                                        <button type="submit" class="btn btn-warning w-100" onclick="return confirm('Are you sure you want to stop this session?')">
-                                            <i class="fas fa-stop"></i> {{ __('Stop Session') }}
+                                        <button type="submit" class="btn btn-warning w-100" onclick="return confirm('Apakah Anda yakin ingin menghentikan device ini?')">
+                                            <i class="fas fa-stop"></i> Hentikan Device
                                         </button>
                                     </form>
                                 @endif
@@ -162,12 +202,12 @@
                                 <!-- Divider -->
                                 <hr class="my-2">
 
-                                <!-- Delete Session Button -->
+                                <!-- Delete Device Button -->
                                 <form action="{{ route('sessions.destroy', $session) }}" method="POST" class="mb-0">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to delete this session? This action cannot be undone.')">
-                                        <i class="fas fa-trash"></i> {{ __('Delete Session') }}
+                                    <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Apakah Anda yakin ingin menghapus device ini? Tindakan ini tidak dapat dibatalkan.')">
+                                        <i class="fas fa-trash"></i> Hapus Device
                                     </button>
                                 </form>
                             </div>
@@ -188,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
-    // Copy Session ID functionality
+    // Copy Device ID functionality
     const copyBtn = document.getElementById('copySessionIdBtn');
     const sessionIdInput = document.getElementById('sessionIdInput');
 
@@ -198,18 +238,60 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const originalHTML = copyBtn.innerHTML;
             const originalClasses = copyBtn.className;
+            const textToCopy = sessionIdInput.value;
             
-            try {
-                // Try modern clipboard API first
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    await navigator.clipboard.writeText(sessionIdInput.value);
-                } else {
-                    // Fallback to execCommand for older browsers
+            let copySuccess = false;
+            
+            // Method 1: Try modern Clipboard API (requires HTTPS or localhost)
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(textToCopy);
+                    copySuccess = true;
+                } catch (err) {
+                    console.log('Clipboard API failed, trying fallback:', err);
+                }
+            }
+            
+            // Method 2: Try execCommand on the input element
+            if (!copySuccess) {
+                try {
+                    sessionIdInput.focus();
                     sessionIdInput.select();
                     sessionIdInput.setSelectionRange(0, 99999); // For mobile devices
-                    document.execCommand('copy');
+                    
+                    if (document.execCommand('copy')) {
+                        copySuccess = true;
+                    }
+                } catch (err) {
+                    console.log('execCommand failed, trying temporary element:', err);
                 }
-                
+            }
+            
+            // Method 3: Create temporary input element
+            if (!copySuccess) {
+                try {
+                    const tempInput = document.createElement('input');
+                    tempInput.value = textToCopy;
+                    tempInput.style.position = 'fixed';
+                    tempInput.style.opacity = '0';
+                    tempInput.style.left = '-9999px';
+                    tempInput.style.top = '-9999px';
+                    document.body.appendChild(tempInput);
+                    tempInput.focus();
+                    tempInput.select();
+                    tempInput.setSelectionRange(0, 99999);
+                    
+                    if (document.execCommand('copy')) {
+                        copySuccess = true;
+                    }
+                    
+                    document.body.removeChild(tempInput);
+                } catch (err) {
+                    console.error('All copy methods failed:', err);
+                }
+            }
+            
+            if (copySuccess) {
                 // Update button icon and show feedback
                 copyBtn.innerHTML = '<i class="fas fa-check"></i>';
                 copyBtn.className = 'btn btn-success';
@@ -217,33 +299,170 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update tooltip
                 const tooltip = bootstrap.Tooltip.getInstance(copyBtn);
                 if (tooltip) {
-                    tooltip.setContent({'.tooltip-inner': 'Copied!'});
+                    tooltip.setContent({'.tooltip-inner': 'Tersalin!'});
                 }
+                
+                // Show toast notification
+                showToast('Device ID berhasil disalin!', 'success');
 
                 // Reset after 2 seconds
                 setTimeout(function() {
                     copyBtn.innerHTML = originalHTML;
                     copyBtn.className = originalClasses;
                     if (tooltip) {
-                        tooltip.setContent({'.tooltip-inner': 'Copy to clipboard'});
+                        tooltip.setContent({'.tooltip-inner': 'Salin ke clipboard'});
                     }
                 }, 2000);
-            } catch (err) {
-                console.error('Failed to copy:', err);
+            } else {
+                // All methods failed - select text for manual copy
+                sessionIdInput.focus();
+                sessionIdInput.select();
+                sessionIdInput.setSelectionRange(0, 99999);
+                
                 // Show error feedback
                 copyBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
                 copyBtn.className = 'btn btn-danger';
                 
+                const tooltip = bootstrap.Tooltip.getInstance(copyBtn);
+                if (tooltip) {
+                    tooltip.setContent({'.tooltip-inner': 'Gagal menyalin. Teks sudah dipilih, tekan Ctrl+C'});
+                }
+                
+                showToast('Gagal menyalin otomatis. Teks sudah dipilih, tekan Ctrl+C (atau Cmd+C di Mac) untuk menyalin.', 'warning');
+                
                 setTimeout(function() {
                     copyBtn.innerHTML = originalHTML;
                     copyBtn.className = originalClasses;
-                }, 2000);
-                
-                alert('Failed to copy Session ID. Please select and copy manually.');
+                    if (tooltip) {
+                        tooltip.setContent({'.tooltip-inner': 'Salin ke clipboard'});
+                    }
+                }, 3000);
             }
         });
     }
+    
+    // Toast notification function
+    function showToast(message, type) {
+        // Remove existing toast if any
+        const existingToast = document.querySelector('.toast-notification');
+        if (existingToast) {
+            existingToast.remove();
+        }
+        
+        const bgColor = type === 'success' ? 'bg-success' : type === 'warning' ? 'bg-warning' : 'bg-danger';
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification ' + bgColor;
+        toast.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 12px 20px; color: white; border-radius: 4px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1); animation: fadeIn 0.3s;';
+        toast.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'exclamation-circle') + ' mr-2"></i>' + message;
+        
+        document.body.appendChild(toast);
+        
+        // Auto remove after 3 seconds
+        setTimeout(function() {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s';
+            setTimeout(function() {
+                toast.remove();
+            }, 300);
+        }, 3000);
+    }
+    
+    // Add fadeIn animation if not exists
+    if (!document.getElementById('toast-styles')) {
+        const style = document.createElement('style');
+        style.id = 'toast-styles';
+        style.textContent = '@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }';
+        document.head.appendChild(style);
+    }
 });
+
+// Edit Device Name Functions - Global scope
+function editSessionName() {
+    document.getElementById('session-name-display').style.display = 'none';
+    document.getElementById('session-name-edit').style.display = 'block';
+    document.getElementById('session-name-input').focus();
+    document.getElementById('session-name-input').select();
+}
+
+function cancelEditSessionName() {
+    document.getElementById('session-name-edit').style.display = 'none';
+    document.getElementById('session-name-display').style.display = 'block';
+    // Reset input value to original
+    document.getElementById('session-name-input').value = document.getElementById('session-name-text').textContent;
+}
+
+function saveSessionName(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    const saveBtn = document.getElementById('save-session-name-btn');
+    const originalBtnHtml = saveBtn.innerHTML;
+    
+    // Disable button and show loading
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    
+    fetch('{{ route("sessions.update", $session) }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'X-HTTP-Method-Override': 'PUT',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify({
+            session_name: formData.get('session_name'),
+            _method: 'PUT'
+        })
+    })
+    .then(response => {
+        // Check if response is ok
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        // Check content type
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return response.json();
+        } else {
+            // If not JSON, try to get text
+            return response.text().then(text => {
+                throw new Error('Response is not JSON: ' + text.substring(0, 100));
+            });
+        }
+    })
+    .then(data => {
+        if (data.success) {
+            // Update display text
+            document.getElementById('session-name-text').textContent = data.session_name;
+            // Hide edit form, show display
+            document.getElementById('session-name-edit').style.display = 'none';
+            document.getElementById('session-name-display').style.display = 'block';
+            
+            // Show success message
+            if (typeof showToast === 'function') {
+                showToast(data.message || 'Nama device berhasil diperbarui.', 'success');
+            } else {
+                alert(data.message || 'Nama device berhasil diperbarui.');
+            }
+        } else {
+            throw new Error(data.message || 'Gagal memperbarui nama device.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        const errorMessage = error.message || 'Gagal memperbarui nama device. Silakan coba lagi.';
+        if (typeof showToast === 'function') {
+            showToast(errorMessage, 'error');
+        } else {
+            alert(errorMessage);
+        }
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = originalBtnHtml;
+    });
+}
 </script>
 @endpush
 @endsection

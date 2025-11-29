@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MessagePricingSetting;
 use App\Models\Plan;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
@@ -18,7 +19,10 @@ class BillingController extends Controller
     {
         $plans = Plan::where('is_active', true)->orderBy('sort_order')->get();
         $currentSubscription = Auth::user()->activeSubscription;
-        return view('billing.index', compact('plans', 'currentSubscription'));
+        $pricing = MessagePricingSetting::getActive();
+        $quota = Auth::user()->getQuota();
+        
+        return view('billing.index', compact('plans', 'currentSubscription', 'pricing', 'quota'));
     }
 
     public function subscribe(Request $request)

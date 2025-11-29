@@ -20,9 +20,9 @@
                             <input type="url" class="form-control" id="url" name="url" required placeholder="https://example.com/webhook">
                         </div>
                         <div class="mb-3">
-                            <label for="session_id" class="form-label">{{ __('Session') }} <small class="text-muted">({{ __('Optional') }})</small></label>
+                            <label for="session_id" class="form-label">{{ __('Device') }} <small class="text-muted">({{ __('Optional') }})</small></label>
                             <select class="form-select" id="session_id" name="session_id">
-                                <option value="">{{ __('All Sessions') }}</option>
+                                <option value="">{{ __('All Devices') }}</option>
                                 @foreach($sessions as $session)
                                     <option value="{{ $session->id }}">{{ $session->session_name }}</option>
                                 @endforeach
@@ -40,7 +40,7 @@
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="events[]" value="session" id="event_session">
-                                <label class="form-check-label" for="event_session">{{ __('Session Events') }}</label>
+                                <label class="form-check-label" for="event_session">{{ __('Device Events') }}</label>
                             </div>
                         </div>
                         <div class="mb-3">

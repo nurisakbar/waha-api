@@ -62,13 +62,26 @@ class SendMessageRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        // Convert device_id to session_id for internal processing
+        if ($this->has('device_id')) {
+            $this->merge([
+                'session_id' => $this->input('device_id'),
+            ]);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array
     {
-        // session_id is optional if provided in URL
+        // device_id is required if not provided in URL (session_id is auto-filled from device_id in prepareForValidation)
         $rules = [
-            'session_id' => 'nullable|string|max:255',
+            'device_id' => 'required|string|max:255',
             'message_type' => 'required_without:template_id|in:text,image,video,document,poll,button,list',
             'to' => 'required|string|max:255', // Increased for group IDs
             'chat_type' => 'nullable|in:personal,group', // Type of chat: personal or group
@@ -148,7 +161,10 @@ class SendMessageRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'session_id.string' => 'Session ID must be a string.',
+            'device_id.required_without' => 'Device ID is required.',
+            'device_id.string' => 'Device ID must be a string.',
+            'device_id.max' => 'Device ID must not exceed 255 characters.',
+            'session_id.string' => 'Session ID must be a string (deprecated, use device_id instead).',
             'message_type.required' => 'Message type is required.',
             'message_type.in' => 'Message type must be one of: text, image, video, document, poll, button, list.',
             'to.required' => 'Recipient number or group ID is required.',

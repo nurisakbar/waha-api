@@ -47,6 +47,66 @@
             <hr class="sidebar-divider my-0">
 
             @auth
+            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'super_admin']))
+            {{-- ADMIN MENU --}}
+            <!-- Nav Item - Admin Dashboard -->
+            <li class="nav-item {{ request()->routeIs('admin.dashboard.*') || request()->routeIs('home') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.dashboard.index') }}">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>{{ __('Admin Dashboard') }}</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                {{ __('Management') }}
+            </div>
+
+            <!-- Nav Item - Payment Reports -->
+            <li class="nav-item {{ request()->routeIs('admin.quota-purchases.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.quota-purchases.index') }}">
+                    <i class="fas fa-fw fa-file-invoice-dollar"></i>
+                    <span>{{ __('Payment Reports') }}</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - Pricing Settings -->
+            <li class="nav-item {{ request()->routeIs('admin.pricing.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.pricing.index') }}">
+                    <i class="fas fa-fw fa-dollar-sign"></i>
+                    <span>{{ __('Pricing Settings') }}</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - Referral Settings -->
+            <li class="nav-item {{ request()->routeIs('admin.referral-settings.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.referral-settings.index') }}">
+                    <i class="fas fa-fw fa-user-friends"></i>
+                    <span>{{ __('Referral Settings') }}</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                {{ __('Account') }}
+            </div>
+
+            <!-- Nav Item - Profile -->
+            <li class="nav-item {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('profile.show') }}">
+                    <i class="fas fa-fw fa-user"></i>
+                    <span>{{ __('Profile') }}</span>
+                </a>
+            </li>
+
+            @else
+            {{-- CLIENT MENU --}}
             <!-- Nav Item - Dashboard -->
             <li class="nav-item {{ request()->routeIs('home') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('home') }}">
@@ -63,11 +123,11 @@
                 {{ __('WhatsApp') }}
             </div>
 
-            <!-- Nav Item - Sessions -->
+            <!-- Nav Item - Devices -->
             <li class="nav-item {{ request()->routeIs('sessions.*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('sessions.index') }}">
                     <i class="fas fa-fw fa-mobile-alt"></i>
-                    <span>{{ __('Sessions') }}</span>
+                    <span>{{ __('Devices') }}</span>
                 </a>
             </li>
 
@@ -76,6 +136,14 @@
                 <a class="nav-link" href="{{ route('messages.index') }}">
                     <i class="fas fa-fw fa-envelope"></i>
                     <span>{{ __('Messages') }}</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - Templates -->
+            <li class="nav-item {{ request()->routeIs('templates.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('templates.index') }}">
+                    <i class="fas fa-fw fa-file-alt"></i>
+                    <span>{{ __('Templates') }}</span>
                 </a>
             </li>
 
@@ -127,21 +195,22 @@
                 </a>
             </li>
 
-            <!-- Nav Item - Billing -->
-            <li class="nav-item {{ request()->routeIs('billing.*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('billing.index') }}">
-                    <i class="fas fa-fw fa-credit-card"></i>
-                    <span>{{ __('Billing') }}</span>
+            <!-- Nav Item - Quota -->
+            <li class="nav-item {{ request()->routeIs('quota.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('quota.index') }}">
+                    <i class="fas fa-fw fa-wallet"></i>
+                    <span>{{ __('Purchase Quota') }}</span>
                 </a>
             </li>
 
-            <!-- Nav Item - Analytics -->
-            <li class="nav-item {{ request()->routeIs('analytics.*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('analytics.index') }}">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>{{ __('Analytics') }}</span>
+            <!-- Nav Item - Referral -->
+            <li class="nav-item {{ request()->routeIs('referral.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('referral.index') }}">
+                    <i class="fas fa-fw fa-user-friends"></i>
+                    <span>{{ __('Referral') }}</span>
                 </a>
             </li>
+            @endif
             @endauth
 
             <!-- Divider -->
@@ -152,15 +221,7 @@
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
 
-            <!-- Sidebar Message (optional, keep from SB Admin 2) -->
-            <div class="sidebar-card d-none d-lg-flex">
-                <img class="sidebar-card-illustration mb-2" src="{{ asset('startbootstrap/img/undraw_rocket.svg') }}"
-                    alt="...">
-                <p class="text-center mb-2">
-                    <strong>SB Admin Pro</strong> is packed with premium features, components, and more!
-                </p>
-                <a class="btn btn-success btn-sm" href="https://startbootstrap.com/theme/sb-admin-pro">Upgrade to Pro!</a>
-            </div>
+
 
         </ul>
         <!-- End of Sidebar -->

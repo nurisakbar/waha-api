@@ -192,42 +192,16 @@
                     </div>
                     @endif
 
+                    @if($user->referral_code)
                     <hr>
-
-                    <div class="text-center">
-                        <a href="{{ route('billing.index') }}" class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-credit-card mr-1"></i>{{ __('Manage Billing') }}
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Stats -->
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">{{ __('Quick Stats') }}</h6>
-                </div>
-                <div class="card-body">
-                    @php
-                        $totalSessions = $user->whatsappSessions()->count();
-                        $activeSessions = $user->whatsappSessions()->where('status', 'connected')->count();
-                        $totalMessages = $user->messages()->count();
-                    @endphp
-
                     <div class="mb-3">
-                        <div class="small text-gray-500 mb-1">{{ __('Total Sessions') }}</div>
-                        <div class="h5 font-weight-bold text-primary mb-0">{{ $totalSessions }}</div>
+                        <div class="small text-gray-500 mb-1">{{ __('Referral Code') }}</div>
+                        <div class="font-weight-bold">
+                            <code style="font-size: 16px; letter-spacing: 2px;">{{ $user->referral_code }}</code>
+                        </div>
+                        <small class="text-muted">Bagikan kode ini untuk mendapatkan bonus quota</small>
                     </div>
-
-                    <div class="mb-3">
-                        <div class="small text-gray-500 mb-1">{{ __('Active Sessions') }}</div>
-                        <div class="h5 font-weight-bold text-success mb-0">{{ $activeSessions }}</div>
-                    </div>
-
-                    <div class="mb-0">
-                        <div class="small text-gray-500 mb-1">{{ __('Total Messages') }}</div>
-                        <div class="h5 font-weight-bold text-info mb-0">{{ $totalMessages }}</div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>

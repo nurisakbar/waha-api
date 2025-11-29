@@ -25,42 +25,116 @@
                         </div>
                     @endif
 
-                    <h5 class="mb-4">{{ __('Available Plans') }}</h5>
-                    <div class="row">
-                        @foreach($plans as $plan)
-                            <div class="col-md-3 mb-4">
-                                <div class="card h-100 {{ $plan->is_featured ? 'border-primary' : '' }}">
-                                    @if($plan->is_featured)
-                                        <div class="card-header bg-primary text-white text-center">
-                                            <strong>{{ __('Featured') }}</strong>
+                    <!-- Current Quota Section -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-wallet"></i> Current Quota
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="card border-left-primary">
+                                        <div class="card-body">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                Balance (IDR)
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                Rp {{ number_format($quota->balance, 0, ',', '.') }}
+                                            </div>
                                         </div>
-                                    @endif
-                                    <div class="card-body text-center">
-                                        <h4>{{ $plan->name }}</h4>
-                                        <h3 class="text-primary">${{ number_format($plan->price, 2) }}</h3>
-                                        <p class="text-muted">{{ $plan->description }}</p>
-                                        <ul class="list-unstyled text-start">
-                                            <li><i class="fas fa-check text-success"></i> {{ $plan->sessions_limit }} {{ __('Sessions') }}</li>
-                                            <li><i class="fas fa-check text-success"></i> 
-                                                @if($plan->messages_per_month)
-                                                    {{ number_format($plan->messages_per_month) }} {{ __('Messages/month') }}
-                                                @else
-                                                    {{ __('Unlimited Messages') }}
-                                                @endif
-                                            </li>
-                                            <li><i class="fas fa-check text-success"></i> {{ $plan->api_rate_limit }} {{ __('API calls/min') }}</li>
-                                        </ul>
-                                        <form action="{{ route('billing.subscribe') }}" method="POST" class="mt-auto">
-                                            @csrf
-                                            <input type="hidden" name="plan_id" value="{{ $plan->id }}">
-                                            <button type="submit" class="btn btn-primary w-100">
-                                                {{ __('Subscribe') }}
-                                            </button>
-                                        </form>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card border-left-info">
+                                        <div class="card-body">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                Text Quota
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                {{ number_format($quota->text_quota, 0, ',', '.') }} pesan
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card border-left-success">
+                                        <div class="card-body">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Multimedia Quota
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                {{ number_format($quota->multimedia_quota, 0, ',', '.') }} pesan
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
+                            <div class="mt-3">
+                                <a href="{{ route('quota.index') }}" class="btn btn-primary">
+                                    <i class="fas fa-shopping-cart"></i> Purchase Quota
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Message Pricing Section -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-dollar-sign"></i> Message Pricing
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Message Type</th>
+                                            <th>Price (IDR)</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Text with Watermark</strong></td>
+                                            <td class="text-success">
+                                                <strong>Rp {{ number_format($pricing->text_with_watermark_price, 0, ',', '.') }}</strong>
+                                                @if($pricing->text_with_watermark_price == 0)
+                                                    <span class="badge badge-success">FREE</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                Pesan text dengan watermark "{{ $pricing->watermark_text }}" di akhir pesan
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Text without Watermark</strong></td>
+                                            <td>
+                                                <strong>Rp {{ number_format($pricing->text_without_watermark_price, 0, ',', '.') }}</strong>
+                                            </td>
+                                            <td>
+                                                Pesan text premium tanpa watermark
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Multimedia</strong></td>
+                                            <td>
+                                                <strong>Rp {{ number_format($pricing->multimedia_price, 0, ',', '.') }}</strong>
+                                            </td>
+                                            <td>
+                                                Pesan multimedia (image, document, video, audio, dll)
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="alert alert-info mt-3">
+                                <i class="fas fa-info-circle"></i> 
+                                <strong>Note:</strong> Harga di atas adalah per pesan. Balance akan dikurangi sesuai harga setiap kali mengirim pesan premium.
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

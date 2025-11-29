@@ -143,7 +143,7 @@
                     <p class="mb-2"><strong>{{ __('1. Kirim Pesan Teks') }}</strong></p>
                     <p><strong>{{ __('Body (JSON)') }}</strong></p>
                     <div class="api-code mb-3"><code>{
-  "session_id": "YOUR_SESSION_ID",
+  "device_id": "YOUR_DEVICE_ID",
   "message_type": "text",
   "to": "6281234567890",
   "message": "Halo, ini pesan dari API"
@@ -152,7 +152,7 @@
                     <p class="mb-2"><strong>{{ __('2. Kirim Pesan Gambar') }}</strong></p>
                     <p><strong>{{ __('Body (JSON)') }}</strong></p>
                     <div class="api-code mb-3"><code>{
-  "session_id": "YOUR_SESSION_ID",
+  "device_id": "YOUR_DEVICE_ID",
   "message_type": "image",
   "to": "6281234567890",
   "image": "https://example.com/image.jpg",
@@ -162,7 +162,7 @@
                     <p class="mb-2"><strong>{{ __('3. Kirim Pesan Video') }}</strong></p>
                     <p><strong>{{ __('Body (JSON)') }}</strong></p>
                     <div class="api-code mb-3"><code>{
-  "session_id": "YOUR_SESSION_ID",
+  "device_id": "YOUR_DEVICE_ID",
   "message_type": "video",
   "to": "6281234567890",
   "video": "https://example.com/video.mp4",
@@ -175,7 +175,7 @@
                     <p class="mb-2"><strong>{{ __('4. Kirim Pesan Dokumen') }}</strong></p>
                     <p><strong>{{ __('Body (JSON)') }}</strong></p>
                     <div class="api-code mb-3"><code>{
-  "session_id": "YOUR_SESSION_ID",
+  "device_id": "YOUR_DEVICE_ID",
   "message_type": "document",
   "to": "6281234567890",
   "document": "https://example.com/invoice.pdf",
@@ -186,7 +186,7 @@
                     <p class="mb-2"><strong>{{ __('5. Kirim Pesan Poll') }}</strong></p>
                     <p><strong>{{ __('Body (JSON)') }}</strong></p>
                     <div class="api-code mb-3"><code>{
-  "session_id": "YOUR_SESSION_ID",
+  "device_id": "YOUR_DEVICE_ID",
   "message_type": "poll",
   "to": "6281234567890",
   "poll_name": "How are you?",
@@ -215,7 +215,7 @@
                     <p class="mb-2"><strong>{{ __('6. Kirim Pesan Button') }}</strong></p>
                     <p><strong>{{ __('Body (JSON)') }}</strong></p>
                     <div class="api-code mb-3"><code>{
-  "session_id": "YOUR_SESSION_ID",
+  "device_id": "YOUR_DEVICE_ID",
   "message_type": "button",
   "to": "6281234567890",
   "body": "Tell us how are you please 🙏",
@@ -274,7 +274,7 @@
                     <p class="mb-2"><strong>{{ __('7. Kirim Pesan List') }}</strong></p>
                     <p><strong>{{ __('Body (JSON)') }}</strong></p>
                     <div class="api-code mb-3"><code>{
-  "session_id": "YOUR_SESSION_ID",
+  "device_id": "YOUR_DEVICE_ID",
   "message_type": "list",
   "to": "6281234567890",
   "message": {
@@ -317,7 +317,7 @@
 
                     <p class="mb-1"><strong>{{ __('Keterangan Field') }}</strong></p>
                     <ul class="api-list">
-                        <li><span class="api-inline-code">session_id</span> – {{ __('ID session WhatsApp (required, string, max 255 karakter). Dapat dilihat di menu Sessions.') }}</li>
+                        <li><span class="api-inline-code">device_id</span> – {{ __('ID device WhatsApp (required, string, max 255 karakter). Dapat dilihat di menu Devices.') }}</li>
                         <li><span class="api-inline-code">message_type</span> – {{ __('Jenis pesan (required): "text", "image", "video", "document", "poll", "button", atau "list".') }}</li>
                         <li><span class="api-inline-code">to</span> – {{ __('Nomor tujuan (required, string, max 20 karakter). Format: 08xxxxxxxxxx atau 628xxxxxxxxxx (akan dinormalisasi otomatis).') }}</li>
                         <li><span class="api-inline-code">message</span> – {{ __('Isi pesan teks (required jika message_type="text", string, maks 4096 karakter).') }}</li>
@@ -384,7 +384,7 @@
   "success": false,
   "error": "Validation failed",
   "errors": {
-    "session_id": ["Session ID is required."],
+    "device_id": ["Device ID is required."],
     "message_type": ["Message type must be one of: text, image, video, document, poll."],
     "to": ["Recipient number is required."]
   }
@@ -405,11 +405,11 @@
                     </p>
 
                     <p><strong>{{ __('Query Parameters') }}</strong></p>
-                    <div class="api-code mb-3"><code>session_id=YOUR_SESSION_ID&per_page=20&page=1</code></div>
+                    <div class="api-code mb-3"><code>device_id=YOUR_DEVICE_ID&per_page=20&page=1</code></div>
 
                     <p class="mb-1"><strong>{{ __('Keterangan parameter') }}</strong></p>
                     <ul class="api-list">
-                        <li><span class="api-inline-code">session_id</span> – {{ __('ID session WhatsApp (required).') }}</li>
+                        <li><span class="api-inline-code">device_id</span> – {{ __('ID device WhatsApp (required).') }}</li>
                         <li><span class="api-inline-code">per_page</span> – {{ __('Jumlah pesan per halaman (opsional, default: 20).') }}</li>
                         <li><span class="api-inline-code">page</span> – {{ __('Nomor halaman (opsional, default: 1).') }}</li>
                     </ul>
@@ -418,7 +418,7 @@
 
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <span class="api-section-title">{{ __('4. Daftar Sessions') }}</span>
+                    <span class="api-section-title">{{ __('4. Daftar Devices') }}</span>
                     <span class="badge bg-primary api-badge">SESSIONS</span>
                 </div>
                 <div class="card-body">

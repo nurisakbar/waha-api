@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\PhoneNumberHelper;
+use App\Jobs\SendMessage as SendMessageJob;
 use App\Models\Message;
 use App\Models\WhatsAppSession;
 use App\Services\WahaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
 
 class MessageController extends Controller
@@ -279,176 +281,81 @@ class MessageController extends Controller
         $messageData = [
             'user_id' => Auth::id(),
             'session_id' => $session->id,
-            'from_number' => $fromNumber, // Phone number from device_info, or null if not available
-            'to_number' => $normalizedNumber, // Normalized phone number (62 format) or group ID
-            'chat_type' => $chatType, // personal or group
+            'from_number' => $fromNumber,
+            'to_number' => $normalizedNumber,
+            'chat_type' => $chatType,
             'message_type' => $request->message_type,
             'direction' => 'outgoing',
             'status' => 'pending',
         ];
 
         try {
+            $mediaPath = null;
+            $documentPath = null;
+            $documentUrl = null;
+
             switch ($request->message_type) {
                 case 'text':
-                    // Log the request details for debugging
-                    \Log::info('Browser: Sending text message', [
-                        'session_id' => $session->session_id,
-                        'chat_id' => $chatId,
-                        'text_length' => strlen($request->content),
-                        'user_id' => Auth::id(),
-                    ]);
-                    
-                    $result = $this->wahaService->sendText(
-                        $session->session_id,
-                        $chatId,
-                        $request->content
-                    );
-                    
-                    // Log the result (same format as API for easy comparison)
-                    \Log::info('Browser: WAHA sendText response', [
-                        'success' => $result['success'] ?? false,
-                        'error' => $result['error'] ?? null,
-                        'data' => $result['data'] ?? null,
-                        'session_id' => $session->session_id,
-                        'chat_id' => $chatId,
-                    ]);
-                    
                     $messageData['content'] = $request->content;
                     break;
 
                 case 'image':
-                    \Log::info('Browser: Sending image message', [
-                        'session_id' => $session->session_id,
-                        'chat_id' => $chatId,
-                        'user_id' => Auth::id(),
-                    ]);
-                    
                     $file = $request->file('media');
                     $path = $file->store('messages/media', 'public');
-                    $result = $this->wahaService->sendImage(
-                        $session->session_id,
-                        $chatId,
-                        storage_path('app/public/' . $path),
-                        $request->caption
-                    );
-                    
-                    \Log::info('Browser: WAHA sendImage response', [
-                        'success' => $result['success'] ?? false,
-                        'error' => $result['error'] ?? null,
-                    ]);
-                    
                     $messageData['media_url'] = Storage::url($path);
                     $messageData['media_mime_type'] = $file->getMimeType();
                     $messageData['media_size'] = $file->getSize();
                     $messageData['caption'] = $request->caption;
+                    $mediaPath = $path;
                     break;
 
                 case 'document':
-                    \Log::info('Browser: Sending document message', [
-                        'session_id' => $session->session_id,
-                        'chat_id' => $chatId,
-                        'user_id' => Auth::id(),
-                        'has_file' => $request->hasFile('document_file'),
-                        'has_url' => !empty($request->document_url),
-                    ]);
-                    
-                    // Support both file upload and URL
                     if ($request->hasFile('document_file')) {
                         $file = $request->file('document_file');
                         $path = $file->store('messages/documents', 'public');
-                        $result = $this->wahaService->sendDocument(
-                            $session->session_id,
-                            $chatId,
-                            storage_path('app/public/' . $path),
-                            $file->getClientOriginalName()
-                        );
                         $messageData['media_url'] = Storage::url($path);
                         $messageData['media_mime_type'] = $file->getMimeType();
                         $messageData['media_size'] = $file->getSize();
+                        $documentPath = $path;
                     } elseif ($request->document_url) {
+                        $messageData['media_url'] = $request->document_url;
                         $documentUrl = $request->document_url;
-                        $result = $this->wahaService->sendDocumentByUrl(
-                            $session->session_id,
-                            $chatId,
-                            $documentUrl
-                        );
-                        $messageData['media_url'] = $documentUrl;
                     } else {
                         return back()->withErrors(['error' => 'Please provide either a document file or document URL.']);
                     }
-                    
-                    \Log::info('Browser: WAHA sendDocument response', [
-                        'success' => $result['success'] ?? false,
-                        'error' => $result['error'] ?? null,
-                    ]);
-                    
                     $messageData['caption'] = $request->caption;
                     break;
             }
 
-            if ($result && $result['success']) {
-                $whatsappId = $result['data']['id'] ?? null;
-                if (is_array($whatsappId)) {
-                    $whatsappId = json_encode($whatsappId);
-                }
-                
-                // Check ack status from WAHA response
-                $ack = $result['data']['ack'] ?? $result['data']['_data']['ack'] ?? null;
-                $status = 'sent';
-                
-                // ack: 0 = pending, 1 = delivered, 2 = read, 3 = played
-                // If ack is 0, message might not be actually sent yet
-                if ($ack === 0) {
-                    $status = 'pending';
-                    \Log::warning('Browser: Message sent but ack=0 (pending delivery)', [
-                        'session_id' => $session->session_id,
-                        'chat_id' => $chatId,
-                        'whatsapp_message_id' => $whatsappId,
-                    ]);
-                }
-                
-                $messageData['whatsapp_message_id'] = $whatsappId;
-                $messageData['status'] = $status;
-                $messageData['sent_at'] = now();
+            // Create message record first
+            $message = Message::create($messageData);
 
-                $message = Message::create($messageData);
+            // Dispatch job to send message asynchronously
+            SendMessageJob::dispatch(
+                $message->id,
+                $session->id,
+                $chatId,
+                $request->message_type,
+                $request->content,
+                $mediaPath,
+                $documentPath,
+                $documentUrl,
+                $request->caption,
+                $chatType
+            );
 
-                \Log::info('Browser: Message sent successfully', [
-                    'message_id' => $message->id,
-                    'whatsapp_message_id' => $whatsappId,
-                    'status' => $status,
-                    'ack' => $ack,
-                    'session_id' => $session->session_id,
-                    'chat_id' => $chatId,
-                    'user_id' => Auth::id(),
-                ]);
+            \Log::info('Browser: Message job dispatched', [
+                'message_id' => $message->id,
+                'session_id' => $session->session_id,
+                'chat_id' => $chatId,
+                'user_id' => Auth::id(),
+            ]);
 
-                return redirect()->route('messages.index')
-                    ->with('success', 'Message sent successfully!');
-            } else {
-                // Log error details
-                $errorMessage = $result['error'] ?? 'Failed to send message';
-                \Log::error('Browser: Failed to send message', [
-                    'error' => $errorMessage,
-                    'result' => $result,
-                    'session_id' => $session->session_id,
-                    'chat_id' => $chatId,
-                ]);
-                
-                $messageData['status'] = 'failed';
-                $error = $result['error'] ?? 'Unknown error';
-                if (is_array($error)) {
-                    $error = json_encode($error);
-                }
-                $messageData['error_message'] = $error;
-                Message::create($messageData);
-
-                return back()->withErrors(['error' => $result['error'] ?? 'Failed to send message']);
-            }
+            return redirect()->route('messages.index')
+                ->with('success', 'Message queued for sending!');
         } catch (\Exception $e) {
             $messageData['status'] = 'failed';
             $errorMessage = $e->getMessage();
-            // Guard against very long / complex error payloads
             if (is_array($errorMessage)) {
                 $errorMessage = json_encode($errorMessage);
             }
@@ -456,6 +363,208 @@ class MessageController extends Controller
             Message::create($messageData);
 
             return back()->withErrors(['error' => 'Error: ' . $errorMessage]);
+        }
+    }
+
+    /**
+     * Store bulk messages from Excel file.
+     */
+    public function storeBulk(Request $request)
+    {
+        $rules = [
+            'session_id' => 'required|exists:whatsapp_sessions,id',
+            'excel_file' => 'required|file|mimes:xlsx,xls|max:10240',
+            'delay_enabled' => 'nullable|boolean',
+            'delay_seconds' => 'nullable|integer|min:1|max:60',
+        ];
+
+        $request->validate($rules);
+
+        $session = WhatsAppSession::where('user_id', Auth::id())
+            ->where('id', $request->session_id)
+            ->where('status', 'connected')
+            ->firstOrFail();
+
+        $delayEnabled = $request->has('delay_enabled') && $request->delay_enabled;
+        $delaySeconds = $delayEnabled ? (int)($request->delay_seconds ?? 2) : 0;
+
+        try {
+            $file = $request->file('excel_file');
+            $spreadsheet = IOFactory::load($file->getRealPath());
+            $worksheet = $spreadsheet->getActiveSheet();
+            $rows = $worksheet->toArray();
+
+            if (count($rows) < 2) {
+                return back()->withErrors(['excel_file' => 'Excel file must have at least one data row (excluding header).']);
+            }
+
+            // Get header row (first row)
+            $headerRow = array_shift($rows);
+            $headerRow = array_map('strtolower', array_map('trim', $headerRow));
+
+            // Find column indices
+            $phoneColumnIndex = null;
+            $messageColumnIndex = null;
+
+            foreach ($headerRow as $index => $header) {
+                if (in_array($header, ['nomor', 'phone', 'phone_number', 'number', 'no', 'telepon'])) {
+                    $phoneColumnIndex = $index;
+                }
+                if (in_array($header, ['pesan', 'message', 'text', 'content', 'isi'])) {
+                    $messageColumnIndex = $index;
+                }
+            }
+
+            if ($phoneColumnIndex === null || $messageColumnIndex === null) {
+                return back()->withErrors([
+                    'excel_file' => 'Excel file must have columns: "nomor" (or phone/number) and "pesan" (or message/text/content).'
+                ]);
+            }
+
+            $results = [
+                'total' => 0,
+                'success' => 0,
+                'failed' => 0,
+                'errors' => []
+            ];
+
+            // Try to get phone number from device_info
+            $fromNumber = null;
+            if ($session->device_info && isset($session->device_info['phone'])) {
+                $fromNumber = $session->device_info['phone'];
+            } elseif ($session->device_info && isset($session->device_info['wid'])) {
+                $wid = $session->device_info['wid'];
+                if (is_string($wid) && strpos($wid, '@') !== false) {
+                    $fromNumber = explode('@', $wid)[0];
+                }
+            }
+
+            // Process each row
+            foreach ($rows as $rowIndex => $row) {
+                $results['total']++;
+
+                // Skip empty rows
+                if (empty($row[$phoneColumnIndex]) || empty($row[$messageColumnIndex])) {
+                    $results['failed']++;
+                    $results['errors'][] = "Row " . ($rowIndex + 2) . ": Missing phone number or message";
+                    continue;
+                }
+
+                $phoneNumber = trim($row[$phoneColumnIndex]);
+                $messageContent = trim($row[$messageColumnIndex]);
+
+                // Normalize phone number
+                $normalizedNumber = PhoneNumberHelper::normalize($phoneNumber);
+                if (!$normalizedNumber) {
+                    $results['failed']++;
+                    $results['errors'][] = "Row " . ($rowIndex + 2) . ": Invalid phone number format: " . $phoneNumber;
+                    continue;
+                }
+
+                $chatId = $normalizedNumber . '@c.us';
+
+                // Prepare message data
+                $messageData = [
+                    'user_id' => Auth::id(),
+                    'session_id' => $session->id,
+                    'from_number' => $fromNumber,
+                    'to_number' => $normalizedNumber,
+                    'chat_type' => 'personal',
+                    'message_type' => 'text',
+                    'content' => $messageContent,
+                    'direction' => 'outgoing',
+                    'status' => 'pending',
+                ];
+
+                try {
+                    // Create message record
+                    $message = Message::create($messageData);
+
+                    // Calculate delay for this message (if enabled)
+                    $delay = 0;
+                    if ($delayEnabled && $delaySeconds > 0) {
+                        $delay = $rowIndex * $delaySeconds; // Cumulative delay
+                    }
+
+                    // Dispatch job with delay
+                    if ($delay > 0) {
+                        SendMessageJob::dispatch(
+                            $message->id,
+                            $session->id,
+                            $chatId,
+                            'text',
+                            $messageContent,
+                            null,
+                            null,
+                            null,
+                            null,
+                            'personal'
+                        )->delay(now()->addSeconds($delay));
+                    } else {
+                        SendMessageJob::dispatch(
+                            $message->id,
+                            $session->id,
+                            $chatId,
+                            'text',
+                            $messageContent,
+                            null,
+                            null,
+                            null,
+                            null,
+                            'personal'
+                        );
+                    }
+
+                    $results['success']++;
+
+                    \Log::info('Bulk: Message job dispatched', [
+                        'row' => $rowIndex + 2,
+                        'phone' => $normalizedNumber,
+                        'message_id' => $message->id,
+                        'delay' => $delay,
+                    ]);
+                } catch (\Exception $e) {
+                    $messageData['status'] = 'failed';
+                    $errorMessage = $e->getMessage();
+                    if (is_array($errorMessage)) {
+                        $errorMessage = json_encode($errorMessage);
+                    }
+                    $messageData['error_message'] = $errorMessage;
+                    Message::create($messageData);
+                    $results['failed']++;
+                    $results['errors'][] = "Row " . ($rowIndex + 2) . ": " . $errorMessage;
+
+                    \Log::error('Bulk: Error creating message', [
+                        'row' => $rowIndex + 2,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            // Prepare success message
+            $queuedCount = $results['success'];
+            $successMessage = "Bulk messaging queued! Total: {$results['total']}, Queued: {$queuedCount}, Failed: {$results['failed']}. Messages will be sent in the background.";
+            
+            if ($results['failed'] > 0 && count($results['errors']) > 0) {
+                $errorDetails = implode("\n", array_slice($results['errors'], 0, 10));
+                if (count($results['errors']) > 10) {
+                    $errorDetails .= "\n... and " . (count($results['errors']) - 10) . " more errors";
+                }
+                return redirect()->route('messages.index')
+                    ->with('success', $successMessage)
+                    ->with('error_details', $errorDetails);
+            }
+
+            return redirect()->route('messages.index')
+                ->with('success', $successMessage);
+
+        } catch (\Exception $e) {
+            \Log::error('Bulk: Error processing Excel file', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return back()->withErrors(['excel_file' => 'Error processing Excel file: ' . $e->getMessage()]);
         }
     }
 
