@@ -1,7 +1,6 @@
 # Vendor directories (Composer)
 /vendor/
 frontend/vendor/
-**/vendor/
 
 # Node modules
 /node_modules/
