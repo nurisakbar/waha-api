@@ -12,6 +12,7 @@ frontend/node_modules/
 .env
 .env.*
 !.env.example
+!docker.env.example
 frontend/.env
 frontend/.env.*
 
@@ -72,6 +73,8 @@ logs/
 # Docker
 docker-compose.override.yml
 .docker/
+docker-data/
+backups/
 
 # Database
 *.sqlite

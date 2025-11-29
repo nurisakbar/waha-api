@@ -1,21 +1,25 @@
 services:
+  # WAHA WhatsApp API Service
   waha:
-    image: devlikeapro/waha-plus:latest
+    # Use devlikeapro/waha for free version or devlikeapro/waha-plus for paid version
+    # For paid version, you need to login first: docker login
+    image: ${WAHA_IMAGE:-devlikeapro/waha:latest}
     container_name: waha-api
     platform: linux/amd64
     ports:
-      - "3000:3000"
+      - "${WAHA_PORT:-3000}:3000"
     environment:
-      - WAHA_LOG_LEVEL=info
-      - WAHA_SWAGGER_ENABLED=true
-      - WHATSAPP_SWAGGER_USERNAME=admin
-      - WHATSAPP_SWAGGER_PASSWORD=admin123
-      - WAHA_DASHBOARD_USERNAME=admin
-      - WAHA_DASHBOARD_PASSWORD=admin123
-      - WAHA_API_KEY=a87aa01beacf47c4b55fa8462cfc97f8
-      - WHATSAPP_DEFAULT_ENGINE=NOWEB
+      - WAHA_LOG_LEVEL=${WAHA_LOG_LEVEL:-info}
+      - WAHA_SWAGGER_ENABLED=${WAHA_SWAGGER_ENABLED:-true}
+      - WHATSAPP_SWAGGER_USERNAME=${WAHA_SWAGGER_USERNAME:-admin}
+      - WHATSAPP_SWAGGER_PASSWORD=${WAHA_SWAGGER_PASSWORD}
+      - WAHA_DASHBOARD_USERNAME=${WAHA_DASHBOARD_USERNAME:-admin}
+      - WAHA_DASHBOARD_PASSWORD=${WAHA_DASHBOARD_PASSWORD}
+      - WAHA_API_KEY=${WAHA_API_KEY}
+      - WHATSAPP_DEFAULT_ENGINE=${WHATSAPP_DEFAULT_ENGINE:-NOWEB}
     volumes:
-      - waha-sessions:/app/.sessions
+      # Menggunakan bind mount untuk persistensi yang lebih baik dan mudah di-backup
+      - ./docker-data/waha-sessions:/app/.sessions
     restart: unless-stopped
     networks:
       - waha-network
@@ -26,8 +30,33 @@ services:
       retries: 3
       start_period: 40s
 
+  # Redis Cache Service
+  redis:
+    image: redis:7-alpine
+    container_name: waha-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - waha-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: >
+      sh -c "if [ -n \"${REDIS_PASSWORD}\" ]; then 
+        redis-server --requirepass \"${REDIS_PASSWORD}\" --appendonly yes; 
+      else 
+        redis-server --appendonly yes; 
+      fi"
+
 volumes:
-  waha-sessions:
+  # waha-sessions sekarang menggunakan bind mount (./docker-data/waha-sessions)
+  # Volume ini tetap ada untuk kompatibilitas jika diperlukan
+  redis-data:
     driver: local
 
 networks:

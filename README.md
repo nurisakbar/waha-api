@@ -22,12 +22,8 @@ wahaapi/
 ├── DATABASE_SCHEMA.sql      → Schema referensi
 ├── README.md                → File ini
 ├── docker-compose.yml        → Docker Compose untuk WAHA
-├── waha-start.sh            → Script start WAHA
-├── waha-stop.sh             → Script stop WAHA
-├── waha-restart.sh          → Script restart WAHA
-├── waha-status.sh           → Script cek status WAHA
-├── waha-logs.sh             → Script lihat logs WAHA
-└── app/                     → Source code Laravel 11
+├── waha.sh                  → All-in-one WAHA management script
+└── frontend/                → Source code Laravel 11
     ├── app/                 → Controllers, Models, dll.
     ├── resources/           → Blade, JS, SCSS
     ├── routes/              → web/api routes
@@ -100,20 +96,30 @@ DB_PASSWORD=root
 
 ### 3. Setup WAHA via Docker
 ```bash
-# Start WAHA API
-./waha-start.sh
+# Setup environment (first time only)
+./waha.sh setup
 
-# Atau manual dengan docker-compose
-docker-compose up -d waha
+# Start WAHA API
+./waha.sh start
 
 # Check status
-./waha-status.sh
+./waha.sh status
 
 # View logs
-./waha-logs.sh
+./waha.sh logs
+./waha.sh logs -f  # Follow logs
 
 # Stop WAHA
-./waha-stop.sh
+./waha.sh stop
+
+# Restart WAHA
+./waha.sh restart
+
+# Backup sessions
+./waha.sh backup
+
+# See all commands
+./waha.sh help
 ```
 
 ### 4. Setup Database
@@ -164,14 +170,16 @@ Lihat file `CHECKLIST_MODUL.md` untuk melihat progress detail setiap modul.
 
 ## 🐳 WAHA Docker Setup
 
-Lihat [WAHA_DOCKER.md](./WAHA_DOCKER.md) untuk panduan lengkap setup WAHA via Docker.
+Lihat [DOCKER_SETUP.md](./DOCKER_SETUP.md) untuk panduan lengkap setup WAHA via Docker.
 
 **Quick Start:**
 ```bash
-./waha-start.sh    # Start WAHA
-./waha-status.sh    # Check status
-./waha-logs.sh      # View logs
-./waha-stop.sh      # Stop WAHA
+./waha.sh setup     # First time setup
+./waha.sh start     # Start WAHA
+./waha.sh status    # Check status
+./waha.sh logs      # View logs
+./waha.sh stop      # Stop WAHA
+./waha.sh help      # See all commands
 ```
 
 ## 🔗 Resources
