@@ -300,9 +300,51 @@ cmd_restart() {
     
     if docker ps | grep -q "$CONTAINER_NAME"; then
         print_success "WAHA restarted successfully!"
-        print_info "📍 API URL: http://localhost:${WAHA_PORT:-3000}"
+        WAHA_PORT=$(grep WAHA_PORT "$ENV_FILE" 2>/dev/null | cut -d'=' -f2 || echo "3000")
+        print_info "📍 API URL: http://localhost:${WAHA_PORT}"
     else
         print_error "WAHA failed to restart"
+        print_info "Check logs: ./waha.sh logs"
+        exit 1
+    fi
+}
+
+cmd_recreate() {
+    print_header "Recreating WAHA Container"
+    
+    check_docker
+    check_env
+    
+    print_warning "This will stop and remove the container, then create a new one"
+    read -p "Continue? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        print_info "Cancelled"
+        return 0
+    fi
+    
+    print_info "Stopping and removing WAHA container..."
+    $DOCKER_COMPOSE -f "$COMPOSE_FILE" --env-file "$ENV_FILE" stop waha 2>/dev/null
+    $DOCKER_COMPOSE -f "$COMPOSE_FILE" --env-file "$ENV_FILE" rm -f waha 2>/dev/null
+    
+    # Also remove container manually if exists
+    if docker ps -a | grep -q "$CONTAINER_NAME"; then
+        docker rm -f "$CONTAINER_NAME" 2>/dev/null
+    fi
+    
+    print_info "Creating new WAHA container..."
+    $DOCKER_COMPOSE -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d waha
+    
+    sleep 3
+    
+    if docker ps | grep -q "$CONTAINER_NAME"; then
+        print_success "WAHA container recreated successfully!"
+        echo ""
+        WAHA_PORT=$(grep WAHA_PORT "$ENV_FILE" 2>/dev/null | cut -d'=' -f2 || echo "3000")
+        print_info "📍 API URL: http://localhost:${WAHA_PORT}"
+        print_info "📚 Swagger UI: http://localhost:${WAHA_PORT}/api-docs"
+    else
+        print_error "WAHA failed to recreate"
         print_info "Check logs: ./waha.sh logs"
         exit 1
     fi
@@ -498,6 +540,7 @@ cmd_help() {
     echo "  start              Start WAHA container"
     echo "  stop               Stop WAHA container"
     echo "  restart            Restart WAHA container"
+    echo "  recreate           Stop, remove, and create new WAHA container"
     echo "  status             Check WAHA status and health"
     echo "  logs [-f]          View WAHA logs (use -f to follow)"
     echo "  backup [dir]       Backup WAHA sessions (default: ./backups)"
@@ -533,6 +576,9 @@ case "$COMMAND" in
         ;;
     restart)
         cmd_restart
+        ;;
+    recreate)
+        cmd_recreate
         ;;
     status)
         cmd_status
