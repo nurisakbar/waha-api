@@ -6,128 +6,19 @@
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <div class="card">
+            <div class="card shadow mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>{{ __('API Keys') }}</span>
-                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#createApiKeyModal">
-                        <i class="fas fa-plus"></i> {{ __('Create API Key') }}
-                    </button>
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-key mr-2"></i>API Key
+                    </h6>
+                    <form action="{{ route('api-keys.regenerate') }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin regenerate API key? Key lama akan berhenti bekerja segera.');">
+                        @csrf
+                        <button type="submit" class="btn btn-warning btn-sm">
+                            <i class="fas fa-sync-alt mr-2"></i>Regenerate Key
+                        </button>
+                    </form>
                 </div>
                 <div class="card-body">
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                            {{ session('success') }}
-                                    @if(session('api_key_plain'))
-                                        <div class="mt-2">
-                                            <div class="input-group" style="max-width: 600px;">
-                                                <input type="text" class="form-control" id="newApiKey" value="{{ session('api_key_plain') }}" readonly>
-                                                <div class="input-group-append">
-                                                    <button class="btn btn-outline-secondary" type="button" onclick="copyApiKey('newApiKey', this)">
-                                                        <i class="fas fa-copy"></i> {{ __('Copy') }}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <small class="text-muted d-block mt-1">
-                                                <i class="fas fa-exclamation-triangle text-warning"></i> 
-                                                {{ __('Save this key now. It won\'t be shown again!') }}
-                                            </small>
-                                            
-                                            @if(session('api_key_plain'))
-                                            <div class="mt-3 border-top pt-3">
-                                                <h6 class="mb-3"><strong><i class="fas fa-code mr-2"></i>{{ __('Format Siap Pakai:') }}</strong></h6>
-                                                
-                                                @php
-                                                    $apiKeyValue = session('api_key_plain');
-                                                @endphp
-                                                
-                                                <!-- cURL Format -->
-                                                <div class="mb-3">
-                                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                                        <label class="small font-weight-bold mb-0">{{ __('cURL:') }}</label>
-                                                        <button class="btn btn-sm btn-outline-secondary" type="button" onclick="copyText(document.getElementById('curlFormat').value, this)" title="{{ __('Copy cURL command') }}">
-                                                            <i class="fas fa-copy"></i> {{ __('Copy') }}
-                                                        </button>
-                                                    </div>
-                                                    <textarea class="form-control font-monospace small" id="curlFormat" rows="2" readonly style="font-size: 12px;">curl -X POST "{{ config('app.url', 'http://localhost:8000') }}/api/v1/messages" \
-  -H "Content-Type: application/json" \
-  -H "X-Api-Key: {{ $apiKeyValue }}" \
-  -d '{"session_id":"YOUR_SESSION_ID","message_type":"text","to":"6281234567890","message":"Hello"}'</textarea>
-                                                </div>
-                                                
-                                                <!-- JavaScript/Fetch Format -->
-                                                <div class="mb-3">
-                                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                                        <label class="small font-weight-bold mb-0">{{ __('JavaScript/Fetch:') }}</label>
-                                                        <button class="btn btn-sm btn-outline-secondary" type="button" onclick="copyText(document.getElementById('jsFormat').value, this)" title="{{ __('Copy JavaScript code') }}">
-                                                            <i class="fas fa-copy"></i> {{ __('Copy') }}
-                                                        </button>
-                                                    </div>
-                                                    <textarea class="form-control font-monospace small" id="jsFormat" rows="5" readonly style="font-size: 12px;">fetch("{{ config('app.url', 'http://localhost:8000') }}/api/v1/messages", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "X-Api-Key": "{{ $apiKeyValue }}"
-  },
-  body: JSON.stringify({
-    session_id: "YOUR_SESSION_ID",
-    message_type: "text",
-    to: "6281234567890",
-    message: "Hello"
-  })
-})</textarea>
-                                                </div>
-                                                
-                                                <!-- PHP Format -->
-                                                <div class="mb-3">
-                                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                                        <label class="small font-weight-bold mb-0">{{ __('PHP:') }}</label>
-                                                        <button class="btn btn-sm btn-outline-secondary" type="button" onclick="copyText(document.getElementById('phpFormat').value, this)" title="{{ __('Copy PHP code') }}">
-                                                            <i class="fas fa-copy"></i> {{ __('Copy') }}
-                                                        </button>
-                                                    </div>
-                                                    <textarea class="form-control font-monospace small" id="phpFormat" rows="8" readonly style="font-size: 12px;">$url = "{{ config('app.url', 'http://localhost:8000') }}/api/v1/messages";
-$data = [
-    "session_id" => "YOUR_SESSION_ID",
-    "message_type" => "text",
-    "to" => "6281234567890",
-    "message" => "Hello"
-];
-
-$options = [
-    "http" => [
-        "method" => "POST",
-        "header" => "Content-Type: application/json\r\n" .
-                    "X-Api-Key: {{ $apiKeyValue }}\r\n",
-        "content" => json_encode($data)
-    ]
-];
-
-$response = file_get_contents($url, false, stream_context_create($options));</textarea>
-                                                </div>
-                                                
-                                                <!-- Header Only Format -->
-                                                <div class="mb-0">
-                                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                                        <label class="small font-weight-bold mb-0">{{ __('Header Only:') }}</label>
-                                                        <button class="btn btn-sm btn-outline-secondary" type="button" onclick="copyText(document.getElementById('headerFormat').value, this)" title="{{ __('Copy header') }}">
-                                                            <i class="fas fa-copy"></i> {{ __('Copy') }}
-                                                        </button>
-                                                    </div>
-                                                    <input type="text" class="form-control font-monospace small" id="headerFormat" value="X-Api-Key: {{ $apiKeyValue }}" readonly style="font-size: 12px;">
-                                                </div>
-                                            </div>
-                                            @endif
-                                        </div>
-                                    @endif
-                                </div>
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        </div>
-                    @endif
 
                     @if ($errors->any())
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -142,125 +33,145 @@ $response = file_get_contents($url, false, stream_context_create($options));</te
                         </div>
                     @endif
 
-                    <!-- Format Siap Pakai Section (Always Visible) -->
-                    @php
-                        $userApiKeys = session('user_api_keys', []);
-                        $latestApiKey = null;
-                        
-                        // Get the latest API key from session
-                        if (!empty($userApiKeys)) {
-                            $latestApiKeyId = array_key_last($userApiKeys);
-                            $latestApiKey = $userApiKeys[$latestApiKeyId] ?? null;
-                        }
-                        
-                        // Also check flash for backward compatibility
-                        if (!$latestApiKey && session('api_key_plain')) {
-                            $latestApiKey = session('api_key_plain');
-                        }
-                    @endphp
-                    
-                    @if($latestApiKey)
-                    <div class="card mb-4 border-success">
-                        <div class="card-header bg-success text-white">
-                            <h6 class="mb-0"><i class="fas fa-key mr-2"></i>{{ __('API Key Siap Pakai') }}</h6>
-                        </div>
-                        <div class="card-body">
-                            <p class="mb-3">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                {{ __('Copy API key di bawah ini dan paste ke Postman atau aplikasi Anda:') }}
-                            </p>
-                            <div class="input-group">
-                                <input type="text" class="form-control font-monospace" id="readyToUseApiKey" value="{{ $latestApiKey }}" readonly style="font-size: 14px;">
-                                <div class="input-group-append">
-                                    <button class="btn btn-success" type="button" onclick="copyApiKey('readyToUseApiKey', this)" style="min-width: 100px;">
-                                        <i class="fas fa-copy mr-2"></i>{{ __('Copy') }}
-                                    </button>
+                    @if($apiKey)
+                        <div class="row">
+                            <!-- Left Column - API Key Display -->
+                            <div class="col-lg-8">
+                                <div class="card border-left-primary mb-4">
+                                    <div class="card-body">
+                                        <h6 class="mb-3">
+                                            <i class="fas fa-key text-primary mr-2"></i>API Key Anda
+                                        </h6>
+                                        
+                                        @php
+                                            $userApiKeys = session('user_api_keys', []);
+                                            $plainKey = $userApiKeys[$apiKey->id] ?? null;
+                                            
+                                            // Also check flash for backward compatibility
+                                            if (!$plainKey && session('api_key_plain') && $apiKey->id === session('api_key_id')) {
+                                                $plainKey = session('api_key_plain');
+                                            }
+                                        @endphp
+                                        
+                                        @if($plainKey)
+                                            {{-- Show masked key with show/hide toggle --}}
+                                            @php
+                                                $keyLength = strlen($plainKey);
+                                                $showChars = 8; // Show first and last 8 characters
+                                                $maskedKey = substr($plainKey, 0, $showChars) . str_repeat('•', max(0, $keyLength - ($showChars * 2))) . substr($plainKey, -$showChars);
+                                            @endphp
+                                            <div class="input-group mb-3">
+                                                <input type="text" 
+                                                       class="form-control font-monospace" 
+                                                       id="apiKeyDisplay" 
+                                                       value="{{ $maskedKey }}" 
+                                                       data-full-key="{{ $plainKey }}"
+                                                       data-masked-key="{{ $maskedKey }}"
+                                                       data-is-masked="true"
+                                                       readonly 
+                                                       style="font-size: 14px; letter-spacing: 1px;">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-outline-secondary" 
+                                                            type="button" 
+                                                            id="toggleApiKey" 
+                                                            onclick="toggleApiKeyVisibility()"
+                                                            title="Tampilkan/Sembunyikan API Key">
+                                                        <i class="fas fa-eye" id="toggleIcon"></i>
+                                                    </button>
+                                                    <button class="btn btn-primary" 
+                                                            type="button" 
+                                                            onclick="copyApiKey('apiKeyDisplay', this)" 
+                                                            style="min-width: 100px;">
+                                                        <i class="fas fa-copy mr-2"></i>Salin
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <small class="text-muted">
+                                                <i class="fas fa-lightbulb mr-1"></i>
+                                                Gunakan di Postman: <code>X-Api-Key: [your_key]</code>
+                                            </small>
+                                        @else
+                                            {{-- This should not happen, but just in case --}}
+                                            <div class="alert alert-warning">
+                                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                                API key Anda sedang dimuat. Silakan refresh halaman.
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- API Key Information -->
+                                <div class="card border-left-info">
+                                    <div class="card-body">
+                                        <h6 class="mb-3">
+                                            <i class="fas fa-info-circle text-info mr-2"></i>Informasi Key
+                                        </h6>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <div class="small text-gray-500 mb-1">Status</div>
+                                                <div>
+                                                    @if($apiKey->is_active)
+                                                        <span class="badge badge-success badge-lg">Aktif</span>
+                                                    @else
+                                                        <span class="badge badge-secondary badge-lg">Tidak Aktif</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <div class="small text-gray-500 mb-1">Dibuat</div>
+                                                <div class="font-weight-bold">{{ $apiKey->created_at->format('d F Y') }}</div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <div class="small text-gray-500 mb-1">Terakhir Digunakan</div>
+                                                <div class="font-weight-bold">
+                                                    {{ $apiKey->last_used_at ? $apiKey->last_used_at->diffForHumans() : 'Belum pernah' }}
+                                                </div>
+                                            </div>
+                                            @if($apiKey->expires_at)
+                                            <div class="col-md-6 mb-3">
+                                                <div class="small text-gray-500 mb-1">Kedaluwarsa</div>
+                                                <div class="font-weight-bold">{{ $apiKey->expires_at->format('d F Y') }}</div>
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <small class="text-muted d-block mt-2">
-                                <i class="fas fa-lightbulb mr-1"></i>
-                                {{ __('Gunakan di Postman:') }} <code>X-Api-Key: {{ $latestApiKey }}</code>
-                            </small>
-                        </div>
-                    </div>
-                    @endif
 
-                    @if ($apiKeys->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>{{ __('Name') }}</th>
-                                        <th>{{ __('API Key') }}</th>
-                                        <th>{{ __('Status') }}</th>
-                                        <th>{{ __('Last Used') }}</th>
-                                        <th>{{ __('Created') }}</th>
-                                        <th>{{ __('Actions') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($apiKeys as $apiKey)
-                                        <tr>
-                                            <td>{{ $apiKey->name }}</td>
-                                            <td>
-                                                @php
-                                                    $userApiKeys = session('user_api_keys', []);
-                                                    $plainKey = $userApiKeys[$apiKey->id] ?? null;
-                                                    
-                                                    // Also check flash for backward compatibility
-                                                    if (!$plainKey && session('api_key_plain') && $apiKey->id === session('api_key_id')) {
-                                                        $plainKey = session('api_key_plain');
-                                                    }
-                                                @endphp
-                                                
-                                                @if($plainKey)
-                                                    {{-- Show full key for newly created key --}}
-                                                    <div class="d-flex align-items-center">
-                                                        <code class="mr-2" id="api-key-{{ $apiKey->id }}" style="font-size: 11px; word-break: break-all;">{{ $plainKey }}</code>
-                                                        <button class="btn btn-sm btn-outline-secondary ml-2" type="button" onclick="copyApiKeyFull('{{ $plainKey }}', this)" title="{{ __('Copy API Key') }}">
-                                                            <i class="fas fa-copy"></i>
-                                                        </button>
-                                                    </div>
-                                                    <small class="text-warning d-block mt-1">
-                                                        <i class="fas fa-exclamation-triangle"></i> 
-                                                        {{ __('Save this key now. It will be hidden after you logout or session expires.') }}
-                                                    </small>
-                                                @else
-                                                    {{-- Show masked key for existing keys --}}
-                                                    <div class="d-flex align-items-center">
-                                                        <code class="mr-2 text-muted">{{ __('Key hidden for security') }}</code>
-                                                        <small class="text-muted ml-2">
-                                                            <i class="fas fa-info-circle" title="{{ __('API key can only be viewed once when created') }}"></i>
-                                                        </small>
-                                                    </div>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($apiKey->is_active)
-                                                    <span class="badge badge-success">{{ __('Active') }}</span>
-                                                @else
-                                                    <span class="badge badge-secondary">{{ __('Inactive') }}</span>
-                                                @endif
-                                            </td>
-                                            <td>{{ $apiKey->last_used_at ? $apiKey->last_used_at->diffForHumans() : __('Never') }}</td>
-                                            <td>{{ $apiKey->created_at->format('Y-m-d') }}</td>
-                                            <td>
-                                                <form action="{{ route('api-keys.destroy', $apiKey) }}" method="POST" class="d-inline">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
-                                                        <i class="fas fa-trash"></i> {{ __('Delete') }}
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                            <!-- Right Column - Usage Instructions -->
+                            <div class="col-lg-4">
+                                <div class="card border-left-success">
+                                    <div class="card-body">
+                                        <h6 class="mb-3">
+                                            <i class="fas fa-book text-success mr-2"></i>Cara Menggunakan
+                                        </h6>
+                                        <ol class="pl-3">
+                                            <li class="mb-2">Salin API key Anda dari atas</li>
+                                            <li class="mb-2">Tambahkan ke header request Anda:<br>
+                                                <code class="small">X-Api-Key: your_key</code>
+                                            </li>
+                                            <li class="mb-2">Lakukan request API ke:<br>
+                                                <code class="small">{{ config('app.url', 'http://localhost:8000') }}/api/v1/*</code>
+                                            </li>
+                                        </ol>
+                                        <hr>
+                                        <div class="small text-muted">
+                                            <i class="fas fa-shield-alt mr-1"></i>
+                                            <strong>Tips Keamanan:</strong>
+                                            <ul class="mt-2 mb-0 pl-3">
+                                                <li>Jangan pernah membagikan API key Anda</li>
+                                                <li>Regenerate jika API key terkompromi</li>
+                                                <li>Gunakan HTTPS di production</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        {{ $apiKeys->links() }}
                     @else
                         <div class="alert alert-info">
-                            <p class="mb-0">{{ __('No API keys found. Create one to start using the API.') }}</p>
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <p class="mb-0">API key tidak ditemukan. Satu akan dibuat secara otomatis.</p>
                         </div>
                     @endif
                 </div>
@@ -268,137 +179,55 @@ $response = file_get_contents($url, false, stream_context_create($options));</te
         </div>
     </div>
 </div>
-
-<!-- Create API Key Modal -->
-<div class="modal fade" id="createApiKeyModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="POST" action="{{ route('api-keys.store') }}">
-                @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ __('Create API Key') }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    @if ($errors->has('name'))
-                        <div class="alert alert-danger">
-                            {{ $errors->first('name') }}
-                        </div>
-                    @endif
-                    <div class="mb-3">
-                        <label for="name" class="form-label">{{ __('Key Name') }} <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" required placeholder="{{ __('e.g., Production API Key') }}" value="{{ old('name') }}">
-                        @error('name')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('Cancel') }}</button>
-                    <button type="submit" class="btn btn-primary">{{ __('Create') }}</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 @endsection
 
 @push('scripts')
 <script>
-$(document).ready(function() {
-    const modal = $('#createApiKeyModal');
-    const form = modal.find('form');
-    
-    // Reset form when modal is closed
-    modal.on('hidden.bs.modal', function () {
-        form[0].reset();
-        // Clear any error messages
-        modal.find('.alert-danger, .invalid-feedback').remove();
-        // Remove error classes
-        modal.find('.is-invalid').removeClass('is-invalid');
-    });
-    
-    // If there are errors, show modal automatically
-    @if($errors->has('name'))
-        modal.modal('show');
-    @endif
-});
-
 /**
- * Copy full API key to clipboard
+ * Toggle API key visibility
  */
-function copyApiKeyFull(key, button) {
-    // Use modern Clipboard API if available
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(key).then(function() {
-            // Show feedback
-            const originalHtml = button.innerHTML;
-            button.innerHTML = '<i class="fas fa-check text-success"></i>';
-            button.classList.add('btn-success');
-            button.classList.remove('btn-outline-secondary');
-            
-            // Reset after 2 seconds
-            setTimeout(function() {
-                button.innerHTML = originalHtml;
-                button.classList.remove('btn-success');
-                button.classList.add('btn-outline-secondary');
-            }, 2000);
-            
-            showToast('{{ __('API Key copied to clipboard!') }}', 'success');
-        }).catch(function(err) {
-            console.error('Failed to copy:', err);
-            // Fallback to execCommand
-            copyApiKeyFallback(key, button);
-        });
-    } else {
-        // Fallback for older browsers
-        copyApiKeyFallback(key, button);
+function toggleApiKeyVisibility() {
+    const input = document.getElementById('apiKeyDisplay');
+    const toggleIcon = document.getElementById('toggleIcon');
+    const toggleBtn = document.getElementById('toggleApiKey');
+    
+    if (input) {
+        const fullKey = input.getAttribute('data-full-key');
+        const maskedKey = input.getAttribute('data-masked-key');
+        const isMasked = input.getAttribute('data-is-masked') === 'true';
+        
+        if (isMasked) {
+            // Show full key
+            input.value = fullKey;
+            input.setAttribute('data-is-masked', 'false');
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+            toggleBtn.classList.remove('btn-outline-secondary');
+            toggleBtn.classList.add('btn-secondary');
+            input.style.color = '#28a745'; // Green color when shown
+        } else {
+            // Hide key (mask it)
+            input.value = maskedKey;
+            input.setAttribute('data-is-masked', 'true');
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+            toggleBtn.classList.remove('btn-secondary');
+            toggleBtn.classList.add('btn-outline-secondary');
+            input.style.color = ''; // Reset color
+        }
     }
 }
 
 /**
- * Fallback copy method using execCommand
+ * Copy API key from input field
  */
-function copyApiKeyFallback(key, button) {
-    // Create temporary input element
-    const tempInput = document.createElement('input');
-    tempInput.value = key;
-    tempInput.style.position = 'fixed';
-    tempInput.style.opacity = '0';
-    document.body.appendChild(tempInput);
-    tempInput.select();
-    tempInput.setSelectionRange(0, 99999); // For mobile devices
-    
-    try {
-        // Copy to clipboard
-        document.execCommand('copy');
-        
-        // Show feedback
-        const originalHtml = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-check text-success"></i>';
-        button.classList.add('btn-success');
-        button.classList.remove('btn-outline-secondary');
-        
-        // Reset after 2 seconds
-        setTimeout(function() {
-            button.innerHTML = originalHtml;
-            button.classList.remove('btn-success');
-            button.classList.add('btn-outline-secondary');
-        }, 2000);
-        
-        // Show toast notification
-        showToast('{{ __('API Key copied to clipboard!') }}', 'success');
-    } catch (err) {
-        console.error('Failed to copy:', err);
-        showToast('{{ __('Failed to copy. Please try again.') }}', 'error');
+function copyApiKey(inputId, button) {
+    const input = document.getElementById(inputId);
+    if (input) {
+        // Always copy the full key from data attribute or value
+        const fullKey = input.getAttribute('data-full-key') || input.value;
+        copyText(fullKey, button);
     }
-    
-    // Remove temporary input
-    document.body.removeChild(tempInput);
 }
 
 /**
@@ -410,18 +239,18 @@ function copyText(text, button) {
         navigator.clipboard.writeText(text).then(function() {
             // Show feedback
             const originalHtml = button.innerHTML;
-            button.innerHTML = '<i class="fas fa-check text-success"></i>';
+            button.innerHTML = '<i class="fas fa-check text-success"></i> Tersalin!';
             button.classList.add('btn-success');
-            button.classList.remove('btn-outline-secondary');
+            button.classList.remove('btn-primary', 'btn-outline-secondary');
             
             // Reset after 2 seconds
             setTimeout(function() {
                 button.innerHTML = originalHtml;
                 button.classList.remove('btn-success');
-                button.classList.add('btn-outline-secondary');
+                button.classList.add('btn-primary');
             }, 2000);
             
-            showToast('{{ __('Copied to clipboard!') }}', 'success');
+            showToast('Berhasil disalin ke clipboard!', 'success');
         }).catch(function(err) {
             console.error('Failed to copy:', err);
             // Fallback to execCommand
@@ -452,36 +281,26 @@ function copyTextFallback(text, button) {
         
         // Show feedback
         const originalHtml = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-check text-success"></i>';
+        button.innerHTML = '<i class="fas fa-check text-success"></i> {{ __('Copied!') }}';
         button.classList.add('btn-success');
-        button.classList.remove('btn-outline-secondary');
+        button.classList.remove('btn-primary', 'btn-outline-secondary');
         
         // Reset after 2 seconds
         setTimeout(function() {
             button.innerHTML = originalHtml;
             button.classList.remove('btn-success');
-            button.classList.add('btn-outline-secondary');
+            button.classList.add('btn-primary');
         }, 2000);
         
         // Show toast notification
-        showToast('{{ __('Copied to clipboard!') }}', 'success');
+        showToast('Berhasil disalin ke clipboard!', 'success');
     } catch (err) {
         console.error('Failed to copy:', err);
-        showToast('{{ __('Failed to copy. Please try again.') }}', 'error');
+        showToast('Gagal menyalin. Silakan coba lagi.', 'error');
     }
     
     // Remove temporary input
     document.body.removeChild(tempInput);
-}
-
-/**
- * Copy API key from input field
- */
-function copyApiKey(inputId, button) {
-    const input = document.getElementById(inputId);
-    if (input) {
-        copyText(input.value, button);
-    }
 }
 
 /**
@@ -523,4 +342,3 @@ if (!$('#toast-styles').length) {
 }
 </script>
 @endpush
-

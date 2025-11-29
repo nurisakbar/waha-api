@@ -47,8 +47,9 @@ Route::middleware('auth')->group(function () {
     // Webhooks
     Route::resource('webhooks', App\Http\Controllers\WebhookController::class);
     
-    // API Keys
-    Route::resource('api-keys', App\Http\Controllers\ApiKeyController::class);
+    // API Keys - Only 1 per user, can be regenerated
+    Route::get('/api-keys', [App\Http\Controllers\ApiKeyController::class, 'index'])->name('api-keys.index');
+    Route::post('/api-keys/regenerate', [App\Http\Controllers\ApiKeyController::class, 'regenerate'])->name('api-keys.regenerate');
     
     // Contacts & Groups
     Route::get('/contacts', [App\Http\Controllers\ContactController::class, 'index'])->name('contacts.index');
@@ -65,6 +66,10 @@ Route::middleware('auth')->group(function () {
     
     // API Documentation
     Route::get('/api-docs', [App\Http\Controllers\ApiDocumentationController::class, 'index'])->name('api-docs.index');
+    
+    // Profile
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 });
 
 // Webhook receiver (public endpoint)

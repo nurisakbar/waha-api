@@ -119,6 +119,14 @@
                 {{ __('Account') }}
             </div>
 
+            <!-- Nav Item - Profile -->
+            <li class="nav-item {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('profile.show') }}">
+                    <i class="fas fa-fw fa-user"></i>
+                    <span>{{ __('Profile') }}</span>
+                </a>
+            </li>
+
             <!-- Nav Item - Billing -->
             <li class="nav-item {{ request()->routeIs('billing.*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('billing.index') }}">
@@ -231,19 +239,13 @@
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="#">
+                                @auth
+                                <a class="dropdown-item" href="{{ route('profile.show') }}">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Settings
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Activity Log
+                                    {{ __('Profile') }}
                                 </a>
                                 <div class="dropdown-divider"></div>
+                                @endauth
                                 @auth
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                         <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
