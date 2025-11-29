@@ -197,6 +197,11 @@
                                             <i class="fas fa-stop"></i> Hentikan Device
                                         </button>
                                     </form>
+                                @else
+                                    <!-- Hubungkan Ulang Button for disconnected or failed status -->
+                                    <a href="{{ route('sessions.pair', $session) }}" class="btn btn-primary w-100">
+                                        <i class="fas fa-sync-alt"></i> Hubungkan Ulang
+                                    </a>
                                 @endif
 
                                 <!-- Divider -->
