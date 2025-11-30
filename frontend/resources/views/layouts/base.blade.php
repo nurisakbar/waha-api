@@ -108,6 +108,14 @@
                 {{ __('Management') }}
             </div>
 
+            <!-- Nav Item - Users -->
+            <li class="nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.users.index') }}">
+                    <i class="fas fa-fw fa-users"></i>
+                    <span>{{ __('Users') }}</span>
+                </a>
+            </li>
+
             <!-- Nav Item - Payment Reports -->
             <li class="nav-item {{ request()->routeIs('admin.quota-purchases.*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.quota-purchases.index') }}">

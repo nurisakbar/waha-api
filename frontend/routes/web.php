@@ -113,6 +113,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/quota-purchases/{quotaPurchase}/approve', [App\Http\Controllers\Admin\QuotaPurchaseController::class, 'approve'])->name('quota-purchases.approve');
         Route::post('/quota-purchases/{quotaPurchase}/reject', [App\Http\Controllers\Admin\QuotaPurchaseController::class, 'reject'])->name('quota-purchases.reject');
         
+        // Users Management
+        Route::get('/users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'show'])->name('users.show');
+        
         // Log Viewer - only accessible by admin
         Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index')->name('logs.index');
     });

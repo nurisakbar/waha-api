@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->uuid('user_id');
             $table->string('session_name');
-            $table->string('session_id')->unique()->comment('WAHA session ID');
+            $table->uuid('session_id')->unique()->comment('WAHA session ID (UUID)');
             $table->enum('status', ['pairing', 'connected', 'disconnected', 'failed'])->default('pairing');
             $table->text('qr_code')->nullable();
             $table->timestamp('qr_code_expires_at')->nullable();

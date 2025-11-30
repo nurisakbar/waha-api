@@ -36,6 +36,10 @@ class WhatsAppSession extends Model
             if (empty($model->id)) {
                 $model->id = (string) Str::uuid();
             }
+            // Auto-generate UUID for session_id if not provided
+            if (empty($model->session_id)) {
+                $model->session_id = (string) Str::uuid();
+            }
         });
     }
 

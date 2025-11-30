@@ -72,8 +72,8 @@ class SessionController extends Controller
         // Format phone number with +62 prefix
         $phoneNumber = '+62' . ltrim($request->phone_number, '0');
         
-        // WAHA Plus supports multiple sessions - use unique random token
-        $sessionId = Str::random(16);
+        // WAHA Plus supports multiple sessions - use UUID for session_id
+        $sessionId = (string) Str::uuid();
 
         \Log::info('SessionController: Starting session creation', [
             'user_id' => Auth::id(),

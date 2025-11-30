@@ -93,22 +93,92 @@
         
         /* Code Block */
         .code-block {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            padding: 2rem;
-            border-radius: 12px;
-            font-family: 'Courier New', 'Monaco', monospace;
+            background: #111827;
+            color: #e5e7eb;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', 'Courier New', monospace;
             font-size: 0.875rem;
+            line-height: 1.6;
             overflow-x: auto;
-            border: 1px solid #333;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid #374151;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             margin: 1.5rem 0;
+            position: relative;
         }
         
-        .code-block .keyword { color: #569cd6; }
-        .code-block .string { color: #ce9178; }
-        .code-block .number { color: #b5cea8; }
-        .code-block .comment { color: #6a9955; }
+        .code-block code {
+            color: inherit;
+            background: transparent;
+            padding: 0;
+            border: 0;
+            white-space: pre;
+            display: block;
+            font-family: inherit;
+            font-size: inherit;
+        }
+        
+        .code-block .keyword { color: #60a5fa; }
+        .code-block .string { color: #34d399; }
+        .code-block .number { color: #fbbf24; }
+        .code-block .comment { color: #9ca3af; font-style: italic; }
+        .code-block .function { color: #a78bfa; }
+        .code-block .variable { color: #f472b6; }
+        
+        /* Code Tabs */
+        .code-tabs {
+            margin: 1rem 0;
+        }
+        .code-tabs-header {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            padding-bottom: 0.5rem;
+        }
+        .code-tab {
+            padding: 0.625rem 1.25rem;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            position: relative;
+            bottom: -2px;
+        }
+        .code-tab:hover {
+            color: var(--primary-color);
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 6px 6px 0 0;
+        }
+        .code-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 6px 6px 0 0;
+        }
+        .code-tab-content {
+            display: none;
+        }
+        .code-tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
         
         /* Sections */
         .section {
@@ -365,6 +435,11 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="docs.html">Dokumentasi</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://wacloudid-7322120.postman.co/workspace/wacloud's-Workspace~5c5388e1-9d0d-4d0c-89ed-872f04bf682d/collection/50462175-4977c6c8-7232-463d-92ab-b68baadab3f7?action=share&creator=50462175&active-environment=50462175-324144eb-2861-48da-8402-2603b16bbbc5&live=t1dw8b3gn1" target="_blank">
+                            <i class="fab fa-get-pocket me-1"></i>Postman Collection
+                        </a>
+                    </li>
                     <li class="nav-item ms-2">
                         <a class="btn btn-primary text-white" href="https://app.wacloud.id/login">Daftar Akun</a>
                     </li>
@@ -403,11 +478,13 @@
                             <a class="nav-link" href="#overview">Overview</a>
                             <a class="nav-link" href="#authentication">Autentikasi</a>
                             <a class="nav-link" href="#endpoints">Endpoints</a>
+                            <a class="nav-link" href="#device-management">Device Management</a>
                             <a class="nav-link" href="#sending-messages">Mengirim Pesan</a>
                             <a class="nav-link" href="#message-types">Jenis Pesan</a>
                             <a class="nav-link" href="#examples">Contoh Kode</a>
                             <a class="nav-link" href="#webhook">Webhook</a>
                             <a class="nav-link" href="#template">Template</a>
+                            <a class="nav-link" href="#otp">OTP</a>
                         </nav>
                     </div>
                 </div>
@@ -424,7 +501,7 @@
                 <div class="alert alert-info mt-4">
                     <h5 class="mb-2"><i class="fas fa-info-circle me-2"></i>Base URL</h5>
                     <p class="mb-0">
-                        <code>http://localhost:8000/api/v1</code>
+                        <code>https://app.wacloud.id/api/v1</code>
                     </p>
                 </div>
                 <h3 class="mt-4">Fitur Utama</h3>
@@ -463,9 +540,9 @@
                 <div class="endpoint-item">
                     <div class="d-flex align-items-center mb-2">
                         <span class="endpoint-badge badge-get">GET</span>
-                        <span class="endpoint-url">/sessions</span>
+                        <span class="endpoint-url">/devices</span>
                     </div>
-                    <p class="text-muted mb-0">Mendapatkan daftar semua session WhatsApp yang terhubung.</p>
+                    <p class="text-muted mb-0">Mendapatkan daftar semua device WhatsApp yang terhubung.</p>
                 </div>
 
                 <div class="endpoint-item">
@@ -487,9 +564,49 @@
                 <div class="endpoint-item">
                     <div class="d-flex align-items-center mb-2">
                         <span class="endpoint-badge badge-post">POST</span>
-                        <span class="endpoint-url">/sessions/{session}/messages/sync</span>
+                        <span class="endpoint-url">/devices/{device_id}/messages/sync</span>
                     </div>
                     <p class="text-muted mb-0">Sinkronisasi pesan masuk dari WAHA ke database.</p>
+                </div>
+                
+                <div class="endpoint-item">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-get">GET</span>
+                        <span class="endpoint-url">/devices/{device_id}</span>
+                    </div>
+                    <p class="text-muted mb-0">Mendapatkan detail device WhatsApp berdasarkan ID.</p>
+                </div>
+                
+                <div class="endpoint-item">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-get">GET</span>
+                        <span class="endpoint-url">/devices/{device_id}/pair</span>
+                    </div>
+                    <p class="text-muted mb-0">Mendapatkan QR code untuk pairing device WhatsApp.</p>
+                </div>
+                
+                <div class="endpoint-item">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-get">GET</span>
+                        <span class="endpoint-url">/templates</span>
+                    </div>
+                    <p class="text-muted mb-0">Mendapatkan daftar semua template pesan.</p>
+                </div>
+                
+                <div class="endpoint-item">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-get">GET</span>
+                        <span class="endpoint-url">/account</span>
+                    </div>
+                    <p class="text-muted mb-0">Mendapatkan informasi akun dan quota.</p>
+                </div>
+                
+                <div class="endpoint-item">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-post">POST</span>
+                        <span class="endpoint-url">/messages/otp</span>
+                    </div>
+                    <p class="text-muted mb-0">Mengirim kode OTP ke nomor tujuan.</p>
                 </div>
             </div>
 
@@ -501,7 +618,7 @@
                 <h3>Format Request</h3>
                 <div class="code-block">
 <code>{
-  <span class="string">"session_id"</span>: <span class="string">"session_xxx"</span>,
+  <span class="string">"device_id"</span>: <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
   <span class="string">"to"</span>: <span class="string">"6281234567890"</span>,
   <span class="string">"message_type"</span>: <span class="string">"text"</span>,
   <span class="string">"text"</span>: <span class="string">"Halo, ini pesan dari API!"</span>
@@ -513,12 +630,206 @@
 <code>{
   <span class="string">"success"</span>: <span class="keyword">true</span>,
   <span class="string">"data"</span>: {
-    <span class="string">"message_id"</span>: <span class="string">"uuid"</span>,
+    <span class="string">"message_id"</span>: <span class="string">"f47ac10b-58cc-4372-a567-0e02b2c3d479"</span>,
     <span class="string">"whatsapp_message_id"</span>: <span class="string">"3EB0..."</span>,
     <span class="string">"status"</span>: <span class="string">"sent"</span>,
+    <span class="string">"ack"</span>: <span class="number">1</span>,
     <span class="string">"to"</span>: <span class="string">"6281234567890"</span>
   }
 }</code>
+                </div>
+
+                <h3>Contoh Implementasi</h3>
+                
+                <div class="code-tabs">
+                    <div class="code-tabs-header">
+                        <button class="code-tab active" onclick="switchCodeTab(this, 'send-msg-curl')">cURL</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'send-msg-php')">PHP</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'send-msg-python')">Python</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'send-msg-nodejs')">Node.js</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'send-msg-javascript')">JavaScript</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'send-msg-golang')">Golang</button>
+                    </div>
+                    <div id="send-msg-curl" class="code-tab-content active">
+                        <div class="code-block">
+<code>curl -X POST "https://app.wacloud.id/api/v1/messages" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device_id": "550e8400-e29b-41d4-a716-446655440000",
+    "to": "6281234567890",
+    "message_type": "text",
+    "text": "Halo, ini pesan dari API!"
+  }'</code>
+                        </div>
+                    </div>
+                    <div id="send-msg-php" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="comment">// Kirim pesan text</span>
+<span class="keyword">$apiKey</span> = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">$url</span> = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">$data</span> = [
+    <span class="string">'device_id'</span> => <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    <span class="string">'to'</span> => <span class="string">'6281234567890'</span>,
+    <span class="string">'message_type'</span> => <span class="string">'text'</span>,
+    <span class="string">'text'</span> => <span class="string">'Halo, ini pesan dari API!'</span>
+];
+
+<span class="keyword">$ch</span> = <span class="function">curl_init</span>(<span class="keyword">$url</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="function">json_encode</span>(<span class="keyword">$data</span>));
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+    <span class="string">'X-Api-Key: ' . $apiKey</span>,
+    <span class="string">'Content-Type: application/json'</span>
+]);
+
+<span class="keyword">$response</span> = <span class="function">curl_exec</span>(<span class="keyword">$ch</span>);
+<span class="function">curl_close</span>(<span class="keyword">$ch</span>);
+
+<span class="keyword">$result</span> = <span class="function">json_decode</span>(<span class="keyword">$response</span>, <span class="keyword">true</span>);
+<span class="keyword">if</span> (<span class="keyword">$result</span>[<span class="string">'success'</span>]) {
+    <span class="function">echo</span> <span class="string">"Message ID: " . $result['data']['message_id']</span>;
+}</code>
+                        </div>
+                    </div>
+                    <div id="send-msg-python" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">api_key</span> = <span class="string">'YOUR_API_KEY'</span>
+<span class="variable">url</span> = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>
+
+<span class="variable">headers</span> = {
+    <span class="string">'X-Api-Key'</span>: <span class="variable">api_key</span>,
+    <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+}
+
+<span class="variable">data</span> = {
+    <span class="string">'device_id'</span>: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    <span class="string">'to'</span>: <span class="string">'6281234567890'</span>,
+    <span class="string">'message_type'</span>: <span class="string">'text'</span>,
+    <span class="string">'text'</span>: <span class="string">'Halo, ini pesan dari API!'</span>
+}
+
+<span class="variable">response</span> = requests.<span class="function">post</span>(<span class="variable">url</span>, <span class="variable">headers</span>=<span class="variable">headers</span>, <span class="variable">json</span>=<span class="variable">data</span>)
+
+<span class="keyword">if</span> <span class="variable">response</span>.status_code == <span class="number">201</span>:
+    <span class="variable">result</span> = <span class="variable">response</span>.<span class="function">json</span>()
+    <span class="keyword">if</span> <span class="variable">result</span>[<span class="string">'success'</span>]:
+        <span class="function">print</span>(<span class="function">f</span>(<span class="string">"Message ID: {result['data']['message_id']}"</span>))</code>
+                        </div>
+                    </div>
+                    <div id="send-msg-nodejs" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> axios = <span class="function">require</span>(<span class="string">'axios'</span>);
+
+<span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'text'</span>,
+    text: <span class="string">'Halo, ini pesan dari API!'</span>
+};
+
+axios.<span class="function">post</span>(url, data, {
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    }
+})
+.<span class="function">then</span>(response => {
+    <span class="keyword">if</span> (response.data.success) {
+        console.<span class="function">log</span>(<span class="string">`Message ID: ${response.data.data.message_id}`</span>);
+    }
+})
+.<span class="function">catch</span>(error => {
+    console.<span class="function">error</span>(<span class="string">'Error:'</span>, error.response?.data || error.message);
+});</code>
+                        </div>
+                    </div>
+                    <div id="send-msg-javascript" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'text'</span>,
+    text: <span class="string">'Halo, ini pesan dari API!'</span>
+};
+
+<span class="function">fetch</span>(url, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    },
+    body: JSON.<span class="function">stringify</span>(data)
+})
+.<span class="function">then</span>(response => response.<span class="function">json</span>())
+.<span class="function">then</span>(result => {
+    <span class="keyword">if</span> (result.success) {
+        console.<span class="function">log</span>(<span class="string">`Message ID: ${result.data.message_id}`</span>);
+    }
+})
+.<span class="function">catch</span>(error => {
+    console.<span class="function">error</span>(<span class="string">'Error:'</span>, error);
+});</code>
+                        </div>
+                    </div>
+                    <div id="send-msg-golang" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
+    <span class="string">"bytes"</span>
+    <span class="string">"encoding/json"</span>
+    <span class="string">"fmt"</span>
+    <span class="string">"io"</span>
+    <span class="string">"net/http"</span>
+)
+
+<span class="keyword">type</span> SendMessageRequest <span class="keyword">struct</span> {
+    DeviceID    <span class="keyword">string</span> <span class="string">`json:"device_id"`</span>
+    To          <span class="keyword">string</span> <span class="string">`json:"to"`</span>
+    MessageType <span class="keyword">string</span> <span class="string">`json:"message_type"`</span>
+    Text        <span class="keyword">string</span> <span class="string">`json:"text"`</span>
+}
+
+<span class="keyword">func</span> main() {
+    apiKey := <span class="string">"YOUR_API_KEY"</span>
+    url := <span class="string">"https://app.wacloud.id/api/v1/messages"</span>
+    
+    data := SendMessageRequest{
+        DeviceID:    <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+        To:          <span class="string">"6281234567890"</span>,
+        MessageType: <span class="string">"text"</span>,
+        Text:        <span class="string">"Halo, ini pesan dari API!"</span>,
+    }
+    
+    jsonData, _ := json.<span class="function">Marshal</span>(data)
+    
+    req, _ := http.<span class="function">NewRequest</span>(<span class="string">"POST"</span>, url, bytes.<span class="function">NewBuffer</span>(jsonData))
+    req.Header.<span class="function">Set</span>(<span class="string">"X-Api-Key"</span>, apiKey)
+    req.Header.<span class="function">Set</span>(<span class="string">"Content-Type"</span>, <span class="string">"application/json"</span>)
+    
+    client := &http.<span class="function">Client</span>{}
+    resp, err := client.<span class="function">Do</span>(req)
+    <span class="keyword">if</span> err != <span class="keyword">nil</span> {
+        <span class="function">panic</span>(err)
+    }
+    <span class="keyword">defer</span> resp.Body.<span class="function">Close</span>()
+    
+    body, _ := io.<span class="function">ReadAll</span>(resp.Body)
+    fmt.<span class="function">Println</span>(<span class="function">string</span>(body))
+}</code>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -529,129 +840,1145 @@
                 
                 <h3>1. Text Message</h3>
                 <p>Pesan teks biasa.</p>
+                <div class="code-tabs">
+                    <div class="code-tabs-header">
+                        <button class="code-tab active" onclick="switchCodeTab(this, 'text-msg-curl')">cURL</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'text-msg-php')">PHP</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'text-msg-python')">Python</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'text-msg-nodejs')">Node.js</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'text-msg-javascript')">JavaScript</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'text-msg-golang')">Golang</button>
+                    </div>
+                    <div id="text-msg-curl" class="code-tab-content active">
                 <div class="code-block">
-<code>{
-  <span class="string">"message_type"</span>: <span class="string">"text"</span>,
-  <span class="string">"text"</span>: <span class="string">"Pesan teks"</span>
+<code>curl -X POST "https://app.wacloud.id/api/v1/messages" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device_id": "550e8400-e29b-41d4-a716-446655440000",
+    "to": "6281234567890",
+    "message_type": "text",
+    "text": "Pesan teks"
+  }'</code>
+                        </div>
+                    </div>
+                    <div id="text-msg-php" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">$apiKey</span> = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">$url</span> = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">$data</span> = [
+    <span class="string">'device_id'</span> => <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    <span class="string">'to'</span> => <span class="string">'6281234567890'</span>,
+    <span class="string">'message_type'</span> => <span class="string">'text'</span>,
+    <span class="string">'text'</span> => <span class="string">'Pesan teks'</span>
+];
+
+<span class="keyword">$ch</span> = <span class="function">curl_init</span>(<span class="keyword">$url</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="function">json_encode</span>(<span class="keyword">$data</span>));
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+    <span class="string">'X-Api-Key: ' . $apiKey</span>,
+    <span class="string">'Content-Type: application/json'</span>
+]);
+
+<span class="keyword">$response</span> = <span class="function">curl_exec</span>(<span class="keyword">$ch</span>);
+<span class="function">curl_close</span>(<span class="keyword">$ch</span>);</code>
+                        </div>
+                    </div>
+                    <div id="text-msg-python" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">response</span> = requests.<span class="function">post</span>(
+    <span class="string">'https://app.wacloud.id/api/v1/messages'</span>,
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>},
+    <span class="variable">json</span>={
+        <span class="string">'device_id'</span>: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+        <span class="string">'to'</span>: <span class="string">'6281234567890'</span>,
+        <span class="string">'message_type'</span>: <span class="string">'text'</span>,
+        <span class="string">'text'</span>: <span class="string">'Pesan teks'</span>
+    }
+)</code>
+                        </div>
+                    </div>
+                    <div id="text-msg-nodejs" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> axios = <span class="function">require</span>(<span class="string">'axios'</span>);
+
+<span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'text'</span>,
+    text: <span class="string">'Pesan teks'</span>
+};
+
+axios.<span class="function">post</span>(url, data, {
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    }
+});</code>
+                        </div>
+                    </div>
+                    <div id="text-msg-javascript" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'text'</span>,
+    text: <span class="string">'Pesan teks'</span>
+};
+
+<span class="function">fetch</span>(url, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    },
+    body: JSON.<span class="function">stringify</span>(data)
+});</code>
+                        </div>
+                    </div>
+                    <div id="text-msg-golang" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
+    <span class="string">"bytes"</span>
+    <span class="string">"encoding/json"</span>
+    <span class="string">"net/http"</span>
+)
+
+<span class="keyword">type</span> TextMessage <span class="keyword">struct</span> {
+    DeviceID    <span class="keyword">string</span> <span class="string">`json:"device_id"`</span>
+    To          <span class="keyword">string</span> <span class="string">`json:"to"`</span>
+    MessageType <span class="keyword">string</span> <span class="string">`json:"message_type"`</span>
+    Text        <span class="keyword">string</span> <span class="string">`json:"text"`</span>
+}
+
+<span class="keyword">func</span> sendTextMessage() {
+    apiKey := <span class="string">"YOUR_API_KEY"</span>
+    url := <span class="string">"https://app.wacloud.id/api/v1/messages"</span>
+    
+    data := TextMessage{
+        DeviceID:    <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+        To:          <span class="string">"6281234567890"</span>,
+        MessageType: <span class="string">"text"</span>,
+        Text:        <span class="string">"Pesan teks"</span>,
+    }
+    
+    jsonData, _ := json.<span class="function">Marshal</span>(data)
+    req, _ := http.<span class="function">NewRequest</span>(<span class="string">"POST"</span>, url, bytes.<span class="function">NewBuffer</span>(jsonData))
+    req.Header.<span class="function">Set</span>(<span class="string">"X-Api-Key"</span>, apiKey)
+    req.Header.<span class="function">Set</span>(<span class="string">"Content-Type"</span>, <span class="string">"application/json"</span>)
+    
+    client := &http.<span class="function">Client</span>{}
+    client.<span class="function">Do</span>(req)
 }</code>
+                        </div>
+                    </div>
                 </div>
 
                 <h3>2. Image Message</h3>
                 <p>Mengirim gambar dengan URL.</p>
+                <div class="code-tabs">
+                    <div class="code-tabs-header">
+                        <button class="code-tab active" onclick="switchCodeTab(this, 'image-msg-curl')">cURL</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'image-msg-php')">PHP</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'image-msg-python')">Python</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'image-msg-nodejs')">Node.js</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'image-msg-javascript')">JavaScript</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'image-msg-golang')">Golang</button>
+                    </div>
+                    <div id="image-msg-curl" class="code-tab-content active">
                 <div class="code-block">
-<code>{
-  <span class="string">"message_type"</span>: <span class="string">"image"</span>,
-  <span class="string">"image"</span>: <span class="string">"https://example.com/image.jpg"</span>,
-  <span class="string">"caption"</span>: <span class="string">"Caption gambar"</span>
+<code>curl -X POST "https://app.wacloud.id/api/v1/messages" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device_id": "550e8400-e29b-41d4-a716-446655440000",
+    "to": "6281234567890",
+    "message_type": "image",
+    "image": "https://example.com/image.jpg",
+    "caption": "Caption gambar"
+  }'</code>
+                        </div>
+                    </div>
+                    <div id="image-msg-php" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">$apiKey</span> = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">$url</span> = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">$data</span> = [
+    <span class="string">'device_id'</span> => <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    <span class="string">'to'</span> => <span class="string">'6281234567890'</span>,
+    <span class="string">'message_type'</span> => <span class="string">'image'</span>,
+    <span class="string">'image'</span> => <span class="string">'https://example.com/image.jpg'</span>,
+    <span class="string">'caption'</span> => <span class="string">'Caption gambar'</span>
+];
+
+<span class="keyword">$ch</span> = <span class="function">curl_init</span>(<span class="keyword">$url</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="function">json_encode</span>(<span class="keyword">$data</span>));
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+    <span class="string">'X-Api-Key: ' . $apiKey</span>,
+    <span class="string">'Content-Type: application/json'</span>
+]);
+
+<span class="keyword">$response</span> = <span class="function">curl_exec</span>(<span class="keyword">$ch</span>);
+<span class="function">curl_close</span>(<span class="keyword">$ch</span>);</code>
+                        </div>
+                    </div>
+                    <div id="image-msg-python" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">response</span> = requests.<span class="function">post</span>(
+    <span class="string">'https://app.wacloud.id/api/v1/messages'</span>,
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>},
+    <span class="variable">json</span>={
+        <span class="string">'device_id'</span>: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+        <span class="string">'to'</span>: <span class="string">'6281234567890'</span>,
+        <span class="string">'message_type'</span>: <span class="string">'image'</span>,
+        <span class="string">'image'</span>: <span class="string">'https://example.com/image.jpg'</span>,
+        <span class="string">'caption'</span>: <span class="string">'Caption gambar'</span>
+    }
+)</code>
+                        </div>
+                    </div>
+                    <div id="image-msg-nodejs" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> axios = <span class="function">require</span>(<span class="string">'axios'</span>);
+
+<span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'image'</span>,
+    image: <span class="string">'https://example.com/image.jpg'</span>,
+    caption: <span class="string">'Caption gambar'</span>
+};
+
+axios.<span class="function">post</span>(url, data, {
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    }
+});</code>
+                        </div>
+                    </div>
+                    <div id="image-msg-javascript" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'image'</span>,
+    image: <span class="string">'https://example.com/image.jpg'</span>,
+    caption: <span class="string">'Caption gambar'</span>
+};
+
+<span class="function">fetch</span>(url, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    },
+    body: JSON.<span class="function">stringify</span>(data)
+});</code>
+                        </div>
+                    </div>
+                    <div id="image-msg-golang" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
+    <span class="string">"bytes"</span>
+    <span class="string">"encoding/json"</span>
+    <span class="string">"net/http"</span>
+)
+
+<span class="keyword">type</span> ImageMessage <span class="keyword">struct</span> {
+    DeviceID    <span class="keyword">string</span> <span class="string">`json:"device_id"`</span>
+    To          <span class="keyword">string</span> <span class="string">`json:"to"`</span>
+    MessageType <span class="keyword">string</span> <span class="string">`json:"message_type"`</span>
+    Image       <span class="keyword">string</span> <span class="string">`json:"image"`</span>
+    Caption     <span class="keyword">string</span> <span class="string">`json:"caption"`</span>
+}
+
+<span class="keyword">func</span> sendImageMessage() {
+    apiKey := <span class="string">"YOUR_API_KEY"</span>
+    url := <span class="string">"https://app.wacloud.id/api/v1/messages"</span>
+    
+    data := ImageMessage{
+        DeviceID:    <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+        To:          <span class="string">"6281234567890"</span>,
+        MessageType: <span class="string">"image"</span>,
+        Image:       <span class="string">"https://example.com/image.jpg"</span>,
+        Caption:     <span class="string">"Caption gambar"</span>,
+    }
+    
+    jsonData, _ := json.<span class="function">Marshal</span>(data)
+    req, _ := http.<span class="function">NewRequest</span>(<span class="string">"POST"</span>, url, bytes.<span class="function">NewBuffer</span>(jsonData))
+    req.Header.<span class="function">Set</span>(<span class="string">"X-Api-Key"</span>, apiKey)
+    req.Header.<span class="function">Set</span>(<span class="string">"Content-Type"</span>, <span class="string">"application/json"</span>)
+    
+    client := &http.<span class="function">Client</span>{}
+    client.<span class="function">Do</span>(req)
 }</code>
+                        </div>
+                    </div>
                 </div>
 
                 <h3>3. Video Message</h3>
                 <p>Mengirim video dengan URL.</p>
+                <div class="code-tabs">
+                    <div class="code-tabs-header">
+                        <button class="code-tab active" onclick="switchCodeTab(this, 'video-msg-curl')">cURL</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'video-msg-php')">PHP</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'video-msg-python')">Python</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'video-msg-nodejs')">Node.js</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'video-msg-javascript')">JavaScript</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'video-msg-golang')">Golang</button>
+                    </div>
+                    <div id="video-msg-curl" class="code-tab-content active">
                 <div class="code-block">
-<code>{
-  <span class="string">"message_type"</span>: <span class="string">"video"</span>,
-  <span class="string">"video"</span>: <span class="string">"https://example.com/video.mp4"</span>,
-  <span class="string">"caption"</span>: <span class="string">"Caption video"</span>
+<code>curl -X POST "https://app.wacloud.id/api/v1/messages" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device_id": "550e8400-e29b-41d4-a716-446655440000",
+    "to": "6281234567890",
+    "message_type": "video",
+    "video": "https://example.com/video.mp4",
+    "caption": "Caption video"
+  }'</code>
+                        </div>
+                    </div>
+                    <div id="video-msg-php" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">$apiKey</span> = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">$url</span> = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">$data</span> = [
+    <span class="string">'device_id'</span> => <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    <span class="string">'to'</span> => <span class="string">'6281234567890'</span>,
+    <span class="string">'message_type'</span> => <span class="string">'video'</span>,
+    <span class="string">'video'</span> => <span class="string">'https://example.com/video.mp4'</span>,
+    <span class="string">'caption'</span> => <span class="string">'Caption video'</span>
+];
+
+<span class="keyword">$ch</span> = <span class="function">curl_init</span>(<span class="keyword">$url</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="function">json_encode</span>(<span class="keyword">$data</span>));
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+    <span class="string">'X-Api-Key: ' . $apiKey</span>,
+    <span class="string">'Content-Type: application/json'</span>
+]);
+
+<span class="keyword">$response</span> = <span class="function">curl_exec</span>(<span class="keyword">$ch</span>);
+<span class="function">curl_close</span>(<span class="keyword">$ch</span>);</code>
+                        </div>
+                    </div>
+                    <div id="video-msg-python" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">response</span> = requests.<span class="function">post</span>(
+    <span class="string">'https://app.wacloud.id/api/v1/messages'</span>,
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>},
+    <span class="variable">json</span>={
+        <span class="string">'device_id'</span>: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+        <span class="string">'to'</span>: <span class="string">'6281234567890'</span>,
+        <span class="string">'message_type'</span>: <span class="string">'video'</span>,
+        <span class="string">'video'</span>: <span class="string">'https://example.com/video.mp4'</span>,
+        <span class="string">'caption'</span>: <span class="string">'Caption video'</span>
+    }
+)</code>
+                        </div>
+                    </div>
+                    <div id="video-msg-nodejs" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> axios = <span class="function">require</span>(<span class="string">'axios'</span>);
+
+<span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'video'</span>,
+    video: <span class="string">'https://example.com/video.mp4'</span>,
+    caption: <span class="string">'Caption video'</span>
+};
+
+axios.<span class="function">post</span>(url, data, {
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    }
+});</code>
+                        </div>
+                    </div>
+                    <div id="video-msg-javascript" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'video'</span>,
+    video: <span class="string">'https://example.com/video.mp4'</span>,
+    caption: <span class="string">'Caption video'</span>
+};
+
+<span class="function">fetch</span>(url, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    },
+    body: JSON.<span class="function">stringify</span>(data)
+});</code>
+                        </div>
+                    </div>
+                    <div id="video-msg-golang" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
+    <span class="string">"bytes"</span>
+    <span class="string">"encoding/json"</span>
+    <span class="string">"net/http"</span>
+)
+
+<span class="keyword">type</span> VideoMessage <span class="keyword">struct</span> {
+    DeviceID    <span class="keyword">string</span> <span class="string">`json:"device_id"`</span>
+    To          <span class="keyword">string</span> <span class="string">`json:"to"`</span>
+    MessageType <span class="keyword">string</span> <span class="string">`json:"message_type"`</span>
+    Video       <span class="keyword">string</span> <span class="string">`json:"video"`</span>
+    Caption     <span class="keyword">string</span> <span class="string">`json:"caption"`</span>
+}
+
+<span class="keyword">func</span> sendVideoMessage() {
+    apiKey := <span class="string">"YOUR_API_KEY"</span>
+    url := <span class="string">"https://app.wacloud.id/api/v1/messages"</span>
+    
+    data := VideoMessage{
+        DeviceID:    <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+        To:          <span class="string">"6281234567890"</span>,
+        MessageType: <span class="string">"video"</span>,
+        Video:       <span class="string">"https://example.com/video.mp4"</span>,
+        Caption:     <span class="string">"Caption video"</span>,
+    }
+    
+    jsonData, _ := json.<span class="function">Marshal</span>(data)
+    req, _ := http.<span class="function">NewRequest</span>(<span class="string">"POST"</span>, url, bytes.<span class="function">NewBuffer</span>(jsonData))
+    req.Header.<span class="function">Set</span>(<span class="string">"X-Api-Key"</span>, apiKey)
+    req.Header.<span class="function">Set</span>(<span class="string">"Content-Type"</span>, <span class="string">"application/json"</span>)
+    
+    client := &http.<span class="function">Client</span>{}
+    client.<span class="function">Do</span>(req)
 }</code>
+                        </div>
+                    </div>
                 </div>
 
                 <h3>4. Document Message</h3>
                 <p>Mengirim dokumen (PDF, DOC, dll).</p>
+                <div class="code-tabs">
+                    <div class="code-tabs-header">
+                        <button class="code-tab active" onclick="switchCodeTab(this, 'doc-msg-curl')">cURL</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'doc-msg-php')">PHP</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'doc-msg-python')">Python</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'doc-msg-nodejs')">Node.js</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'doc-msg-javascript')">JavaScript</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'doc-msg-golang')">Golang</button>
+                    </div>
+                    <div id="doc-msg-curl" class="code-tab-content active">
                 <div class="code-block">
-<code>{
-  <span class="string">"message_type"</span>: <span class="string">"document"</span>,
-  <span class="string">"document"</span>: <span class="string">"https://example.com/file.pdf"</span>
+<code>curl -X POST "https://app.wacloud.id/api/v1/messages" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device_id": "550e8400-e29b-41d4-a716-446655440000",
+    "to": "6281234567890",
+    "message_type": "document",
+    "document": "https://example.com/file.pdf"
+  }'</code>
+                        </div>
+                    </div>
+                    <div id="doc-msg-php" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">$apiKey</span> = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">$url</span> = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">$data</span> = [
+    <span class="string">'device_id'</span> => <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    <span class="string">'to'</span> => <span class="string">'6281234567890'</span>,
+    <span class="string">'message_type'</span> => <span class="string">'document'</span>,
+    <span class="string">'document'</span> => <span class="string">'https://example.com/file.pdf'</span>
+];
+
+<span class="keyword">$ch</span> = <span class="function">curl_init</span>(<span class="keyword">$url</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="function">json_encode</span>(<span class="keyword">$data</span>));
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+    <span class="string">'X-Api-Key: ' . $apiKey</span>,
+    <span class="string">'Content-Type: application/json'</span>
+]);
+
+<span class="keyword">$response</span> = <span class="function">curl_exec</span>(<span class="keyword">$ch</span>);
+<span class="function">curl_close</span>(<span class="keyword">$ch</span>);</code>
+                        </div>
+                    </div>
+                    <div id="doc-msg-python" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">response</span> = requests.<span class="function">post</span>(
+    <span class="string">'https://app.wacloud.id/api/v1/messages'</span>,
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>},
+    <span class="variable">json</span>={
+        <span class="string">'device_id'</span>: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+        <span class="string">'to'</span>: <span class="string">'6281234567890'</span>,
+        <span class="string">'message_type'</span>: <span class="string">'document'</span>,
+        <span class="string">'document'</span>: <span class="string">'https://example.com/file.pdf'</span>
+    }
+)</code>
+                        </div>
+                    </div>
+                    <div id="doc-msg-nodejs" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> axios = <span class="function">require</span>(<span class="string">'axios'</span>);
+
+<span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'document'</span>,
+    document: <span class="string">'https://example.com/file.pdf'</span>
+};
+
+axios.<span class="function">post</span>(url, data, {
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    }
+});</code>
+                        </div>
+                    </div>
+                    <div id="doc-msg-javascript" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'document'</span>,
+    document: <span class="string">'https://example.com/file.pdf'</span>
+};
+
+<span class="function">fetch</span>(url, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    },
+    body: JSON.<span class="function">stringify</span>(data)
+});</code>
+                        </div>
+                    </div>
+                    <div id="doc-msg-golang" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
+    <span class="string">"bytes"</span>
+    <span class="string">"encoding/json"</span>
+    <span class="string">"net/http"</span>
+)
+
+<span class="keyword">type</span> DocumentMessage <span class="keyword">struct</span> {
+    DeviceID    <span class="keyword">string</span> <span class="string">`json:"device_id"`</span>
+    To          <span class="keyword">string</span> <span class="string">`json:"to"`</span>
+    MessageType <span class="keyword">string</span> <span class="string">`json:"message_type"`</span>
+    Document    <span class="keyword">string</span> <span class="string">`json:"document"`</span>
+}
+
+<span class="keyword">func</span> sendDocumentMessage() {
+    apiKey := <span class="string">"YOUR_API_KEY"</span>
+    url := <span class="string">"https://app.wacloud.id/api/v1/messages"</span>
+    
+    data := DocumentMessage{
+        DeviceID:    <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+        To:          <span class="string">"6281234567890"</span>,
+        MessageType: <span class="string">"document"</span>,
+        Document:    <span class="string">"https://example.com/file.pdf"</span>,
+    }
+    
+    jsonData, _ := json.<span class="function">Marshal</span>(data)
+    req, _ := http.<span class="function">NewRequest</span>(<span class="string">"POST"</span>, url, bytes.<span class="function">NewBuffer</span>(jsonData))
+    req.Header.<span class="function">Set</span>(<span class="string">"X-Api-Key"</span>, apiKey)
+    req.Header.<span class="function">Set</span>(<span class="string">"Content-Type"</span>, <span class="string">"application/json"</span>)
+    
+    client := &http.<span class="function">Client</span>{}
+    client.<span class="function">Do</span>(req)
 }</code>
+                        </div>
+                    </div>
                 </div>
 
                 <h3>5. Poll Message</h3>
                 <p>Mengirim polling interaktif.</p>
+                <div class="code-tabs">
+                    <div class="code-tabs-header">
+                        <button class="code-tab active" onclick="switchCodeTab(this, 'poll-msg-curl')">cURL</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'poll-msg-php')">PHP</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'poll-msg-python')">Python</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'poll-msg-nodejs')">Node.js</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'poll-msg-javascript')">JavaScript</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'poll-msg-golang')">Golang</button>
+                    </div>
+                    <div id="poll-msg-curl" class="code-tab-content active">
                 <div class="code-block">
-<code>{
-  <span class="string">"message_type"</span>: <span class="string">"poll"</span>,
-  <span class="string">"poll_name"</span>: <span class="string">"Pertanyaan?"</span>,
-  <span class="string">"poll_options"</span>: [<span class="string">"Opsi 1"</span>, <span class="string">"Opsi 2"</span>]
+<code>curl -X POST "https://app.wacloud.id/api/v1/messages" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device_id": "550e8400-e29b-41d4-a716-446655440000",
+    "to": "6281234567890",
+    "message_type": "poll",
+    "poll_name": "Pertanyaan?",
+    "poll_options": ["Opsi 1", "Opsi 2"]
+  }'</code>
+                        </div>
+                    </div>
+                    <div id="poll-msg-php" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">$apiKey</span> = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">$url</span> = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">$data</span> = [
+    <span class="string">'device_id'</span> => <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    <span class="string">'to'</span> => <span class="string">'6281234567890'</span>,
+    <span class="string">'message_type'</span> => <span class="string">'poll'</span>,
+    <span class="string">'poll_name'</span> => <span class="string">'Pertanyaan?'</span>,
+    <span class="string">'poll_options'</span> => [<span class="string">'Opsi 1'</span>, <span class="string">'Opsi 2'</span>]
+];
+
+<span class="keyword">$ch</span> = <span class="function">curl_init</span>(<span class="keyword">$url</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="function">json_encode</span>(<span class="keyword">$data</span>));
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+    <span class="string">'X-Api-Key: ' . $apiKey</span>,
+    <span class="string">'Content-Type: application/json'</span>
+]);
+
+<span class="keyword">$response</span> = <span class="function">curl_exec</span>(<span class="keyword">$ch</span>);
+<span class="function">curl_close</span>(<span class="keyword">$ch</span>);</code>
+                        </div>
+                    </div>
+                    <div id="poll-msg-python" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">response</span> = requests.<span class="function">post</span>(
+    <span class="string">'https://app.wacloud.id/api/v1/messages'</span>,
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>},
+    <span class="variable">json</span>={
+        <span class="string">'device_id'</span>: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+        <span class="string">'to'</span>: <span class="string">'6281234567890'</span>,
+        <span class="string">'message_type'</span>: <span class="string">'poll'</span>,
+        <span class="string">'poll_name'</span>: <span class="string">'Pertanyaan?'</span>,
+        <span class="string">'poll_options'</span>: [<span class="string">'Opsi 1'</span>, <span class="string">'Opsi 2'</span>]
+    }
+)</code>
+                        </div>
+                    </div>
+                    <div id="poll-msg-nodejs" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> axios = <span class="function">require</span>(<span class="string">'axios'</span>);
+
+<span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'poll'</span>,
+    poll_name: <span class="string">'Pertanyaan?'</span>,
+    poll_options: [<span class="string">'Opsi 1'</span>, <span class="string">'Opsi 2'</span>]
+};
+
+axios.<span class="function">post</span>(url, data, {
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    }
+});</code>
+                        </div>
+                    </div>
+                    <div id="poll-msg-javascript" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'poll'</span>,
+    poll_name: <span class="string">'Pertanyaan?'</span>,
+    poll_options: [<span class="string">'Opsi 1'</span>, <span class="string">'Opsi 2'</span>]
+};
+
+<span class="function">fetch</span>(url, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    },
+    body: JSON.<span class="function">stringify</span>(data)
+});</code>
+                        </div>
+                    </div>
+                    <div id="poll-msg-golang" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
+    <span class="string">"bytes"</span>
+    <span class="string">"encoding/json"</span>
+    <span class="string">"net/http"</span>
+)
+
+<span class="keyword">type</span> PollMessage <span class="keyword">struct</span> {
+    DeviceID    <span class="keyword">string</span>   <span class="string">`json:"device_id"`</span>
+    To          <span class="keyword">string</span>   <span class="string">`json:"to"`</span>
+    MessageType <span class="keyword">string</span>   <span class="string">`json:"message_type"`</span>
+    PollName    <span class="keyword">string</span>   <span class="string">`json:"poll_name"`</span>
+    PollOptions []<span class="keyword">string</span> <span class="string">`json:"poll_options"`</span>
+}
+
+<span class="keyword">func</span> sendPollMessage() {
+    apiKey := <span class="string">"YOUR_API_KEY"</span>
+    url := <span class="string">"https://app.wacloud.id/api/v1/messages"</span>
+    
+    data := PollMessage{
+        DeviceID:    <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+        To:          <span class="string">"6281234567890"</span>,
+        MessageType: <span class="string">"poll"</span>,
+        PollName:    <span class="string">"Pertanyaan?"</span>,
+        PollOptions: []<span class="keyword">string</span>{<span class="string">"Opsi 1"</span>, <span class="string">"Opsi 2"</span>},
+    }
+    
+    jsonData, _ := json.<span class="function">Marshal</span>(data)
+    req, _ := http.<span class="function">NewRequest</span>(<span class="string">"POST"</span>, url, bytes.<span class="function">NewBuffer</span>(jsonData))
+    req.Header.<span class="function">Set</span>(<span class="string">"X-Api-Key"</span>, apiKey)
+    req.Header.<span class="function">Set</span>(<span class="string">"Content-Type"</span>, <span class="string">"application/json"</span>)
+    
+    client := &http.<span class="function">Client</span>{}
+    client.<span class="function">Do</span>(req)
 }</code>
+                        </div>
+                    </div>
                 </div>
 
                 <h3>6. List Message</h3>
                 <p>Mengirim pesan dengan format list interaktif.</p>
+                <div class="code-tabs">
+                    <div class="code-tabs-header">
+                        <button class="code-tab active" onclick="switchCodeTab(this, 'list-msg-curl')">cURL</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'list-msg-php')">PHP</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'list-msg-python')">Python</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'list-msg-nodejs')">Node.js</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'list-msg-javascript')">JavaScript</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'list-msg-golang')">Golang</button>
+                    </div>
+                    <div id="list-msg-curl" class="code-tab-content active">
                 <div class="code-block">
-<code>{
-  <span class="string">"message_type"</span>: <span class="string">"list"</span>,
-  <span class="string">"message"</span>: {
-    <span class="string">"title"</span>: <span class="string">"Judul"</span>,
-    <span class="string">"description"</span>: <span class="string">"Deskripsi"</span>,
-    <span class="string">"button"</span>: <span class="string">"Pilih"</span>,
-    <span class="string">"sections"</span>: [...]
-  }
+<code>curl -X POST "https://app.wacloud.id/api/v1/messages" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device_id": "550e8400-e29b-41d4-a716-446655440000",
+    "to": "6281234567890",
+    "message_type": "list",
+    "message": {
+      "title": "Judul",
+      "description": "Deskripsi",
+      "button": "Pilih",
+      "sections": []
+    }
+  }'</code>
+                        </div>
+                    </div>
+                    <div id="list-msg-php" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">$apiKey</span> = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">$url</span> = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">$data</span> = [
+    <span class="string">'device_id'</span> => <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    <span class="string">'to'</span> => <span class="string">'6281234567890'</span>,
+    <span class="string">'message_type'</span> => <span class="string">'list'</span>,
+    <span class="string">'message'</span> => [
+        <span class="string">'title'</span> => <span class="string">'Judul'</span>,
+        <span class="string">'description'</span> => <span class="string">'Deskripsi'</span>,
+        <span class="string">'button'</span> => <span class="string">'Pilih'</span>,
+        <span class="string">'sections'</span> => []
+    ]
+];
+
+<span class="keyword">$ch</span> = <span class="function">curl_init</span>(<span class="keyword">$url</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="function">json_encode</span>(<span class="keyword">$data</span>));
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+    <span class="string">'X-Api-Key: ' . $apiKey</span>,
+    <span class="string">'Content-Type: application/json'</span>
+]);
+
+<span class="keyword">$response</span> = <span class="function">curl_exec</span>(<span class="keyword">$ch</span>);
+<span class="function">curl_close</span>(<span class="keyword">$ch</span>);</code>
+                        </div>
+                    </div>
+                    <div id="list-msg-python" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">response</span> = requests.<span class="function">post</span>(
+    <span class="string">'https://app.wacloud.id/api/v1/messages'</span>,
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>},
+    <span class="variable">json</span>={
+        <span class="string">'device_id'</span>: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+        <span class="string">'to'</span>: <span class="string">'6281234567890'</span>,
+        <span class="string">'message_type'</span>: <span class="string">'list'</span>,
+        <span class="string">'message'</span>: {
+            <span class="string">'title'</span>: <span class="string">'Judul'</span>,
+            <span class="string">'description'</span>: <span class="string">'Deskripsi'</span>,
+            <span class="string">'button'</span>: <span class="string">'Pilih'</span>,
+            <span class="string">'sections'</span>: []
+        }
+    }
+)</code>
+                        </div>
+                    </div>
+                    <div id="list-msg-nodejs" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> axios = <span class="function">require</span>(<span class="string">'axios'</span>);
+
+<span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'list'</span>,
+    message: {
+        title: <span class="string">'Judul'</span>,
+        description: <span class="string">'Deskripsi'</span>,
+        button: <span class="string">'Pilih'</span>,
+        sections: []
+    }
+};
+
+axios.<span class="function">post</span>(url, data, {
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    }
+});</code>
+                        </div>
+                    </div>
+                    <div id="list-msg-javascript" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'list'</span>,
+    message: {
+        title: <span class="string">'Judul'</span>,
+        description: <span class="string">'Deskripsi'</span>,
+        button: <span class="string">'Pilih'</span>,
+        sections: []
+    }
+};
+
+<span class="function">fetch</span>(url, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    },
+    body: JSON.<span class="function">stringify</span>(data)
+});</code>
+                        </div>
+                    </div>
+                    <div id="list-msg-golang" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
+    <span class="string">"bytes"</span>
+    <span class="string">"encoding/json"</span>
+    <span class="string">"net/http"</span>
+)
+
+<span class="keyword">type</span> ListMessage <span class="keyword">struct</span> {
+    DeviceID    <span class="keyword">string</span>      <span class="string">`json:"device_id"`</span>
+    To          <span class="keyword">string</span>      <span class="string">`json:"to"`</span>
+    MessageType <span class="keyword">string</span>      <span class="string">`json:"message_type"`</span>
+    Message     <span class="keyword">map[string]interface</span>{} <span class="string">`json:"message"`</span>
+}
+
+<span class="keyword">func</span> sendListMessage() {
+    apiKey := <span class="string">"YOUR_API_KEY"</span>
+    url := <span class="string">"https://app.wacloud.id/api/v1/messages"</span>
+    
+    data := ListMessage{
+        DeviceID:    <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+        To:          <span class="string">"6281234567890"</span>,
+        MessageType: <span class="string">"list"</span>,
+        Message: <span class="keyword">map[string]interface</span>{}{
+            <span class="string">"title"</span>:       <span class="string">"Judul"</span>,
+            <span class="string">"description"</span>:  <span class="string">"Deskripsi"</span>,
+            <span class="string">"button"</span>:       <span class="string">"Pilih"</span>,
+            <span class="string">"sections"</span>:     []<span class="keyword">interface</span>{}{},
+        },
+    }
+    
+    jsonData, _ := json.<span class="function">Marshal</span>(data)
+    req, _ := http.<span class="function">NewRequest</span>(<span class="string">"POST"</span>, url, bytes.<span class="function">NewBuffer</span>(jsonData))
+    req.Header.<span class="function">Set</span>(<span class="string">"X-Api-Key"</span>, apiKey)
+    req.Header.<span class="function">Set</span>(<span class="string">"Content-Type"</span>, <span class="string">"application/json"</span>)
+    
+    client := &http.<span class="function">Client</span>{}
+    client.<span class="function">Do</span>(req)
 }</code>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Examples -->
             <div class="docs-card" id="examples">
                 <h2>Contoh Kode</h2>
+                <p>Berikut adalah contoh implementasi mengirim pesan menggunakan berbagai bahasa pemrograman:</p>
                 
-                <h3>PHP (cURL)</h3>
-                <div class="code-block">
+                <div class="code-tabs">
+                    <div class="code-tabs-header">
+                        <button class="code-tab active" onclick="switchCodeTab(this, 'example-curl')">cURL</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'example-php')">PHP</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'example-python')">Python</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'example-nodejs')">Node.js</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'example-javascript')">JavaScript</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'example-golang')">Golang</button>
+                    </div>
+                    <div id="example-curl" class="code-tab-content active">
+                        <div class="code-block">
+<code>curl -X POST "https://app.wacloud.id/api/v1/messages" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device_id": "550e8400-e29b-41d4-a716-446655440000",
+    "to": "6281234567890",
+    "message_type": "text",
+    "text": "Halo dari API!"
+  }'</code>
+                        </div>
+                    </div>
+                    <div id="example-php" class="code-tab-content">
+                        <div class="code-block">
 <code><span class="comment">// Kirim pesan text</span>
-<span class="keyword">$ch</span> = <span class="keyword">curl_init</span>(<span class="string">'http://localhost:8000/api/v1/messages'</span>);
-<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
-<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
-<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
-    <span class="string">'X-Api-Key: waha_your_key'</span>,
-    <span class="string">'Content-Type: application/json'</span>
-]);
-<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="keyword">json_encode</span>([
-    <span class="string">'session_id'</span> => <span class="string">'session_xxx'</span>,
+<span class="keyword">$apiKey</span> = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">$url</span> = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">$data</span> = [
+    <span class="string">'device_id'</span> => <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
     <span class="string">'to'</span> => <span class="string">'6281234567890'</span>,
     <span class="string">'message_type'</span> => <span class="string">'text'</span>,
     <span class="string">'text'</span> => <span class="string">'Halo dari API!'</span>
-]));
-<span class="keyword">$response</span> = <span class="keyword">curl_exec</span>(<span class="keyword">$ch</span>);
-<span class="keyword">curl_close</span>(<span class="keyword">$ch</span>);</code>
-                </div>
+];
 
-                <h3>JavaScript (Fetch)</h3>
-                <div class="code-block">
-<code><span class="comment">// Kirim pesan text</span>
-<span class="keyword">fetch</span>(<span class="string">'http://localhost:8000/api/v1/messages'</span>, {
-    <span class="keyword">method</span>: <span class="string">'POST'</span>,
-    <span class="keyword">headers</span>: {
-        <span class="string">'X-Api-Key'</span>: <span class="string">'waha_your_key'</span>,
-        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
-    },
-    <span class="keyword">body</span>: <span class="keyword">JSON.stringify</span>({
-        <span class="string">session_id</span>: <span class="string">'session_xxx'</span>,
-        <span class="string">to</span>: <span class="string">'6281234567890'</span>,
-        <span class="string">message_type</span>: <span class="string">'text'</span>,
-        <span class="string">text</span>: <span class="string">'Halo dari API!'</span>
-    })
-})
-.<span class="keyword">then</span>(<span class="keyword">response</span> => <span class="keyword">response.json</span>())
-.<span class="keyword">then</span>(<span class="keyword">data</span> => <span class="keyword">console.log</span>(<span class="keyword">data</span>));</code>
-                </div>
+<span class="keyword">$ch</span> = <span class="function">curl_init</span>(<span class="keyword">$url</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="function">json_encode</span>(<span class="keyword">$data</span>));
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+    <span class="string">'X-Api-Key: ' . $apiKey</span>,
+    <span class="string">'Content-Type: application/json'</span>
+]);
 
-                <h3>Python (Requests)</h3>
-                <div class="code-block">
+<span class="keyword">$response</span> = <span class="function">curl_exec</span>(<span class="keyword">$ch</span>);
+<span class="function">curl_close</span>(<span class="keyword">$ch</span>);
+
+<span class="keyword">$result</span> = <span class="function">json_decode</span>(<span class="keyword">$response</span>, <span class="keyword">true</span>);
+<span class="keyword">if</span> (<span class="keyword">$result</span>[<span class="string">'success'</span>]) {
+    <span class="function">echo</span> <span class="string">"Message ID: " . $result['data']['message_id']</span>;
+}</code>
+                        </div>
+                    </div>
+                    <div id="example-python" class="code-tab-content">
+                        <div class="code-block">
 <code><span class="keyword">import</span> requests
 
 <span class="comment"># Kirim pesan text</span>
-<span class="keyword">url</span> = <span class="string">'http://localhost:8000/api/v1/messages'</span>
-<span class="keyword">headers</span> = {
-    <span class="string">'X-Api-Key'</span>: <span class="string">'waha_your_key'</span>,
+<span class="variable">api_key</span> = <span class="string">'YOUR_API_KEY'</span>
+<span class="variable">url</span> = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>
+
+<span class="variable">headers</span> = {
+    <span class="string">'X-Api-Key'</span>: <span class="variable">api_key</span>,
     <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
 }
-<span class="keyword">data</span> = {
-    <span class="string">'session_id'</span>: <span class="string">'session_xxx'</span>,
+
+<span class="variable">data</span> = {
+    <span class="string">'device_id'</span>: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
     <span class="string">'to'</span>: <span class="string">'6281234567890'</span>,
     <span class="string">'message_type'</span>: <span class="string">'text'</span>,
     <span class="string">'text'</span>: <span class="string">'Halo dari API!'</span>
 }
-<span class="keyword">response</span> = <span class="keyword">requests.post</span>(<span class="keyword">url</span>, <span class="keyword">json</span>=<span class="keyword">data</span>, <span class="keyword">headers</span>=<span class="keyword">headers</span>)
-<span class="keyword">print</span>(<span class="keyword">response.json</span>())</code>
+
+<span class="variable">response</span> = requests.<span class="function">post</span>(<span class="variable">url</span>, <span class="variable">headers</span>=<span class="variable">headers</span>, <span class="variable">json</span>=<span class="variable">data</span>)
+
+<span class="keyword">if</span> <span class="variable">response</span>.status_code == <span class="number">201</span>:
+    <span class="variable">result</span> = <span class="variable">response</span>.<span class="function">json</span>()
+    <span class="keyword">if</span> <span class="variable">result</span>[<span class="string">'success'</span>]:
+        <span class="function">print</span>(<span class="string">f"Message ID: {result['data']['message_id']}"</span>)</code>
+                        </div>
+                    </div>
+                    <div id="example-nodejs" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> axios = <span class="function">require</span>(<span class="string">'axios'</span>);
+
+<span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'text'</span>,
+    text: <span class="string">'Halo dari API!'</span>
+};
+
+axios.<span class="function">post</span>(url, data, {
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    }
+})
+.<span class="function">then</span>(response => {
+    <span class="keyword">if</span> (response.data.success) {
+        console.<span class="function">log</span>(<span class="string">`Message ID: ${response.data.data.message_id}`</span>);
+    }
+})
+.<span class="function">catch</span>(error => {
+    console.<span class="function">error</span>(<span class="string">'Error:'</span>, error.response?.data || error.message);
+});</code>
+                        </div>
+                    </div>
+                    <div id="example-javascript" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    message_type: <span class="string">'text'</span>,
+    text: <span class="string">'Halo dari API!'</span>
+};
+
+<span class="function">fetch</span>(url, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    },
+    body: JSON.<span class="function">stringify</span>(data)
+})
+.<span class="function">then</span>(response => response.<span class="function">json</span>())
+.<span class="function">then</span>(result => {
+    <span class="keyword">if</span> (result.success) {
+        console.<span class="function">log</span>(<span class="string">`Message ID: ${result.data.message_id}`</span>);
+    }
+})
+.<span class="function">catch</span>(error => {
+    console.<span class="function">error</span>(<span class="string">'Error:'</span>, error);
+});</code>
+                        </div>
+                    </div>
+                    <div id="example-golang" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
+    <span class="string">"bytes"</span>
+    <span class="string">"encoding/json"</span>
+    <span class="string">"fmt"</span>
+    <span class="string">"io"</span>
+    <span class="string">"net/http"</span>
+)
+
+<span class="keyword">type</span> SendMessageRequest <span class="keyword">struct</span> {
+    DeviceID    <span class="keyword">string</span> <span class="string">`json:"device_id"`</span>
+    To          <span class="keyword">string</span> <span class="string">`json:"to"`</span>
+    MessageType <span class="keyword">string</span> <span class="string">`json:"message_type"`</span>
+    Text        <span class="keyword">string</span> <span class="string">`json:"text"`</span>
+}
+
+<span class="keyword">func</span> main() {
+    apiKey := <span class="string">"YOUR_API_KEY"</span>
+    url := <span class="string">"https://app.wacloud.id/api/v1/messages"</span>
+    
+    data := SendMessageRequest{
+        DeviceID:    <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+        To:          <span class="string">"6281234567890"</span>,
+        MessageType: <span class="string">"text"</span>,
+        Text:        <span class="string">"Halo dari API!"</span>,
+    }
+    
+    jsonData, _ := json.<span class="function">Marshal</span>(data)
+    
+    req, _ := http.<span class="function">NewRequest</span>(<span class="string">"POST"</span>, url, bytes.<span class="function">NewBuffer</span>(jsonData))
+    req.Header.<span class="function">Set</span>(<span class="string">"X-Api-Key"</span>, apiKey)
+    req.Header.<span class="function">Set</span>(<span class="string">"Content-Type"</span>, <span class="string">"application/json"</span>)
+    
+    client := &http.<span class="function">Client</span>{}
+    resp, err := client.<span class="function">Do</span>(req)
+    <span class="keyword">if</span> err != <span class="keyword">nil</span> {
+        <span class="function">panic</span>(err)
+    }
+    <span class="keyword">defer</span> resp.Body.<span class="function">Close</span>()
+    
+    body, _ := io.<span class="function">ReadAll</span>(resp.Body)
+    fmt.<span class="function">Println</span>(<span class="function">string</span>(body))
+}</code>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -678,8 +2005,239 @@
 <code>{
   <span class="string">"url"</span>: <span class="string">"https://your-domain.com/webhook"</span>,
   <span class="string">"events"</span>: [<span class="string">"message"</span>, <span class="string">"status"</span>],
-  <span class="string">"session_id"</span>: <span class="string">"session_xxx"</span>
+  <span class="string">"device_id"</span>: <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>
 }</code>
+                </div>
+
+                <h3>Contoh Implementasi</h3>
+                
+                <div class="code-tabs">
+                    <div class="code-tabs-header">
+                        <button class="code-tab active" onclick="switchCodeTab(this, 'webhook-curl')">cURL</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'webhook-python')">Python</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'webhook-php')">PHP</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'webhook-nodejs')">Node.js</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'webhook-javascript')">JavaScript</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'webhook-golang')">Golang</button>
+                    </div>
+                    <div id="webhook-curl" class="code-tab-content active">
+                        <div class="code-block">
+<code><span class="comment"># Membuat webhook</span>
+curl -X POST "https://app.wacloud.id/api/v1/webhooks" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://your-domain.com/webhook",
+    "events": ["message", "status"],
+    "device_id": "550e8400-e29b-41d4-a716-446655440000"
+  }'</code>
+                        </div>
+                    </div>
+                    <div id="webhook-python" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">api_key</span> = <span class="string">'YOUR_API_KEY'</span>
+<span class="variable">url</span> = <span class="string">'https://app.wacloud.id/api/v1/webhooks'</span>
+
+<span class="variable">headers</span> = {
+    <span class="string">'X-Api-Key'</span>: <span class="variable">api_key</span>,
+    <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+}
+
+<span class="variable">data</span> = {
+    <span class="string">'url'</span>: <span class="string">'https://your-domain.com/webhook'</span>,
+    <span class="string">'events'</span>: [<span class="string">'message'</span>, <span class="string">'status'</span>],
+    <span class="string">'device_id'</span>: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>
+}
+
+<span class="variable">response</span> = requests.<span class="function">post</span>(<span class="variable">url</span>, <span class="variable">headers</span>=<span class="variable">headers</span>, <span class="variable">json</span>=<span class="variable">data</span>)
+
+<span class="keyword">if</span> <span class="variable">response</span>.status_code == <span class="number">201</span>:
+    <span class="variable">result</span> = <span class="variable">response</span>.<span class="function">json</span>()
+    <span class="keyword">if</span> <span class="variable">result</span>[<span class="string">'success'</span>]:
+        <span class="function">print</span>(<span class="function">f</span>(<span class="string">"Webhook created: {result['data']['id']}"</span>))</code>
+                        </div>
+                    </div>
+                    <div id="webhook-php" class="code-tab-content active">
+                        <div class="code-block">
+<code><span class="comment">// Membuat webhook</span>
+<span class="keyword">$apiKey</span> = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">$url</span> = <span class="string">'https://app.wacloud.id/api/v1/webhooks'</span>;
+
+<span class="keyword">$data</span> = [
+    <span class="string">'url'</span> => <span class="string">'https://your-domain.com/webhook'</span>,
+    <span class="string">'events'</span> => [<span class="string">'message'</span>, <span class="string">'status'</span>],
+    <span class="string">'device_id'</span> => <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>
+];
+
+<span class="keyword">$ch</span> = <span class="keyword">curl_init</span>(<span class="keyword">$url</span>);
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="keyword">json_encode</span>(<span class="keyword">$data</span>));
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+    <span class="string">'X-Api-Key: ' . $apiKey</span>,
+    <span class="string">'Content-Type: application/json'</span>
+]);
+
+<span class="keyword">$response</span> = <span class="keyword">curl_exec</span>(<span class="keyword">$ch</span>);
+<span class="keyword">curl_close</span>(<span class="keyword">$ch</span>);
+
+<span class="comment">// Menerima webhook di endpoint Anda</span>
+<span class="keyword">$payload</span> = <span class="keyword">json_decode</span>(<span class="keyword">file_get_contents</span>(<span class="string">'php://input'</span>), <span class="keyword">true</span>);
+
+<span class="keyword">if</span> (<span class="keyword">$payload</span>[<span class="string">'event'</span>] === <span class="string">'message'</span>) {
+    <span class="keyword">$from</span> = <span class="keyword">$payload</span>[<span class="string">'data'</span>][<span class="string">'from'</span>];
+    <span class="keyword">$body</span> = <span class="keyword">$payload</span>[<span class="string">'data'</span>][<span class="string">'body'</span>];
+    <span class="comment">// Proses pesan masuk</span>
+    <span class="keyword">echo</span> <span class="string">"Pesan dari {$from}: {$body}"</span>;
+}</code>
+                        </div>
+                    </div>
+                    <div id="webhook-nodejs" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> axios = <span class="keyword">require</span>(<span class="string">'axios'</span>);
+<span class="keyword">const</span> express = <span class="keyword">require</span>(<span class="string">'express'</span>);
+<span class="keyword">const</span> app = <span class="keyword">express</span>();
+
+<span class="comment">// Membuat webhook</span>
+<span class="keyword">const</span> createWebhook = <span class="keyword">async</span> () => {
+    <span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+    <span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/webhooks'</span>;
+    
+    <span class="keyword">const</span> data = {
+        url: <span class="string">'https://your-domain.com/webhook'</span>,
+        events: [<span class="string">'message'</span>, <span class="string">'status'</span>],
+        device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>
+    };
+    
+    <span class="keyword">try</span> {
+        <span class="keyword">const</span> response = <span class="keyword">await</span> axios.<span class="keyword">post</span>(url, data, {
+            headers: {
+                <span class="string">'X-Api-Key'</span>: apiKey,
+                <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+            }
+        });
+        <span class="keyword">console.log</span>(<span class="string">'Webhook created:'</span>, response.data);
+    } <span class="keyword">catch</span> (error) {
+        <span class="keyword">console.error</span>(<span class="string">'Error:'</span>, error.response?.data || error.message);
+    }
+};
+
+<span class="comment">// Menerima webhook</span>
+app.<span class="keyword">use</span>(express.<span class="keyword">json</span>());
+
+app.<span class="keyword">post</span>(<span class="string">'/webhook'</span>, (req, res) => {
+    <span class="keyword">const</span> { event, data } = req.body;
+    
+    <span class="keyword">if</span> (event === <span class="string">'message'</span>) {
+        <span class="keyword">console.log</span>(<span class="string">`Pesan dari ${data.from}: ${data.body}`</span>);
+        <span class="comment">// Proses pesan masuk</span>
+    }
+    
+    res.<span class="keyword">status</span>(<span class="number">200</span>).<span class="keyword">send</span>(<span class="string">'OK'</span>);
+});
+
+app.<span class="keyword">listen</span>(<span class="number">3000</span>, () => {
+    <span class="keyword">console.log</span>(<span class="string">'Webhook server running on port 3000'</span>);
+});</code>
+                        </div>
+                    </div>
+                    <div id="webhook-javascript" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="comment">// Membuat webhook</span>
+<span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/webhooks'</span>;
+
+<span class="keyword">const</span> data = {
+    url: <span class="string">'https://your-domain.com/webhook'</span>,
+    events: [<span class="string">'message'</span>, <span class="string">'status'</span>],
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>
+};
+
+<span class="keyword">fetch</span>(url, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    },
+    body: <span class="keyword">JSON.stringify</span>(data)
+})
+.<span class="keyword">then</span>(response => response.<span class="keyword">json</span>())
+.<span class="keyword">then</span>(result => {
+    <span class="keyword">if</span> (result.success) {
+        <span class="keyword">console.log</span>(<span class="string">'Webhook created:'</span>, result.data);
+    }
+})
+.<span class="keyword">catch</span>(error => {
+    <span class="keyword">console.error</span>(<span class="string">'Error:'</span>, error);
+});</code>
+                        </div>
+                    </div>
+                    <div id="webhook-golang" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
+    <span class="string">"bytes"</span>
+    <span class="string">"encoding/json"</span>
+    <span class="string">"fmt"</span>
+    <span class="string">"io"</span>
+    <span class="string">"net/http"</span>
+)
+
+<span class="keyword">type</span> WebhookRequest <span class="keyword">struct</span> {
+    URL      <span class="keyword">string</span>   <span class="string">`json:"url"`</span>
+    Events   []<span class="keyword">string</span> <span class="string">`json:"events"`</span>
+    DeviceID <span class="keyword">string</span>   <span class="string">`json:"device_id"`</span>
+}
+
+<span class="keyword">func</span> createWebhook() {
+    apiKey := <span class="string">"YOUR_API_KEY"</span>
+    url := <span class="string">"https://app.wacloud.id/api/v1/webhooks"</span>
+    
+    data := WebhookRequest{
+        URL:      <span class="string">"https://your-domain.com/webhook"</span>,
+        Events:   []<span class="keyword">string</span>{<span class="string">"message"</span>, <span class="string">"status"</span>},
+        DeviceID: <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+    }
+    
+    jsonData, _ := json.<span class="keyword">Marshal</span>(data)
+    
+    req, _ := http.<span class="keyword">NewRequest</span>(<span class="string">"POST"</span>, url, bytes.<span class="keyword">NewBuffer</span>(jsonData))
+    req.Header.<span class="keyword">Set</span>(<span class="string">"X-Api-Key"</span>, apiKey)
+    req.Header.<span class="keyword">Set</span>(<span class="string">"Content-Type"</span>, <span class="string">"application/json"</span>)
+    
+    client := &http.<span class="keyword">Client</span>{}
+    resp, err := client.<span class="keyword">Do</span>(req)
+    <span class="keyword">if</span> err != <span class="keyword">nil</span> {
+        <span class="keyword">panic</span>(err)
+    }
+    <span class="keyword">defer</span> resp.Body.<span class="keyword">Close</span>()
+    
+    body, _ := io.<span class="keyword">ReadAll</span>(resp.Body)
+    <span class="keyword">fmt.Println</span>(<span class="keyword">string</span>(body))
+}
+
+<span class="comment">// Menerima webhook</span>
+<span class="keyword">func</span> webhookHandler(w http.ResponseWriter, r *http.Request) {
+    <span class="keyword">var</span> payload <span class="keyword">map[string]interface</span>{}
+    json.<span class="keyword">NewDecoder</span>(r.Body).<span class="keyword">Decode</span>(&payload)
+    
+    <span class="keyword">if</span> payload[<span class="string">"event"</span>] == <span class="string">"message"</span> {
+        data := payload[<span class="string">"data"</span>].(<span class="keyword">map[string]interface</span>{})
+        <span class="keyword">fmt.Printf</span>(<span class="string">"Pesan dari %v: %v\n"</span>, data[<span class="string">"from"</span>], data[<span class="string">"body"</span>])
+    }
+    
+    w.<span class="keyword">WriteHeader</span>(http.StatusOK)
+}
+
+<span class="keyword">func</span> main() {
+    http.<span class="keyword">HandleFunc</span>(<span class="string">"/webhook"</span>, webhookHandler)
+    http.<span class="keyword">ListenAndServe</span>(<span class="string">":3000"</span>, <span class="keyword">nil</span>)
+}</code>
+                        </div>
+                    </div>
                 </div>
 
                 <h3>Format Webhook Payload</h3>
@@ -687,7 +2245,7 @@
                 <div class="code-block">
 <code>{
   <span class="string">"event"</span>: <span class="string">"message"</span>,
-  <span class="string">"session_id"</span>: <span class="string">"session_xxx"</span>,
+  <span class="string">"device_id"</span>: <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
   <span class="string">"data"</span>: {
     <span class="string">"from"</span>: <span class="string">"6281234567890@c.us"</span>,
     <span class="string">"to"</span>: <span class="string">"6289876543210@c.us"</span>,
@@ -706,12 +2264,43 @@
                     </div>
                     <p class="text-muted mb-2">Mendapatkan daftar semua webhook yang telah dibuat.</p>
                 </div>
+                <p><strong>Contoh cURL:</strong></p>
+                <div class="code-block">
+<code>curl -X GET "https://app.wacloud.id/api/v1/webhooks" \
+  -H "X-Api-Key: YOUR_API_KEY"</code>
+                </div>
+                <p><strong>Contoh Python:</strong></p>
+                <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">response</span> = requests.<span class="function">get</span>(
+    <span class="string">'https://app.wacloud.id/api/v1/webhooks'</span>,
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>}
+)
+<span class="variable">result</span> = <span class="variable">response</span>.<span class="function">json</span>()</code>
+                </div>
+                
                 <div class="endpoint-item">
                     <div class="d-flex align-items-center mb-2">
                         <span class="endpoint-badge badge-delete">DELETE</span>
                         <span class="endpoint-url">/webhooks/{id}</span>
                     </div>
                     <p class="text-muted mb-0">Menghapus webhook tertentu.</p>
+                </div>
+                <p><strong>Contoh cURL:</strong></p>
+                <div class="code-block">
+<code>curl -X DELETE "https://app.wacloud.id/api/v1/webhooks/webhook-id-here" \
+  -H "X-Api-Key: YOUR_API_KEY"</code>
+                </div>
+                <p><strong>Contoh Python:</strong></p>
+                <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">webhook_id</span> = <span class="string">'webhook-id-here'</span>
+<span class="variable">response</span> = requests.<span class="function">delete</span>(
+    <span class="function">f</span>(<span class="string">'https://app.wacloud.id/api/v1/webhooks/{webhook_id}'</span>),
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>}
+)</code>
                 </div>
 
                 <div class="alert alert-info mt-4">
@@ -746,24 +2335,436 @@
                 <div class="code-block">
 <code>{
   <span class="string">"name"</span>: <span class="string">"Order Confirmation"</span>,
-  <span class="string">"content"</span>: <span class="string">"Halo {{name}}, pesanan Anda #{{order_id}} telah dikonfirmasi. Total: Rp {{amount}}"</span>,
+  <span class="string">"content"</span>: <span class="string">"Halo @{{name}}, pesanan Anda #@{{order_id}} telah dikonfirmasi. Total: Rp @{{amount}}"</span>,
   <span class="string">"message_type"</span>: <span class="string">"text"</span>,
   <span class="string">"variables"</span>: [<span class="string">"name"</span>, <span class="string">"order_id"</span>, <span class="string">"amount"</span>],
   <span class="string">"description"</span>: <span class="string">"Template untuk konfirmasi pesanan"</span>
 }</code>
                 </div>
 
+                <h3>Contoh Implementasi - Membuat Template</h3>
+                
+                <div class="code-tabs">
+                    <div class="code-tabs-header">
+                        <button class="code-tab active" onclick="switchCodeTab(this, 'create-template-curl')">cURL</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'create-template-python')">Python</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'create-template-php')">PHP</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'create-template-nodejs')">Node.js</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'create-template-javascript')">JavaScript</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'create-template-golang')">Golang</button>
+                    </div>
+                    <div id="create-template-curl" class="code-tab-content active">
+                        <div class="code-block">
+<code>curl -X POST "https://app.wacloud.id/api/v1/templates" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Order Confirmation",
+    "content": "Halo @{{name}}, pesanan Anda #@{{order_id}} telah dikonfirmasi. Total: Rp @{{amount}}",
+    "message_type": "text",
+    "description": "Template untuk konfirmasi pesanan"
+  }'</code>
+                        </div>
+                    </div>
+                    <div id="create-template-python" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">api_key</span> = <span class="string">'YOUR_API_KEY'</span>
+<span class="variable">url</span> = <span class="string">'https://app.wacloud.id/api/v1/templates'</span>
+
+<span class="variable">headers</span> = {
+    <span class="string">'X-Api-Key'</span>: <span class="variable">api_key</span>,
+    <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+}
+
+<span class="variable">data</span> = {
+    <span class="string">'name'</span>: <span class="string">'Order Confirmation'</span>,
+    <span class="string">'content'</span>: <span class="string">'Halo @{{name}}, pesanan Anda #@{{order_id}} telah dikonfirmasi. Total: Rp @{{amount}}'</span>,
+    <span class="string">'message_type'</span>: <span class="string">'text'</span>,
+    <span class="string">'description'</span>: <span class="string">'Template untuk konfirmasi pesanan'</span>
+}
+
+<span class="variable">response</span> = requests.<span class="function">post</span>(<span class="variable">url</span>, <span class="variable">headers</span>=<span class="variable">headers</span>, <span class="variable">json</span>=<span class="variable">data</span>)
+
+<span class="keyword">if</span> <span class="variable">response</span>.status_code == <span class="number">201</span>:
+    <span class="variable">result</span> = <span class="variable">response</span>.<span class="function">json</span>()
+    <span class="keyword">if</span> <span class="variable">result</span>[<span class="string">'success'</span>]:
+        <span class="function">print</span>(<span class="function">f</span>(<span class="string">"Template ID: {result['data']['id']}"</span>))</code>
+                        </div>
+                    </div>
+                    <div id="create-template-php" class="code-tab-content active">
+                        <div class="code-block">
+<code><span class="comment">// Membuat template</span>
+<span class="keyword">$apiKey</span> = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">$url</span> = <span class="string">'https://app.wacloud.id/api/v1/templates'</span>;
+
+<span class="keyword">$data</span> = [
+    <span class="string">'name'</span> => <span class="string">'Order Confirmation'</span>,
+    <span class="string">'content'</span> => <span class="string">'Halo @{{name}}, pesanan Anda #@{{order_id}} telah dikonfirmasi. Total: Rp @{{amount}}'</span>,
+    <span class="string">'message_type'</span> => <span class="string">'text'</span>,
+    <span class="string">'description'</span> => <span class="string">'Template untuk konfirmasi pesanan'</span>
+];
+
+<span class="keyword">$ch</span> = <span class="keyword">curl_init</span>(<span class="keyword">$url</span>);
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="keyword">json_encode</span>(<span class="keyword">$data</span>));
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+    <span class="string">'X-Api-Key: ' . $apiKey</span>,
+    <span class="string">'Content-Type: application/json'</span>
+]);
+
+<span class="keyword">$response</span> = <span class="keyword">curl_exec</span>(<span class="keyword">$ch</span>);
+<span class="keyword">curl_close</span>(<span class="keyword">$ch</span>);
+
+<span class="keyword">$result</span> = <span class="keyword">json_decode</span>(<span class="keyword">$response</span>, <span class="keyword">true</span>);
+<span class="keyword">if</span> (<span class="keyword">$result</span>[<span class="string">'success'</span>]) {
+    <span class="keyword">echo</span> <span class="string">"Template ID: " . $result['data']['id']</span>;
+}</code>
+                        </div>
+                    </div>
+                    <div id="create-template-nodejs" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> axios = <span class="keyword">require</span>(<span class="string">'axios'</span>);
+
+<span class="keyword">const</span> createTemplate = <span class="keyword">async</span> () => {
+    <span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+    <span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/templates'</span>;
+    
+    <span class="keyword">const</span> data = {
+        name: <span class="string">'Order Confirmation'</span>,
+        content: <span class="string">'Halo @{{name}}, pesanan Anda #@{{order_id}} telah dikonfirmasi. Total: Rp @{{amount}}'</span>,
+        message_type: <span class="string">'text'</span>,
+        description: <span class="string">'Template untuk konfirmasi pesanan'</span>
+    };
+    
+    <span class="keyword">try</span> {
+        <span class="keyword">const</span> response = <span class="keyword">await</span> axios.<span class="keyword">post</span>(url, data, {
+            headers: {
+                <span class="string">'X-Api-Key'</span>: apiKey,
+                <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+            }
+        });
+        <span class="keyword">console.log</span>(<span class="string">'Template ID:'</span>, response.data.data.id);
+    } <span class="keyword">catch</span> (error) {
+        <span class="keyword">console.error</span>(<span class="string">'Error:'</span>, error.response?.data || error.message);
+    }
+};
+
+createTemplate();</code>
+                        </div>
+                    </div>
+                    <div id="create-template-javascript" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/templates'</span>;
+
+<span class="keyword">const</span> data = {
+    name: <span class="string">'Order Confirmation'</span>,
+    content: <span class="string">'Halo @{{name}}, pesanan Anda #@{{order_id}} telah dikonfirmasi. Total: Rp @{{amount}}'</span>,
+    message_type: <span class="string">'text'</span>,
+    description: <span class="string">'Template untuk konfirmasi pesanan'</span>
+};
+
+<span class="keyword">fetch</span>(url, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    },
+    body: <span class="keyword">JSON.stringify</span>(data)
+})
+.<span class="keyword">then</span>(response => response.<span class="keyword">json</span>())
+.<span class="keyword">then</span>(result => {
+    <span class="keyword">if</span> (result.success) {
+        <span class="keyword">console.log</span>(<span class="string">`Template ID: ${result.data.id}`</span>);
+    }
+})
+.<span class="keyword">catch</span>(error => {
+    <span class="keyword">console.error</span>(<span class="string">'Error:'</span>, error);
+});</code>
+                        </div>
+                    </div>
+                    <div id="create-template-golang" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
+    <span class="string">"bytes"</span>
+    <span class="string">"encoding/json"</span>
+    <span class="string">"fmt"</span>
+    <span class="string">"io"</span>
+    <span class="string">"net/http"</span>
+)
+
+<span class="keyword">type</span> CreateTemplateRequest <span class="keyword">struct</span> {
+    Name        <span class="keyword">string</span> <span class="string">`json:"name"`</span>
+    Content     <span class="keyword">string</span> <span class="string">`json:"content"`</span>
+    MessageType <span class="keyword">string</span> <span class="string">`json:"message_type"`</span>
+    Description <span class="keyword">string</span> <span class="string">`json:"description"`</span>
+}
+
+<span class="keyword">func</span> createTemplate() {
+    apiKey := <span class="string">"YOUR_API_KEY"</span>
+    url := <span class="string">"https://app.wacloud.id/api/v1/templates"</span>
+    
+    data := CreateTemplateRequest{
+        Name:        <span class="string">"Order Confirmation"</span>,
+        Content:     <span class="string">"Halo @{{name}}, pesanan Anda #@{{order_id}} telah dikonfirmasi. Total: Rp @{{amount}}"</span>,
+        MessageType: <span class="string">"text"</span>,
+        Description: <span class="string">"Template untuk konfirmasi pesanan"</span>,
+    }
+    
+    jsonData, _ := json.<span class="keyword">Marshal</span>(data)
+    
+    req, _ := http.<span class="keyword">NewRequest</span>(<span class="string">"POST"</span>, url, bytes.<span class="keyword">NewBuffer</span>(jsonData))
+    req.Header.<span class="keyword">Set</span>(<span class="string">"X-Api-Key"</span>, apiKey)
+    req.Header.<span class="keyword">Set</span>(<span class="string">"Content-Type"</span>, <span class="string">"application/json"</span>)
+    
+    client := &http.<span class="keyword">Client</span>{}
+    resp, err := client.<span class="keyword">Do</span>(req)
+    <span class="keyword">if</span> err != <span class="keyword">nil</span> {
+        <span class="keyword">panic</span>(err)
+    }
+    <span class="keyword">defer</span> resp.Body.<span class="keyword">Close</span>()
+    
+    body, _ := io.<span class="keyword">ReadAll</span>(resp.Body)
+    <span class="keyword">fmt.Println</span>(<span class="keyword">string</span>(body))
+}</code>
+                        </div>
+                    </div>
+                </div>
+
                 <h3>Menggunakan Template</h3>
                 <p>Untuk mengirim pesan menggunakan template, gunakan <code>template_id</code> dan <code>variables</code> dalam request:</p>
                 <div class="code-block">
 <code>{
+  <span class="string">"device_id"</span>: <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
   <span class="string">"to"</span>: <span class="string">"6281234567890"</span>,
-  <span class="string">"template_id"</span>: <span class="string">"template-uuid-here"</span>,
+  <span class="string">"template_id"</span>: <span class="string">"a1b2c3d4-e5f6-7890-abcd-ef1234567890"</span>,
   <span class="string">"variables"</span>: {
     <span class="string">"name"</span>: <span class="string">"John Doe"</span>,
     <span class="string">"order_id"</span>: <span class="string">"ORD-12345"</span>,
     <span class="string">"amount"</span>: <span class="string">"150.000"</span>
   }
+}</code>
+                </div>
+
+                <h3>Contoh Implementasi - Menggunakan Template</h3>
+                
+                <div class="code-tabs">
+                    <div class="code-tabs-header">
+                        <button class="code-tab active" onclick="switchCodeTab(this, 'use-template-curl')">cURL</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'use-template-python')">Python</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'use-template-php')">PHP</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'use-template-nodejs')">Node.js</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'use-template-javascript')">JavaScript</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'use-template-golang')">Golang</button>
+                    </div>
+                    <div id="use-template-curl" class="code-tab-content active">
+                        <div class="code-block">
+<code>curl -X POST "https://app.wacloud.id/api/v1/messages" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device_id": "550e8400-e29b-41d4-a716-446655440000",
+    "to": "6281234567890",
+    "template_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "variables": {
+      "name": "John Doe",
+      "order_id": "ORD-12345",
+      "amount": "150.000"
+    }
+  }'</code>
+                        </div>
+                    </div>
+                    <div id="use-template-python" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">api_key</span> = <span class="string">'YOUR_API_KEY'</span>
+<span class="variable">url</span> = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>
+
+<span class="variable">headers</span> = {
+    <span class="string">'X-Api-Key'</span>: <span class="variable">api_key</span>,
+    <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+}
+
+<span class="variable">data</span> = {
+    <span class="string">'device_id'</span>: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    <span class="string">'to'</span>: <span class="string">'6281234567890'</span>,
+    <span class="string">'template_id'</span>: <span class="string">'a1b2c3d4-e5f6-7890-abcd-ef1234567890'</span>,
+    <span class="string">'variables'</span>: {
+        <span class="string">'name'</span>: <span class="string">'John Doe'</span>,
+        <span class="string">'order_id'</span>: <span class="string">'ORD-12345'</span>,
+        <span class="string">'amount'</span>: <span class="string">'150.000'</span>
+    }
+}
+
+<span class="variable">response</span> = requests.<span class="function">post</span>(<span class="variable">url</span>, <span class="variable">headers</span>=<span class="variable">headers</span>, <span class="variable">json</span>=<span class="variable">data</span>)
+
+<span class="keyword">if</span> <span class="variable">response</span>.status_code == <span class="number">201</span>:
+    <span class="variable">result</span> = <span class="variable">response</span>.<span class="function">json</span>()
+    <span class="keyword">if</span> <span class="variable">result</span>[<span class="string">'success'</span>]:
+        <span class="function">print</span>(<span class="function">f</span>(<span class="string">"Message sent: {result['data']['message_id']}"</span>))</code>
+                        </div>
+                    </div>
+                    <div id="use-template-php" class="code-tab-content">
+                <div class="code-block">
+<code><span class="comment">// Mengirim pesan menggunakan template</span>
+<span class="keyword">$apiKey</span> = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">$url</span> = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">$data</span> = [
+    <span class="string">'device_id'</span> => <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    <span class="string">'to'</span> => <span class="string">'6281234567890'</span>,
+    <span class="string">'template_id'</span> => <span class="string">'a1b2c3d4-e5f6-7890-abcd-ef1234567890'</span>,
+    <span class="string">'variables'</span> => [
+        <span class="string">'name'</span> => <span class="string">'John Doe'</span>,
+        <span class="string">'order_id'</span> => <span class="string">'ORD-12345'</span>,
+        <span class="string">'amount'</span> => <span class="string">'150.000'</span>
+    ]
+];
+
+<span class="keyword">$ch</span> = <span class="keyword">curl_init</span>(<span class="keyword">$url</span>);
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="keyword">json_encode</span>(<span class="keyword">$data</span>));
+<span class="keyword">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+    <span class="string">'X-Api-Key: ' . $apiKey</span>,
+    <span class="string">'Content-Type: application/json'</span>
+]);
+
+<span class="keyword">$response</span> = <span class="keyword">curl_exec</span>(<span class="keyword">$ch</span>);
+<span class="keyword">curl_close</span>(<span class="keyword">$ch</span>);
+
+<span class="keyword">$result</span> = <span class="keyword">json_decode</span>(<span class="keyword">$response</span>, <span class="keyword">true</span>);
+<span class="keyword">if</span> (<span class="keyword">$result</span>[<span class="string">'success'</span>]) {
+    <span class="keyword">echo</span> <span class="string">"Message sent: " . $result['data']['message_id']</span>;
+}</code>
+                </div>
+
+                    </div>
+                    <div id="use-template-nodejs" class="code-tab-content">
+                <div class="code-block">
+<code><span class="keyword">const</span> axios = <span class="keyword">require</span>(<span class="string">'axios'</span>);
+
+<span class="keyword">const</span> sendTemplateMessage = <span class="keyword">async</span> () => {
+    <span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+    <span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+    
+    <span class="keyword">const</span> data = {
+        device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+        to: <span class="string">'6281234567890'</span>,
+        template_id: <span class="string">'a1b2c3d4-e5f6-7890-abcd-ef1234567890'</span>,
+        variables: {
+            name: <span class="string">'John Doe'</span>,
+            order_id: <span class="string">'ORD-12345'</span>,
+            amount: <span class="string">'150.000'</span>
+        }
+    };
+    
+    <span class="keyword">try</span> {
+        <span class="keyword">const</span> response = <span class="keyword">await</span> axios.<span class="keyword">post</span>(url, data, {
+            headers: {
+                <span class="string">'X-Api-Key'</span>: apiKey,
+                <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+            }
+        });
+        <span class="keyword">console.log</span>(<span class="string">'Message sent:'</span>, response.data.data.message_id);
+    } <span class="keyword">catch</span> (error) {
+        <span class="keyword">console.error</span>(<span class="string">'Error:'</span>, error.response?.data || error.message);
+    }
+};
+
+sendTemplateMessage();</code>
+                </div>
+                    </div>
+                    <div id="use-template-javascript" class="code-tab-content">
+                <div class="code-block">
+<code><span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages'</span>;
+
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'6281234567890'</span>,
+    template_id: <span class="string">'a1b2c3d4-e5f6-7890-abcd-ef1234567890'</span>,
+    variables: {
+        name: <span class="string">'John Doe'</span>,
+        order_id: <span class="string">'ORD-12345'</span>,
+        amount: <span class="string">'150.000'</span>
+    }
+};
+
+<span class="keyword">fetch</span>(url, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    },
+    body: <span class="keyword">JSON.stringify</span>(data)
+})
+.<span class="keyword">then</span>(response => response.<span class="keyword">json</span>())
+.<span class="keyword">then</span>(result => {
+    <span class="keyword">if</span> (result.success) {
+        <span class="keyword">console.log</span>(<span class="string">`Message sent: ${result.data.message_id}`</span>);
+    }
+})
+.<span class="keyword">catch</span>(error => {
+    <span class="keyword">console.error</span>(<span class="string">'Error:'</span>, error);
+});</code>
+                </div>
+                    </div>
+                    <div id="use-template-golang" class="code-tab-content">
+                <div class="code-block">
+<code><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
+    <span class="string">"bytes"</span>
+    <span class="string">"encoding/json"</span>
+    <span class="string">"fmt"</span>
+    <span class="string">"io"</span>
+    <span class="string">"net/http"</span>
+)
+
+<span class="keyword">type</span> SendTemplateMessageRequest <span class="keyword">struct</span> {
+    DeviceID   <span class="keyword">string</span>            <span class="string">`json:"device_id"`</span>
+    To         <span class="keyword">string</span>            <span class="string">`json:"to"`</span>
+    TemplateID <span class="keyword">string</span>            <span class="string">`json:"template_id"`</span>
+    Variables  <span class="keyword">map[string]string</span> <span class="string">`json:"variables"`</span>
+}
+
+<span class="keyword">func</span> sendTemplateMessage() {
+    apiKey := <span class="string">"YOUR_API_KEY"</span>
+    url := <span class="string">"https://app.wacloud.id/api/v1/messages"</span>
+    
+    data := SendTemplateMessageRequest{
+        DeviceID:   <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+        To:         <span class="string">"6281234567890"</span>,
+        TemplateID: <span class="string">"a1b2c3d4-e5f6-7890-abcd-ef1234567890"</span>,
+        Variables: <span class="keyword">map[string]string</span>{
+            <span class="string">"name"</span>:     <span class="string">"John Doe"</span>,
+            <span class="string">"order_id"</span>: <span class="string">"ORD-12345"</span>,
+            <span class="string">"amount"</span>:   <span class="string">"150.000"</span>,
+        },
+    }
+    
+    jsonData, _ := json.<span class="keyword">Marshal</span>(data)
+    
+    req, _ := http.<span class="keyword">NewRequest</span>(<span class="string">"POST"</span>, url, bytes.<span class="keyword">NewBuffer</span>(jsonData))
+    req.Header.<span class="keyword">Set</span>(<span class="string">"X-Api-Key"</span>, apiKey)
+    req.Header.<span class="keyword">Set</span>(<span class="string">"Content-Type"</span>, <span class="string">"application/json"</span>)
+    
+    client := &http.<span class="keyword">Client</span>{}
+    resp, err := client.<span class="keyword">Do</span>(req)
+    <span class="keyword">if</span> err != <span class="keyword">nil</span> {
+        <span class="keyword">panic</span>(err)
+    }
+    <span class="keyword">defer</span> resp.Body.<span class="keyword">Close</span>()
+    
+    body, _ := io.<span class="keyword">ReadAll</span>(resp.Body)
+    <span class="keyword">fmt.Println</span>(<span class="keyword">string</span>(body))
 }</code>
                 </div>
 
@@ -775,6 +2776,22 @@
                     </div>
                     <p class="text-muted mb-2">Mendapatkan daftar semua template yang telah dibuat.</p>
                 </div>
+                <p><strong>Contoh cURL:</strong></p>
+                <div class="code-block">
+<code>curl -X GET "https://app.wacloud.id/api/v1/templates" \
+  -H "X-Api-Key: YOUR_API_KEY"</code>
+                </div>
+                <p><strong>Contoh Python:</strong></p>
+                <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">response</span> = requests.<span class="function">get</span>(
+    <span class="string">'https://app.wacloud.id/api/v1/templates'</span>,
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>}
+)
+<span class="variable">result</span> = <span class="variable">response</span>.<span class="function">json</span>()</code>
+                </div>
+                
                 <div class="endpoint-item">
                     <div class="d-flex align-items-center mb-2">
                         <span class="endpoint-badge badge-get">GET</span>
@@ -782,6 +2799,23 @@
                     </div>
                     <p class="text-muted mb-2">Mendapatkan detail template tertentu.</p>
                 </div>
+                <p><strong>Contoh cURL:</strong></p>
+                <div class="code-block">
+<code>curl -X GET "https://app.wacloud.id/api/v1/templates/a1b2c3d4-e5f6-7890-abcd-ef1234567890" \
+  -H "X-Api-Key: YOUR_API_KEY"</code>
+                </div>
+                <p><strong>Contoh Python:</strong></p>
+                <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">template_id</span> = <span class="string">'a1b2c3d4-e5f6-7890-abcd-ef1234567890'</span>
+<span class="variable">response</span> = requests.<span class="function">get</span>(
+    <span class="function">f</span>(<span class="string">'https://app.wacloud.id/api/v1/templates/{template_id}'</span>),
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>}
+)
+<span class="variable">result</span> = <span class="variable">response</span>.<span class="function">json</span>()</code>
+                </div>
+                
                 <div class="endpoint-item">
                     <div class="d-flex align-items-center mb-2">
                         <span class="endpoint-badge badge-put">PUT</span>
@@ -789,6 +2823,33 @@
                     </div>
                     <p class="text-muted mb-2">Memperbarui template yang sudah ada.</p>
                 </div>
+                <p><strong>Contoh cURL:</strong></p>
+                <div class="code-block">
+<code>curl -X PUT "https://app.wacloud.id/api/v1/templates/a1b2c3d4-e5f6-7890-abcd-ef1234567890" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Template",
+    "content": "Updated content",
+    "message_type": "text"
+  }'</code>
+                </div>
+                <p><strong>Contoh Python:</strong></p>
+                <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">template_id</span> = <span class="string">'a1b2c3d4-e5f6-7890-abcd-ef1234567890'</span>
+<span class="variable">response</span> = requests.<span class="function">put</span>(
+    <span class="function">f</span>(<span class="string">'https://app.wacloud.id/api/v1/templates/{template_id}'</span>),
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>},
+    <span class="variable">json</span>={
+        <span class="string">'name'</span>: <span class="string">'Updated Template'</span>,
+        <span class="string">'content'</span>: <span class="string">'Updated content'</span>,
+        <span class="string">'message_type'</span>: <span class="string">'text'</span>
+    }
+)</code>
+                </div>
+                
                 <div class="endpoint-item">
                     <div class="d-flex align-items-center mb-2">
                         <span class="endpoint-badge badge-delete">DELETE</span>
@@ -796,6 +2857,22 @@
                     </div>
                     <p class="text-muted mb-2">Menghapus template tertentu.</p>
                 </div>
+                <p><strong>Contoh cURL:</strong></p>
+                <div class="code-block">
+<code>curl -X DELETE "https://app.wacloud.id/api/v1/templates/a1b2c3d4-e5f6-7890-abcd-ef1234567890" \
+  -H "X-Api-Key: YOUR_API_KEY"</code>
+                </div>
+                <p><strong>Contoh Python:</strong></p>
+                <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">template_id</span> = <span class="string">'a1b2c3d4-e5f6-7890-abcd-ef1234567890'</span>
+<span class="variable">response</span> = requests.<span class="function">delete</span>(
+    <span class="function">f</span>(<span class="string">'https://app.wacloud.id/api/v1/templates/{template_id}'</span>),
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>}
+)</code>
+                </div>
+                
                 <div class="endpoint-item">
                     <div class="d-flex align-items-center mb-2">
                         <span class="endpoint-badge badge-post">POST</span>
@@ -803,11 +2880,41 @@
                     </div>
                     <p class="text-muted mb-0">Preview template dengan variabel yang sudah diisi.</p>
                 </div>
+                <p><strong>Contoh cURL:</strong></p>
+                <div class="code-block">
+<code>curl -X POST "https://app.wacloud.id/api/v1/templates/a1b2c3d4-e5f6-7890-abcd-ef1234567890/preview" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "variables": {
+      "name": "John Doe",
+      "order_id": "ORD-12345",
+      "amount": "150.000"
+    }
+  }'</code>
+                </div>
+                <p><strong>Contoh Python:</strong></p>
+                <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">template_id</span> = <span class="string">'a1b2c3d4-e5f6-7890-abcd-ef1234567890'</span>
+<span class="variable">response</span> = requests.<span class="function">post</span>(
+    <span class="function">f</span>(<span class="string">'https://app.wacloud.id/api/v1/templates/{template_id}/preview'</span>),
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>},
+    <span class="variable">json</span>={
+        <span class="string">'variables'</span>: {
+            <span class="string">'name'</span>: <span class="string">'John Doe'</span>,
+            <span class="string">'order_id'</span>: <span class="string">'ORD-12345'</span>,
+            <span class="string">'amount'</span>: <span class="string">'150.000'</span>
+        }
+    }
+)</code>
+                </div>
 
                 <h3>Format Variabel</h3>
-                <p>Variabel dalam template menggunakan format <code>{{variable_name}}</code>. Contoh:</p>
+                <p>Variabel dalam template menggunakan format <code>@{{variable_name}}</code>. Contoh:</p>
                 <div class="code-block">
-<code><span class="string">"Halo {{name}}, terima kasih telah memesan. Total pembayaran: Rp {{total}}"</span></code>
+<code><span class="string">"Halo @{{name}}, terima kasih telah memesan. Total pembayaran: Rp @{{total}}"</span></code>
                 </div>
 
                 <div class="alert alert-info mt-4">
@@ -817,6 +2924,760 @@
                         <li>Variabel akan otomatis diekstrak dari content jika tidak didefinisikan</li>
                         <li>Template dapat digunakan untuk berbagai jenis pesan (text, image, button, list)</li>
                         <li>Gunakan preview untuk melihat hasil sebelum mengirim</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Device Management -->
+            <div class="docs-card" id="device-management">
+                <h2>Device Management</h2>
+                <p>
+                    Device (atau Session) adalah koneksi WhatsApp yang terhubung ke akun Anda. Setiap device memerlukan 
+                    proses pairing dengan QR code sebelum dapat digunakan untuk mengirim pesan.
+                </p>
+                
+                <h3>Membuat Device Baru</h3>
+                <p>Untuk membuat device baru, gunakan endpoint berikut:</p>
+                <div class="endpoint-item">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-post">POST</span>
+                        <span class="endpoint-url">/devices</span>
+                    </div>
+                    <p class="text-muted mb-3">Membuat device baru. Device akan dalam status "pairing" dan memerlukan QR code untuk terhubung.</p>
+                </div>
+
+                <h3>Format Request</h3>
+                <div class="code-block">
+<code>{
+  <span class="string">"name"</span>: <span class="string">"Device Utama"</span>,
+  <span class="string">"phone_number"</span>: <span class="string">"81234567890"</span>
+}</code>
+                </div>
+
+                <h3>Format Response</h3>
+                <div class="code-block">
+<code>{
+  <span class="string">"success"</span>: <span class="keyword">true</span>,
+  <span class="string">"message"</span>: <span class="string">"Device created successfully. Use the pair endpoint to get QR code."</span>,
+  <span class="string">"data"</span>: {
+    <span class="string">"id"</span>: <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+    <span class="string">"name"</span>: <span class="string">"Device Utama"</span>,
+    <span class="string">"status"</span>: <span class="string">"pairing"</span>,
+    <span class="string">"created_at"</span>: <span class="string">"2025-11-30T10:00:00Z"</span>
+  }
+}</code>
+                </div>
+
+                <h3>Mendapatkan Daftar Device</h3>
+                <div class="endpoint-item">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-get">GET</span>
+                        <span class="endpoint-url">/devices</span>
+                    </div>
+                    <p class="text-muted mb-3">Mendapatkan daftar semua device yang terhubung (status: connected).</p>
+                </div>
+                <p><strong>Contoh cURL:</strong></p>
+                <div class="code-block">
+<code>curl -X GET "https://app.wacloud.id/api/v1/devices" \
+  -H "X-Api-Key: YOUR_API_KEY"</code>
+                </div>
+                <p><strong>Contoh Python:</strong></p>
+                <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">response</span> = requests.<span class="function">get</span>(
+    <span class="string">'https://app.wacloud.id/api/v1/devices'</span>,
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>}
+)
+<span class="variable">result</span> = <span class="variable">response</span>.<span class="function">json</span>()</code>
+                </div>
+
+                <h3>Mendapatkan Detail Device</h3>
+                <div class="endpoint-item">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-get">GET</span>
+                        <span class="endpoint-url">/devices/{device_id}</span>
+                    </div>
+                    <p class="text-muted mb-3">Mendapatkan detail lengkap device berdasarkan ID.</p>
+                </div>
+                <p><strong>Contoh cURL:</strong></p>
+                <div class="code-block">
+<code>curl -X GET "https://app.wacloud.id/api/v1/devices/550e8400-e29b-41d4-a716-446655440000" \
+  -H "X-Api-Key: YOUR_API_KEY"</code>
+                </div>
+                <p><strong>Contoh Python:</strong></p>
+                <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">device_id</span> = <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>
+<span class="variable">response</span> = requests.<span class="function">get</span>(
+    <span class="function">f</span>(<span class="string">'https://app.wacloud.id/api/v1/devices/{device_id}'</span>),
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>}
+)
+<span class="variable">result</span> = <span class="variable">response</span>.<span class="function">json</span>()</code>
+                </div>
+
+                <h3>Mendapatkan Status Device</h3>
+                <div class="endpoint-item">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-get">GET</span>
+                        <span class="endpoint-url">/devices/{device_id}/status</span>
+                    </div>
+                    <p class="text-muted mb-3">Mendapatkan status device (connected, pairing, disconnected).</p>
+                </div>
+                <p><strong>Contoh cURL:</strong></p>
+                <div class="code-block">
+<code>curl -X GET "https://app.wacloud.id/api/v1/devices/550e8400-e29b-41d4-a716-446655440000/status" \
+  -H "X-Api-Key: YOUR_API_KEY"</code>
+                </div>
+                <p><strong>Contoh Python:</strong></p>
+                <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">device_id</span> = <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>
+<span class="variable">response</span> = requests.<span class="function">get</span>(
+    <span class="function">f</span>(<span class="string">'https://app.wacloud.id/api/v1/devices/{device_id}/status'</span>),
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>}
+)
+<span class="variable">result</span> = <span class="variable">response</span>.<span class="function">json</span>()</code>
+                </div>
+
+                <h3>Mendapatkan QR Code untuk Pairing</h3>
+                <p>Setelah membuat device, Anda perlu mendapatkan QR code untuk menghubungkan WhatsApp ke device tersebut.</p>
+                <div class="endpoint-item">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-get">GET</span>
+                        <span class="endpoint-url">/devices/{device_id}/pair</span>
+                    </div>
+                    <p class="text-muted mb-3">Mendapatkan QR code untuk pairing device dengan WhatsApp. QR code berlaku selama 2 menit.</p>
+                </div>
+
+                <h3>Format Response QR Code</h3>
+                <div class="code-block">
+<code>{
+  <span class="string">"success"</span>: <span class="keyword">true</span>,
+  <span class="string">"data"</span>: {
+    <span class="string">"qr_code"</span>: <span class="string">"data:image/png;base64,iVBORw0KGgoAAAANS..."</span>,
+    <span class="string">"expires_at"</span>: <span class="string">"2025-11-30T10:02:00Z"</span>,
+    <span class="string">"device_id"</span>: <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+    <span class="string">"status"</span>: <span class="string">"pairing"</span>
+  }
+}</code>
+                </div>
+
+                <h3>Contoh Implementasi - Membuat dan Pairing Device</h3>
+                
+                <div class="code-tabs">
+                    <div class="code-tabs-header">
+                        <button class="code-tab active" onclick="switchCodeTab(this, 'device-curl')">cURL</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'device-python')">Python</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'device-php')">PHP</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'device-nodejs')">Node.js</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'device-javascript')">JavaScript</button>
+                    </div>
+                    <div id="device-curl" class="code-tab-content active">
+                        <div class="code-block">
+<code><span class="comment"># Membuat device baru</span>
+curl -X POST "https://app.wacloud.id/api/v1/devices" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Device Utama",
+    "phone_number": "81234567890"
+  }'
+
+<span class="comment"># Mendapatkan QR code (ganti {device_id} dengan ID dari response di atas)</span>
+curl -X GET "https://app.wacloud.id/api/v1/devices/{device_id}/pair" \
+  -H "X-Api-Key: YOUR_API_KEY"</code>
+                        </div>
+                    </div>
+                    <div id="device-python" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">api_key</span> = <span class="string">'YOUR_API_KEY'</span>
+<span class="variable">headers</span> = {
+    <span class="string">'X-Api-Key'</span>: <span class="variable">api_key</span>,
+    <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+}
+
+<span class="comment"># Membuat device baru</span>
+<span class="variable">url</span> = <span class="string">'https://app.wacloud.id/api/v1/devices'</span>
+<span class="variable">data</span> = {
+    <span class="string">'name'</span>: <span class="string">'Device Utama'</span>,
+    <span class="string">'phone_number'</span>: <span class="string">'81234567890'</span>
+}
+
+<span class="variable">response</span> = requests.<span class="function">post</span>(<span class="variable">url</span>, <span class="variable">headers</span>=<span class="variable">headers</span>, <span class="variable">json</span>=<span class="variable">data</span>)
+
+<span class="keyword">if</span> <span class="variable">response</span>.status_code == <span class="number">201</span>:
+    <span class="variable">result</span> = <span class="variable">response</span>.<span class="function">json</span>()
+    <span class="keyword">if</span> <span class="variable">result</span>[<span class="string">'success'</span>]:
+        <span class="variable">device_id</span> = <span class="variable">result</span>[<span class="string">'data'</span>][<span class="string">'id'</span>]
+        
+        <span class="comment"># Mendapatkan QR code</span>
+        <span class="variable">qr_url</span> = <span class="function">f</span>(<span class="string">'https://app.wacloud.id/api/v1/devices/{device_id}/pair'</span>)
+        <span class="variable">qr_response</span> = requests.<span class="function">get</span>(<span class="variable">qr_url</span>, <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="variable">api_key</span>})
+        
+        <span class="keyword">if</span> <span class="variable">qr_response</span>.status_code == <span class="number">200</span>:
+            <span class="variable">qr_result</span> = <span class="variable">qr_response</span>.<span class="function">json</span>()
+            <span class="keyword">if</span> <span class="variable">qr_result</span>[<span class="string">'success'</span>]:
+                <span class="function">print</span>(<span class="function">f</span>(<span class="string">"QR Code: {qr_result['data']['qr_code']}"</span>))</code>
+                        </div>
+                    </div>
+                    <div id="device-php" class="code-tab-content active">
+                        <div class="code-block">
+<code><span class="comment">// Membuat device baru</span>
+<span class="keyword">$apiKey</span> = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">$url</span> = <span class="string">'https://app.wacloud.id/api/v1/devices'</span>;
+
+<span class="keyword">$data</span> = [
+    <span class="string">'name'</span> => <span class="string">'Device Utama'</span>,
+    <span class="string">'phone_number'</span> => <span class="string">'81234567890'</span>
+];
+
+<span class="keyword">$ch</span> = <span class="function">curl_init</span>(<span class="keyword">$url</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="function">json_encode</span>(<span class="keyword">$data</span>));
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+    <span class="string">'X-Api-Key: ' . $apiKey</span>,
+    <span class="string">'Content-Type: application/json'</span>
+]);
+
+<span class="keyword">$response</span> = <span class="function">curl_exec</span>(<span class="keyword">$ch</span>);
+<span class="function">curl_close</span>(<span class="keyword">$ch</span>);
+
+<span class="keyword">$result</span> = <span class="function">json_decode</span>(<span class="keyword">$response</span>, <span class="keyword">true</span>);
+<span class="keyword">if</span> (<span class="keyword">$result</span>[<span class="string">'success'</span>]) {
+    <span class="keyword">$deviceId</span> = <span class="keyword">$result</span>[<span class="string">'data'</span>][<span class="string">'id'</span>];
+    
+    <span class="comment">// Mendapatkan QR code</span>
+    <span class="keyword">$qrUrl</span> = <span class="string">"https://app.wacloud.id/api/v1/devices/{$deviceId}/pair"</span>;
+    <span class="keyword">$ch</span> = <span class="function">curl_init</span>(<span class="keyword">$qrUrl</span>);
+    <span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+    <span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+        <span class="string">'X-Api-Key: ' . $apiKey</span>
+    ]);
+    <span class="keyword">$qrResponse</span> = <span class="function">curl_exec</span>(<span class="keyword">$ch</span>);
+    <span class="function">curl_close</span>(<span class="keyword">$ch</span>);
+    
+    <span class="keyword">$qrResult</span> = <span class="function">json_decode</span>(<span class="keyword">$qrResponse</span>, <span class="keyword">true</span>);
+    <span class="keyword">if</span> (<span class="keyword">$qrResult</span>[<span class="string">'success'</span>]) {
+        <span class="comment">// QR code dalam format base64, bisa langsung digunakan di tag img</span>
+        <span class="keyword">$qrCode</span> = <span class="keyword">$qrResult</span>[<span class="string">'data'</span>][<span class="string">'qr_code'</span>];
+        <span class="function">echo</span> <span class="string">"&lt;img src='{$qrCode}' alt='QR Code' /&gt;"</span>;
+    }
+}</code>
+                        </div>
+                    </div>
+                    <div id="device-nodejs" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> axios = <span class="function">require</span>(<span class="string">'axios'</span>);
+
+<span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+
+<span class="comment">// Membuat device baru</span>
+<span class="keyword">const</span> createDevice = <span class="keyword">async</span> () => {
+    <span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/devices'</span>;
+    <span class="keyword">const</span> data = {
+        name: <span class="string">'Device Utama'</span>,
+        phone_number: <span class="string">'81234567890'</span>
+    };
+    
+    <span class="keyword">try</span> {
+        <span class="keyword">const</span> response = <span class="keyword">await</span> axios.<span class="function">post</span>(url, data, {
+            headers: {
+                <span class="string">'X-Api-Key'</span>: apiKey,
+                <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+            }
+        });
+        
+        <span class="keyword">if</span> (response.data.success) {
+            <span class="keyword">const</span> deviceId = response.data.data.id;
+            
+            <span class="comment">// Mendapatkan QR code</span>
+            <span class="keyword">const</span> qrResponse = <span class="keyword">await</span> axios.<span class="function">get</span>(
+                <span class="string">`https://app.wacloud.id/api/v1/devices/${deviceId}/pair`</span>,
+                {
+                    headers: {
+                        <span class="string">'X-Api-Key'</span>: apiKey
+                    }
+                }
+            );
+            
+            <span class="keyword">if</span> (qrResponse.data.success) {
+                <span class="keyword">const</span> qrCode = qrResponse.data.data.qr_code;
+                <span class="function">console.log</span>(<span class="string">'QR Code:'</span>, qrCode);
+            }
+        }
+    } <span class="keyword">catch</span> (error) {
+        <span class="function">console.error</span>(<span class="string">'Error:'</span>, error.response?.data || error.message);
+    }
+};
+
+createDevice();</code>
+                        </div>
+                    </div>
+                    <div id="device-python" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">api_key</span> = <span class="string">'YOUR_API_KEY'</span>
+<span class="variable">headers</span> = {
+    <span class="string">'X-Api-Key'</span>: <span class="variable">api_key</span>,
+    <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+}
+
+<span class="comment"># Membuat device baru</span>
+<span class="variable">url</span> = <span class="string">'https://app.wacloud.id/api/v1/devices'</span>
+<span class="variable">data</span> = {
+    <span class="string">'name'</span>: <span class="string">'Device Utama'</span>,
+    <span class="string">'phone_number'</span>: <span class="string">'81234567890'</span>
+}
+
+<span class="variable">response</span> = requests.<span class="function">post</span>(<span class="variable">url</span>, <span class="variable">headers</span>=<span class="variable">headers</span>, <span class="variable">json</span>=<span class="variable">data</span>)
+
+<span class="keyword">if</span> <span class="variable">response</span>.status_code == <span class="number">201</span>:
+    <span class="variable">result</span> = <span class="variable">response</span>.<span class="function">json</span>()
+    <span class="keyword">if</span> <span class="variable">result</span>[<span class="string">'success'</span>]:
+        <span class="variable">device_id</span> = <span class="variable">result</span>[<span class="string">'data'</span>][<span class="string">'id'</span>]
+        
+        <span class="comment"># Mendapatkan QR code</span>
+        <span class="variable">qr_url</span> = <span class="function">f</span>(<span class="string">'https://app.wacloud.id/api/v1/devices/{device_id}/pair'</span>)
+        <span class="variable">qr_response</span> = requests.<span class="function">get</span>(<span class="variable">qr_url</span>, <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="variable">api_key</span>})
+        
+        <span class="keyword">if</span> <span class="variable">qr_response</span>.status_code == <span class="number">200</span>:
+            <span class="variable">qr_result</span> = <span class="variable">qr_response</span>.<span class="function">json</span>()
+            <span class="keyword">if</span> <span class="variable">qr_result</span>[<span class="string">'success'</span>]:
+                <span class="function">print</span>(<span class="function">f</span>(<span class="string">"QR Code: {qr_result['data']['qr_code']}"</span>))</code>
+                        </div>
+                    </div>
+                    <div id="device-javascript" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+
+<span class="comment">// Membuat device baru</span>
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/devices'</span>;
+<span class="keyword">const</span> data = {
+    name: <span class="string">'Device Utama'</span>,
+    phone_number: <span class="string">'81234567890'</span>
+};
+
+<span class="function">fetch</span>(url, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    },
+    body: <span class="function">JSON.stringify</span>(data)
+})
+.<span class="function">then</span>(response => response.<span class="function">json</span>())
+.<span class="function">then</span>(result => {
+    <span class="keyword">if</span> (result.success) {
+        <span class="keyword">const</span> deviceId = result.data.id;
+        
+        <span class="comment">// Mendapatkan QR code</span>
+        <span class="keyword">return</span> <span class="function">fetch</span>(
+            <span class="function">`https://app.wacloud.id/api/v1/devices/${deviceId}/pair`</span>,
+            {
+                headers: {
+                    <span class="string">'X-Api-Key'</span>: apiKey
+                }
+            }
+        );
+    }
+})
+.<span class="function">then</span>(response => response.<span class="function">json</span>())
+.<span class="function">then</span>(qrResult => {
+    <span class="keyword">if</span> (qrResult.success) {
+        <span class="function">console.log</span>(<span class="string">'QR Code:'</span>, qrResult.data.qr_code);
+    }
+})
+.<span class="function">catch</span>(error => {
+    <span class="function">console.error</span>(<span class="string">'Error:'</span>, error);
+});</code>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Status Device</h3>
+                <p>Device dapat memiliki status berikut:</p>
+                <ul>
+                    <li><strong>pairing</strong> - Device sedang menunggu scan QR code</li>
+                    <li><strong>connected</strong> - Device sudah terhubung dan siap digunakan</li>
+                    <li><strong>disconnected</strong> - Device terputus atau dihentikan</li>
+                </ul>
+
+                <div class="alert alert-info mt-4">
+                    <h5 class="mb-2"><i class="fas fa-info-circle me-2"></i>Tips</h5>
+                    <ul class="mb-0">
+                        <li>QR code berlaku selama 2 menit. Jika expired, panggil endpoint pair lagi untuk mendapatkan QR code baru</li>
+                        <li>Setiap user memiliki batas jumlah device berdasarkan plan mereka</li>
+                        <li>Device harus dalam status "connected" sebelum dapat digunakan untuk mengirim pesan</li>
+                        <li>Nomor telepon harus dalam format 9-13 digit tanpa leading 0 (contoh: 81234567890)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- OTP -->
+            <div class="docs-card" id="otp">
+                <h2>OTP (One-Time Password)</h2>
+                <p>
+                    Fitur OTP memungkinkan Anda mengirim kode verifikasi satu kali ke nomor WhatsApp. 
+                    Sangat berguna untuk verifikasi akun, reset password, atau autentikasi dua faktor.
+                </p>
+                
+                <h3>Mengirim OTP</h3>
+                <p>Untuk mengirim kode OTP, gunakan endpoint berikut:</p>
+                <div class="endpoint-item">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-post">POST</span>
+                        <span class="endpoint-url">/messages/otp</span>
+                    </div>
+                    <p class="text-muted mb-3">Mengirim kode OTP 6 digit ke nomor tujuan. OTP akan expire dalam waktu yang ditentukan (default: 10 menit).</p>
+                </div>
+
+                <h3>Format Request</h3>
+                <div class="code-block">
+<code>{
+  <span class="string">"device_id"</span>: <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+  <span class="string">"to"</span>: <span class="string">"81234567890"</span>,
+  <span class="string">"template_id"</span>: <span class="string">"a1b2c3d4-e5f6-7890-abcd-ef1234567890"</span>,
+  <span class="string">"expiry_minutes"</span>: <span class="number">10</span>
+}</code>
+                </div>
+
+                <h3>Format Response</h3>
+                <div class="code-block">
+<code>{
+  <span class="string">"success"</span>: <span class="keyword">true</span>,
+  <span class="string">"data"</span>: {
+    <span class="string">"otp_id"</span>: <span class="string">"f47ac10b-58cc-4372-a567-0e02b2c3d479"</span>,
+    <span class="string">"expires_at"</span>: <span class="string">"2025-11-30T12:10:00Z"</span>,
+    <span class="string">"expires_in_minutes"</span>: <span class="number">10</span>
+  }
+}</code>
+                </div>
+
+                <h3>Verifikasi OTP</h3>
+                <p>Setelah mengirim OTP, verifikasi kode yang dimasukkan user:</p>
+                <div class="endpoint-item">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-post">POST</span>
+                        <span class="endpoint-url">/messages/verify-otp</span>
+                    </div>
+                    <p class="text-muted mb-3">Memverifikasi kode OTP yang telah dikirim.</p>
+                </div>
+
+                <h3>Format Request Verifikasi</h3>
+                <div class="code-block">
+<code>{
+  <span class="string">"phone_number"</span>: <span class="string">"81234567890"</span>,
+  <span class="string">"code"</span>: <span class="string">"123456"</span>
+}</code>
+                </div>
+
+                <h3>Format Response Verifikasi</h3>
+                <div class="code-block">
+<code>{
+  <span class="string">"success"</span>: <span class="keyword">true</span>,
+  <span class="string">"message"</span>: <span class="string">"OTP verified successfully"</span>
+}</code>
+                </div>
+
+                <h3>Mendapatkan Status OTP</h3>
+                <div class="endpoint-item">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="endpoint-badge badge-get">GET</span>
+                        <span class="endpoint-url">/messages/otp/{otp_id}/status</span>
+                    </div>
+                    <p class="text-muted mb-3">Mendapatkan status OTP berdasarkan ID (pending, verified, expired).</p>
+                </div>
+                <p><strong>Contoh cURL:</strong></p>
+                <div class="code-block">
+<code>curl -X GET "https://app.wacloud.id/api/v1/messages/otp/f47ac10b-58cc-4372-a567-0e02b2c3d479/status" \
+  -H "X-Api-Key: YOUR_API_KEY"</code>
+                </div>
+                <p><strong>Contoh Python:</strong></p>
+                <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">otp_id</span> = <span class="string">'f47ac10b-58cc-4372-a567-0e02b2c3d479'</span>
+<span class="variable">response</span> = requests.<span class="function">get</span>(
+    <span class="function">f</span>(<span class="string">'https://app.wacloud.id/api/v1/messages/otp/{otp_id}/status'</span>),
+    <span class="variable">headers</span>={<span class="string">'X-Api-Key'</span>: <span class="string">'YOUR_API_KEY'</span>}
+)
+<span class="variable">result</span> = <span class="variable">response</span>.<span class="function">json</span>()</code>
+                </div>
+
+                <h3>Contoh Implementasi - Mengirim dan Verifikasi OTP</h3>
+                
+                <div class="code-tabs">
+                    <div class="code-tabs-header">
+                        <button class="code-tab active" onclick="switchCodeTab(this, 'otp-curl')">cURL</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'otp-python')">Python</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'otp-php')">PHP</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'otp-nodejs')">Node.js</button>
+                        <button class="code-tab" onclick="switchCodeTab(this, 'otp-javascript')">JavaScript</button>
+                    </div>
+                    <div id="otp-curl" class="code-tab-content active">
+                        <div class="code-block">
+<code><span class="comment"># Mengirim OTP</span>
+curl -X POST "https://app.wacloud.id/api/v1/messages/otp" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device_id": "550e8400-e29b-41d4-a716-446655440000",
+    "to": "81234567890",
+    "expiry_minutes": 10
+  }'
+
+<span class="comment"># Verifikasi OTP</span>
+curl -X POST "https://app.wacloud.id/api/v1/messages/verify-otp" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "phone_number": "81234567890",
+    "code": "123456"
+  }'</code>
+                        </div>
+                    </div>
+                    <div id="otp-php" class="code-tab-content active">
+                        <div class="code-block">
+<code><span class="comment">// Mengirim OTP</span>
+<span class="keyword">$apiKey</span> = <span class="string">'YOUR_API_KEY'</span>;
+<span class="keyword">$url</span> = <span class="string">'https://app.wacloud.id/api/v1/messages/otp'</span>;
+
+<span class="keyword">$data</span> = [
+    <span class="string">'device_id'</span> => <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    <span class="string">'to'</span> => <span class="string">'81234567890'</span>,
+    <span class="string">'expiry_minutes'</span> => <span class="number">10</span>
+];
+
+<span class="keyword">$ch</span> = <span class="function">curl_init</span>(<span class="keyword">$url</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="function">json_encode</span>(<span class="keyword">$data</span>));
+<span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+    <span class="string">'X-Api-Key: ' . $apiKey</span>,
+    <span class="string">'Content-Type: application/json'</span>
+]);
+
+<span class="keyword">$response</span> = <span class="function">curl_exec</span>(<span class="keyword">$ch</span>);
+<span class="function">curl_close</span>(<span class="keyword">$ch</span>);
+
+<span class="keyword">$result</span> = <span class="function">json_decode</span>(<span class="keyword">$response</span>, <span class="keyword">true</span>);
+<span class="keyword">if</span> (<span class="keyword">$result</span>[<span class="string">'success'</span>]) {
+    <span class="keyword">$otpId</span> = <span class="keyword">$result</span>[<span class="string">'data'</span>][<span class="string">'otp_id'</span>];
+    <span class="function">echo</span> <span class="string">"OTP sent! ID: {$otpId}\n"</span>;
+    
+    <span class="comment">// Verifikasi OTP (contoh: user memasukkan kode 123456)</span>
+    <span class="keyword">$verifyUrl</span> = <span class="string">'https://app.wacloud.id/api/v1/messages/verify-otp'</span>;
+    <span class="keyword">$verifyData</span> = [
+        <span class="string">'phone_number'</span> => <span class="string">'81234567890'</span>,
+        <span class="string">'code'</span> => <span class="string">'123456'</span>
+    ];
+    
+    <span class="keyword">$ch</span> = <span class="function">curl_init</span>(<span class="keyword">$verifyUrl</span>);
+    <span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+    <span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+    <span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, <span class="function">json_encode</span>(<span class="keyword">$verifyData</span>));
+    <span class="function">curl_setopt</span>(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+        <span class="string">'X-Api-Key: ' . $apiKey</span>,
+        <span class="string">'Content-Type: application/json'</span>
+    ]);
+    
+    <span class="keyword">$verifyResponse</span> = <span class="function">curl_exec</span>(<span class="keyword">$ch</span>);
+    <span class="function">curl_close</span>(<span class="keyword">$ch</span>);
+    
+    <span class="keyword">$verifyResult</span> = <span class="function">json_decode</span>(<span class="keyword">$verifyResponse</span>, <span class="keyword">true</span>);
+    <span class="keyword">if</span> (<span class="keyword">$verifyResult</span>[<span class="string">'success'</span>]) {
+        <span class="function">echo</span> <span class="string">"OTP verified successfully!\n"</span>;
+    } <span class="keyword">else</span> {
+        <span class="function">echo</span> <span class="string">"Error: " . $verifyResult['error'] . "\n"</span>;
+    }
+}</code>
+                        </div>
+                    </div>
+                    <div id="otp-nodejs" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> axios = <span class="function">require</span>(<span class="string">'axios'</span>);
+
+<span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+
+<span class="comment">// Mengirim OTP</span>
+<span class="keyword">const</span> sendOTP = <span class="keyword">async</span> () => {
+    <span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages/otp'</span>;
+    <span class="keyword">const</span> data = {
+        device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+        to: <span class="string">'81234567890'</span>,
+        expiry_minutes: <span class="number">10</span>
+    };
+    
+    <span class="keyword">try</span> {
+        <span class="keyword">const</span> response = <span class="keyword">await</span> axios.<span class="function">post</span>(url, data, {
+            headers: {
+                <span class="string">'X-Api-Key'</span>: apiKey,
+                <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+            }
+        });
+        
+        <span class="keyword">if</span> (response.data.success) {
+            <span class="function">console.log</span>(<span class="string">`OTP sent! ID: ${response.data.data.otp_id}`</span>);
+            
+            <span class="comment">// Verifikasi OTP (contoh: user memasukkan kode 123456)</span>
+            <span class="keyword">const</span> verifyResponse = <span class="keyword">await</span> axios.<span class="function">post</span>(
+                <span class="string">'https://app.wacloud.id/api/v1/messages/verify-otp'</span>,
+                {
+                    phone_number: <span class="string">'81234567890'</span>,
+                    code: <span class="string">'123456'</span>
+                },
+                {
+                    headers: {
+                        <span class="string">'X-Api-Key'</span>: apiKey,
+                        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+                    }
+                }
+            );
+            
+            <span class="keyword">if</span> (verifyResponse.data.success) {
+                <span class="function">console.log</span>(<span class="string">'OTP verified successfully!'</span>);
+            } <span class="keyword">else</span> {
+                <span class="function">console.error</span>(<span class="string">'Error:'</span>, verifyResponse.data.error);
+            }
+        }
+    } <span class="keyword">catch</span> (error) {
+        <span class="function">console.error</span>(<span class="string">'Error:'</span>, error.response?.data || error.message);
+    }
+};
+
+sendOTP();</code>
+                        </div>
+                    </div>
+                    <div id="otp-python" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">import</span> requests
+
+<span class="variable">api_key</span> = <span class="string">'YOUR_API_KEY'</span>
+<span class="variable">headers</span> = {
+    <span class="string">'X-Api-Key'</span>: <span class="variable">api_key</span>,
+    <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+}
+
+<span class="comment"># Mengirim OTP</span>
+<span class="variable">url</span> = <span class="string">'https://app.wacloud.id/api/v1/messages/otp'</span>
+<span class="variable">data</span> = {
+    <span class="string">'device_id'</span>: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    <span class="string">'to'</span>: <span class="string">'81234567890'</span>,
+    <span class="string">'expiry_minutes'</span>: <span class="number">10</span>
+}
+
+<span class="variable">response</span> = requests.<span class="function">post</span>(<span class="variable">url</span>, <span class="variable">headers</span>=<span class="variable">headers</span>, <span class="variable">json</span>=<span class="variable">data</span>)
+
+<span class="keyword">if</span> <span class="variable">response</span>.status_code == <span class="number">200</span>:
+    <span class="variable">result</span> = <span class="variable">response</span>.<span class="function">json</span>()
+    <span class="keyword">if</span> <span class="variable">result</span>[<span class="string">'success'</span>]:
+        <span class="function">print</span>(<span class="function">f</span>(<span class="string">"OTP sent! ID: {result['data']['otp_id']}"</span>))
+        
+        <span class="comment"># Verifikasi OTP (contoh: user memasukkan kode 123456)</span>
+        <span class="variable">verify_url</span> = <span class="string">'https://app.wacloud.id/api/v1/messages/verify-otp'</span>
+        <span class="variable">verify_data</span> = {
+            <span class="string">'phone_number'</span>: <span class="string">'81234567890'</span>,
+            <span class="string">'code'</span>: <span class="string">'123456'</span>
+        }
+        
+        <span class="variable">verify_response</span> = requests.<span class="function">post</span>(<span class="variable">verify_url</span>, <span class="variable">headers</span>=<span class="variable">headers</span>, <span class="variable">json</span>=<span class="variable">verify_data</span>)
+        
+        <span class="keyword">if</span> <span class="variable">verify_response</span>.status_code == <span class="number">200</span>:
+            <span class="variable">verify_result</span> = <span class="variable">verify_response</span>.<span class="function">json</span>()
+            <span class="keyword">if</span> <span class="variable">verify_result</span>[<span class="string">'success'</span>]:
+                <span class="function">print</span>(<span class="string">"OTP verified successfully!"</span>)
+            <span class="keyword">else</span>:
+                <span class="function">print</span>(<span class="function">f</span>(<span class="string">"Error: {verify_result['error']}"</span>))</code>
+                        </div>
+                    </div>
+                    <div id="otp-javascript" class="code-tab-content">
+                        <div class="code-block">
+<code><span class="keyword">const</span> apiKey = <span class="string">'YOUR_API_KEY'</span>;
+
+<span class="comment">// Mengirim OTP</span>
+<span class="keyword">const</span> url = <span class="string">'https://app.wacloud.id/api/v1/messages/otp'</span>;
+<span class="keyword">const</span> data = {
+    device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
+    to: <span class="string">'81234567890'</span>,
+    expiry_minutes: <span class="number">10</span>
+};
+
+<span class="function">fetch</span>(url, {
+    method: <span class="string">'POST'</span>,
+    headers: {
+        <span class="string">'X-Api-Key'</span>: apiKey,
+        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+    },
+    body: <span class="function">JSON.stringify</span>(data)
+})
+.<span class="function">then</span>(response => response.<span class="function">json</span>())
+.<span class="function">then</span>(result => {
+    <span class="keyword">if</span> (result.success) {
+        <span class="function">console.log</span>(<span class="string">`OTP sent! ID: ${result.data.otp_id}`</span>);
+        
+        <span class="comment">// Verifikasi OTP (contoh: user memasukkan kode 123456)</span>
+        <span class="keyword">return</span> <span class="function">fetch</span>(<span class="string">'https://app.wacloud.id/api/v1/messages/verify-otp'</span>, {
+            method: <span class="string">'POST'</span>,
+            headers: {
+                <span class="string">'X-Api-Key'</span>: apiKey,
+                <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+            },
+            body: <span class="function">JSON.stringify</span>({
+                phone_number: <span class="string">'81234567890'</span>,
+                code: <span class="string">'123456'</span>
+            })
+        });
+    }
+})
+.<span class="function">then</span>(response => response.<span class="function">json</span>())
+.<span class="function">then</span>(verifyResult => {
+    <span class="keyword">if</span> (verifyResult.success) {
+        <span class="function">console.log</span>(<span class="string">'OTP verified successfully!'</span>);
+    } <span class="keyword">else</span> {
+        <span class="function">console.error</span>(<span class="string">'Error:'</span>, verifyResult.error);
+    }
+})
+.<span class="function">catch</span>(error => {
+    <span class="function">console.error</span>(<span class="string">'Error:'</span>, error);
+});</code>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Menggunakan Template OTP</h3>
+                <p>Anda dapat menggunakan template OTP yang sudah dibuat untuk mengirim pesan OTP dengan format yang konsisten:</p>
+                <div class="code-block">
+<code>{
+  <span class="string">"device_id"</span>: <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
+  <span class="string">"to"</span>: <span class="string">"81234567890"</span>,
+  <span class="string">"template_id"</span>: <span class="string">"a1b2c3d4-e5f6-7890-abcd-ef1234567890"</span>,
+  <span class="string">"expiry_minutes"</span>: <span class="number">10</span>
+}</code>
+                </div>
+
+                <h3>Status OTP</h3>
+                <p>OTP dapat memiliki status berikut:</p>
+                <ul>
+                    <li><strong>pending</strong> - OTP telah dikirim, menunggu verifikasi</li>
+                    <li><strong>verified</strong> - OTP telah berhasil diverifikasi</li>
+                    <li><strong>expired</strong> - OTP telah kadaluarsa</li>
+                </ul>
+
+                <div class="alert alert-info mt-4">
+                    <h5 class="mb-2"><i class="fas fa-info-circle me-2"></i>Tips</h5>
+                    <ul class="mb-0">
+                        <li>Kode OTP adalah 6 digit angka yang di-generate secara acak</li>
+                        <li>Default expiry time adalah 10 menit, dapat diubah dari 1-60 menit</li>
+                        <li>OTP hanya dapat digunakan sekali (one-time use)</li>
+                        <li>Gunakan template OTP untuk format pesan yang konsisten dan profesional</li>
+                        <li>Device harus dalam status "connected" sebelum dapat mengirim OTP</li>
                     </ul>
                 </div>
             </div>
@@ -888,6 +3749,26 @@
     
     <!-- Smooth Scroll & Active Menu -->
     <script>
+        // Function untuk switch code tabs
+        function switchCodeTab(button, tabId) {
+            // Hide all tab contents dalam container yang sama
+            const tabContainer = button.closest('.code-tabs');
+            const tabContents = tabContainer.querySelectorAll('.code-tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class dari semua tabs dalam header yang sama
+            const tabsHeader = button.closest('.code-tabs-header');
+            const tabs = tabsHeader.querySelectorAll('.code-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) {
+                targetTab.classList.add('active');
+                button.classList.add('active');
+            }
+        }
+        
         // Smooth scroll untuk anchor links
         document.querySelectorAll('.docs-sidebar .nav-link').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
