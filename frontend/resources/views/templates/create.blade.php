@@ -71,9 +71,9 @@
                                 placeholder="Masukkan template pesan Anda di sini...
 Gunakan @{{variable_name}} untuk konten dinamis
 Contoh: Halo @{{name}}, pesanan Anda @{{order_id}} telah dikonfirmasi!
-Untuk OTP: Kode OTP Anda adalah @{{kode_otp}}. Jangan bagikan kode ini.">{{ old('content') }}</textarea>
+Untuk OTP: Kode OTP Anda adalah @{{OTP}}. Jangan bagikan kode ini.">{{ old('content') }}</textarea>
                             <small class="form-text text-muted">
-                                Gunakan <code>@{{variable_name}}</code> untuk menyisipkan konten dinamis. Untuk template OTP, gunakan <code>@{{kode_otp}}</code>.
+                                Gunakan <code>@{{variable_name}}</code> untuk menyisipkan konten dinamis. Untuk template OTP, gunakan <code>@{{OTP}}</code>.
                             </small>
                             @error('content')
                                 <span class="invalid-feedback" role="alert">
@@ -155,5 +155,46 @@ Terima kasih atas pembelian Anda!</pre>
     </div>
 
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const templateTypeSelect = document.getElementById('template_type');
+    const contentTextarea = document.getElementById('content');
+    const defaultOtpContent = 'Kode OTP Anda: {{OTP}}\n\nBerlaku selama 5 menit. Jangan berikan kode ini kepada siapa pun.';
+    
+    // Track previous template type to detect when switching to OTP
+    let previousTemplateType = templateTypeSelect.value;
+    let wasOtpBefore = previousTemplateType === 'otp';
+    
+    // Set initial content if OTP is selected and content is empty
+    if (templateTypeSelect.value === 'otp' && !contentTextarea.value.trim()) {
+        contentTextarea.value = defaultOtpContent;
+    }
+    
+    templateTypeSelect.addEventListener('change', function() {
+        const selectedType = this.value;
+        
+        if (selectedType === 'otp') {
+            // When switching TO OTP (not from OTP), always fill with default
+            // This provides the default content as requested
+            if (!wasOtpBefore) {
+                contentTextarea.value = defaultOtpContent;
+            } else if (!contentTextarea.value.trim()) {
+                // If was OTP before but content is empty, fill it
+                contentTextarea.value = defaultOtpContent;
+            }
+            wasOtpBefore = true;
+        } else {
+            // Switching away from OTP
+            wasOtpBefore = false;
+            // Keep the content as is - don't clear it
+        }
+        previousTemplateType = selectedType;
+    });
+});
+</script>
+@endpush
+
 @endsection
 

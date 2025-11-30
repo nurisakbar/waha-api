@@ -69,6 +69,7 @@ class User extends Authenticatable
         'password',
         'phone',
         'avatar',
+        'google_id',
         'auto_sync_incoming_messages',
         'role',
         'subscription_plan_id',

@@ -5,6 +5,12 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
+// Google OAuth routes
+Route::get('/auth/google', [App\Http\Controllers\Auth\GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [App\Http\Controllers\Auth\GoogleAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+Route::get('/auth/google/phone', [App\Http\Controllers\Auth\GoogleAuthController::class, 'showPhoneInput'])->name('auth.google.phone')->middleware('auth');
+Route::post('/auth/google/phone', [App\Http\Controllers\Auth\GoogleAuthController::class, 'savePhone'])->name('auth.google.phone.save')->middleware('auth');
+
 // Redirect root to login, or home if already authenticated
 Route::get('/', function () {
     if (Auth::check()) {

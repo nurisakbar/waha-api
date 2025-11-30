@@ -55,6 +55,7 @@ class RegisterController extends Controller
         $validator = Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'phone' => ['required', 'string', 'max:20', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'captcha' => ['required', 'string'],
             'captcha_answer' => ['required', 'integer'],
@@ -63,6 +64,8 @@ class RegisterController extends Controller
             'captcha.required' => 'Captcha harus diisi.',
             'captcha_answer.required' => 'Captcha answer harus ada.',
             'referral_code.exists' => 'Kode referral tidak valid.',
+            'phone.required' => 'Nomor HP harus diisi.',
+            'phone.unique' => 'Nomor HP sudah terdaftar.',
         ]);
 
         // Validate captcha
@@ -102,6 +105,7 @@ class RegisterController extends Controller
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
+                'phone' => $data['phone'],
                 'password' => Hash::make($data['password']),
                 'referred_by' => $referredBy,
             ]);

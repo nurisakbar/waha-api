@@ -42,6 +42,21 @@
             </div>
 
             <div class="form-group">
+                <label for="phone" class="form-label">Nomor HP</label>
+                <input id="phone" type="tel"
+                       class="form-control @error('phone') is-invalid @enderror"
+                       name="phone" value="{{ old('phone') }}" required autocomplete="tel"
+                       placeholder="Contoh: +6281234567890">
+
+                @error('phone')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
+                <small class="form-text text-muted">Gunakan format internasional (contoh: +6281234567890)</small>
+            </div>
+
+            <div class="form-group">
                 <label for="password" class="form-label">Password</label>
                 <div class="password-input-wrapper">
                     <input id="password" type="password"
@@ -447,8 +462,7 @@ function generateCaptcha() {
 }
 
 function registerWithGoogle() {
-    // Implement Google OAuth registration here
-    alert('Fitur Daftar dengan Google akan segera tersedia');
+    window.location.href = '{{ route('auth.google') }}';
 }
 
 // Regenerate captcha on form submit if validation fails

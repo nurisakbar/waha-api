@@ -416,8 +416,7 @@ function generateCaptcha() {
 }
 
 function loginWithGoogle() {
-    // Implement Google OAuth login here
-    alert('Fitur Login dengan Google akan segera tersedia');
+    window.location.href = '{{ route('auth.google') }}';
 }
 
 // Regenerate captcha on form submit if validation fails
