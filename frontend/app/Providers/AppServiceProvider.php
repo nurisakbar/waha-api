@@ -22,5 +22,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // Set Carbon locale to Indonesian
         Carbon::setLocale('id');
+        if(env('FORCE_HTTPS',false)) { 
+            URL::forceScheme('https');
+        }
     }
 }
