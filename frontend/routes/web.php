@@ -82,6 +82,7 @@ Route::middleware('auth')->group(function () {
     
     // API Documentation
     Route::get('/api-docs', [App\Http\Controllers\ApiDocumentationController::class, 'index'])->name('api-docs.index');
+    Route::get('/api-docs/{module}', [App\Http\Controllers\ApiDocumentationController::class, 'detail'])->name('api-docs.detail');
     
     // Profile
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');

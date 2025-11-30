@@ -249,8 +249,8 @@ class WebhookController extends Controller
 
         $session = WhatsAppSession::where('session_id', $sessionId)->first();
         if (!$session) {
-            Log::warning('Webhook: Session not found', ['session_id' => $sessionId]);
-            return response()->json(['error' => 'Session not found'], 404);
+            Log::warning('Webhook: Device not found', ['session_id' => $sessionId]);
+            return response()->json(['error' => 'Device not found'], 404);
         }
 
         $event = $request->input('event');

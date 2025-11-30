@@ -77,13 +77,13 @@ class SendMessage implements ShouldQueue
 
         $session = WhatsAppSession::find($this->sessionId);
         if (!$session || $session->status !== 'connected') {
-            Log::error('SendMessage Job: Session not found or not connected', [
+            Log::error('SendMessage Job: Device not found or not connected', [
                 'session_id' => $this->sessionId,
                 'message_id' => $this->messageId,
             ]);
             $message->update([
                 'status' => 'failed',
-                'error_message' => 'Session not found or not connected',
+                'error_message' => 'Device not found or not connected',
             ]);
             return;
         }

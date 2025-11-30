@@ -23,6 +23,49 @@
     <link href="{{ asset('startbootstrap/css/sb-admin-2.min.css') }}" rel="stylesheet">
 
     @stack('styles')
+    
+    <style>
+        .support-whatsapp-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: #25D366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .support-whatsapp-btn:hover {
+            background-color: #20BA5A;
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(37, 211, 102, 0.6);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .support-whatsapp-btn:active {
+            transform: scale(0.95);
+        }
+        
+        @media (max-width: 768px) {
+            .support-whatsapp-btn {
+                width: 56px;
+                height: 56px;
+                font-size: 24px;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body id="page-top">
@@ -382,6 +425,14 @@
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Support WhatsApp Floating Button -->
+    <a href="https://wa.me/6289699935552?text=Hallo%20mimin%20wacloud.id,%20saya%20ingin%20diskusi" 
+       target="_blank" 
+       class="support-whatsapp-btn"
+       title="Hubungi Support">
+        <i class="fab fa-whatsapp"></i>
     </a>
 
     <!-- Logout Modal-->

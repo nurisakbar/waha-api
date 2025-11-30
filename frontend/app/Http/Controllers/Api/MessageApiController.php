@@ -42,7 +42,7 @@ class MessageApiController extends Controller
         
         // Support both formats:
         // 1. /api/v1/messages (device_id in body)
-        // 2. /api/v1/sessions/{session}/messages (session in URL)
+        // 2. /api/v1/devices/{session}/messages (device in URL)
         
         // If session is provided in URL, use it; otherwise use device_id from request body
         $sessionId = $session ?? $request->device_id;
@@ -65,7 +65,7 @@ class MessageApiController extends Controller
             $this->usageService->log($request, 404, $startTime);
             return response()->json([
                 'success' => false,
-                'error' => 'Session not found or not connected',
+                'error' => 'Device not found or not connected',
             ], 404);
         }
 
@@ -681,6 +681,11 @@ class MessageApiController extends Controller
                     $errorMessage = 'This feature is not supported by your WAHA engine. Please check WAHA documentation for supported features. Original error: ' . ($result['error'] ?? 'Unknown error');
                 }
                 
+                // Check if error is related to video URL access (403)
+                if (stripos($errorMessage, '403') !== false || stripos($errorMessage, 'forbidden') !== false) {
+                    $errorMessage = 'Video URL is not accessible. The server hosting the video is blocking access (403 Forbidden). Please ensure the video URL is publicly accessible without authentication or IP restrictions.';
+                }
+                
                 \Log::error('API: Failed to send message', [
                     'error' => $errorMessage,
                     'result' => $result,
@@ -784,7 +789,7 @@ class MessageApiController extends Controller
         
         // Support both formats:
         // 1. /api/v1/messages?device_id=xxx (device_id in query)
-        // 2. /api/v1/sessions/{session}/messages (session in URL)
+        // 2. /api/v1/devices/{session}/messages (device in URL)
         
         $sessionId = $session ?? $request->input('device_id');
         
@@ -804,7 +809,7 @@ class MessageApiController extends Controller
             $this->usageService->log($request, 404, $startTime);
             return response()->json([
                 'success' => false,
-                'error' => 'Session not found',
+                'error' => 'Device not found',
             ], 404);
         }
 
@@ -869,7 +874,7 @@ class MessageApiController extends Controller
             $this->usageService->log($request, 404, $startTime);
             return response()->json([
                 'success' => false,
-                'error' => 'Session not found',
+                'error' => 'Device not found',
             ], 404);
         }
 

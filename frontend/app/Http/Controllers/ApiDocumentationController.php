@@ -23,4 +23,22 @@ class ApiDocumentationController extends Controller
         
         return view('api-documentation.index', compact('apiKeys', 'baseUrl'));
     }
+
+    /**
+     * Display detailed documentation for a specific module.
+     */
+    public function detail($module)
+    {
+        $user = Auth::user();
+        $apiKeys = $user->apiKeys()->where('is_active', true)->get();
+        $baseUrl = config('app.url', 'http://localhost:8000');
+        
+        $allowedModules = ['devices', 'messages', 'templates', 'account', 'otp', 'health'];
+        
+        if (!in_array($module, $allowedModules)) {
+            abort(404);
+        }
+        
+        return view('api-documentation.detail', compact('apiKeys', 'baseUrl', 'module'));
+    }
 }

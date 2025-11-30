@@ -843,9 +843,13 @@ class WahaService
                 $errorMessage = $errorData['error'];
             }
             
-            // Check if error is related to URL not found (404)
-            if (stripos($errorMessage, '404') !== false || stripos($errorMessage, 'not found') !== false) {
+            // Check if error is related to URL access issues
+            if (stripos($errorMessage, '403') !== false || stripos($errorMessage, 'forbidden') !== false) {
+                $errorMessage = "Video URL is not accessible (403 Forbidden). The server hosting the video is blocking access. Please ensure the video URL is publicly accessible and not protected by authentication or IP restrictions. URL: {$videoUrl}";
+            } elseif (stripos($errorMessage, '404') !== false || stripos($errorMessage, 'not found') !== false) {
                 $errorMessage = "Video URL not accessible or not found. Please ensure the URL is valid and publicly accessible: {$videoUrl}";
+            } elseif (stripos($errorMessage, '403') !== false) {
+                $errorMessage = "Video URL access denied (403). The video server is blocking access. Please use a publicly accessible video URL without authentication or IP restrictions.";
             }
             
             Log::error('WAHA: sendVideo failed', [
