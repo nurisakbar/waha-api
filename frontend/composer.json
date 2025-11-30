@@ -13,6 +13,7 @@
         "laravel/tinker": "^2.10.1",
         "laravel/ui": "^4.6",
         "phpoffice/phpspreadsheet": "^5.3",
+        "rap2hpoutre/laravel-log-viewer": "^2.5",
         "xendit/xendit-php": "^7.0",
         "yajra/laravel-datatables-oracle": "^12.6"
     },
