@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>WAHA Gateway - WhatsApp API untuk Developer</title>
-    <meta name="description" content="Platform WhatsApp Gateway API yang powerful untuk developer. Kirim pesan, kelola session, dan integrasikan WhatsApp ke aplikasi Anda dengan mudah.">
+    <title>WACloud.id - Layanan API WhatsApp Unofficial Pertama di Indonesia</title>
+    <meta name="description" content="WACloud adalah layanan API WhatsApp unofficial pertama di Indonesia dengan skema pricing pay-as-you-go. Kirim pesan, kelola session, dan integrasikan WhatsApp ke aplikasi Anda dengan mudah.">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -678,7 +678,7 @@
         <div class="container">
             <a class="navbar-brand fw-bold fs-4" href="/">
                 <i class="fab fa-whatsapp text-success me-2"></i>
-                WAHA Gateway
+                WACloud.id
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -716,13 +716,19 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6">
+                    <div class="mb-3">
+                        <span class="badge bg-warning text-dark px-3 py-2 fs-6 mb-3">
+                            <i class="fas fa-star me-1"></i>Pertama di Indonesia
+                        </span>
+                    </div>
                     <h1 class="display-4 fw-bold mb-4">
-                        WhatsApp API Gateway<br>
-                        <span class="text-warning">untuk Developer</span>
+                        WACloud<br>
+                        <span class="text-warning">API WhatsApp Unofficial</span>
                     </h1>
                     <p class="lead mb-4">
+                        Layanan API WhatsApp unofficial <strong>pertama di Indonesia</strong> dengan skema pricing <strong class="text-primary">Pay as You Go</strong>. 
                         Integrasikan WhatsApp messaging ke dalam aplikasi Anda dengan API yang powerful dan ramah developer. 
-                        Kirim pesan, kelola session, dan bangun pengalaman yang luar biasa.
+                        Bayar hanya untuk yang Anda gunakan, tanpa komitmen bulanan.
                     </p>
                     <div class="d-flex gap-3 flex-wrap mb-4">
                         <a href="/register" class="btn btn-light btn-lg">
@@ -739,14 +745,14 @@
                             <span class="comment"># Kirim pesan WhatsApp via API</span>
                         </div>
                         <div>
-                            <span class="keyword">curl</span> -X POST <span class="string">https://api.wahagateway.com/v1/sessions/{id}/messages/text</span><br>
+                            <span class="keyword">curl</span> -X POST <span class="string">https://api.wacloud.id/v1/sessions/{id}/messages/text</span><br>
                             &nbsp;&nbsp;-H <span class="string">"X-Api-Key: API_KEY_ANDA"</span><br>
                             &nbsp;&nbsp;-H <span class="string">"Content-Type: application/json"</span><br>
                             &nbsp;&nbsp;-d <span class="string">'{</span><br>
                             &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"to": "62812345xxxxx",</span><br>
                             &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"device_id": "device_id_anda",</span><br>
                             &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"message_type": "document",</span><br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"document": "https://example.com/document.pdf",</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"document_url": "https://example.com/document.pdf",</span><br>
                             &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"filename": "document.pdf",</span><br>
                             &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"caption": "Dokumen contoh"</span><br>
                             &nbsp;&nbsp;<span class="string">}'</span>
@@ -871,8 +877,12 @@
     <section id="pay-as-you-go" class="section bg-white">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="section-title">Biaya Langganan</h2>
-                <p class="section-subtitle">Top up quota pesan sesuai kebutuhan Anda. Tidak ada komitmen bulanan, bayar hanya untuk yang Anda gunakan.</p>
+                <h2 class="section-title">Pay as You Go</h2>
+                <p class="section-subtitle">
+                    <span class="badge bg-primary mb-2">Skema Pricing Pertama di Indonesia</span><br>
+                    Top up quota pesan sesuai kebutuhan Anda. Tidak ada komitmen bulanan, bayar hanya untuk yang Anda gunakan. 
+                    Quota tidak kadaluarsa dan dapat digunakan kapan saja.
+                </p>
             </div>
             <div class="row justify-content-center">
                 <div class="col-lg-10">
@@ -963,7 +973,7 @@
         <div class="container">
             <div class="text-center mb-5">
                 <h2 class="section-title">Dipercaya oleh Perusahaan Terkemuka</h2>
-                <p class="section-subtitle">Ribuan perusahaan telah mempercayai WAHA Gateway untuk kebutuhan WhatsApp API mereka</p>
+                <p class="section-subtitle">Ribuan perusahaan telah mempercayai WACloud untuk kebutuhan WhatsApp API mereka</p>
             </div>
             <div class="row g-4 mb-5">
                 <div class="col-lg-3 col-md-4 col-sm-6">
@@ -1511,9 +1521,9 @@
                 <div class="col-lg-4 col-md-6 mb-4">
                     <h5 class="mb-3">
                         <i class="fab fa-whatsapp text-success me-2"></i>
-                        WAHA Gateway
+                        WACloud
                     </h5>
-                    <p class="text-muted mb-4">Platform WhatsApp Gateway API yang powerful untuk developer. Bangun aplikasi luar biasa dengan integrasi WhatsApp.</p>
+                    <p class="text-muted mb-4">Layanan API WhatsApp unofficial pertama di Indonesia dengan skema pricing pay-as-you-go. Bangun aplikasi luar biasa dengan integrasi WhatsApp tanpa komitmen bulanan.</p>
                 </div>
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="mb-3">Produk</h6>
@@ -1550,7 +1560,7 @@
             <hr class="bg-secondary">
             <div class="row">
                 <div class="col-12 text-center">
-                    <p class="text-muted mb-0">&copy; 2025 WAHA Gateway. All rights reserved.</p>
+                    <p class="text-muted mb-0">&copy; 2025 WACloud. All rights reserved.</p>
                 </div>
             </div>
         </div>

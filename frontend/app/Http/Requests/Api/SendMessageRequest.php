@@ -104,15 +104,15 @@ class SendMessageRequest extends FormRequest
             $rules['text'] = 'required_without:message|string|max:4096';
             $rules['message'] = 'required_without:text|string|max:4096';
         } elseif ($messageType === 'image') {
-            $rules['image'] = 'required|url|max:500';
+            $rules['image_url'] = 'required|url|max:500';
             $rules['caption'] = 'nullable|string|max:1024';
         } elseif ($messageType === 'video') {
-            $rules['video'] = 'required|url|max:500';
+            $rules['video_url'] = 'required|url|max:500';
             $rules['caption'] = 'nullable|string|max:1024';
             $rules['as_note'] = 'nullable|boolean';
             $rules['convert'] = 'nullable|boolean';
         } elseif ($messageType === 'document') {
-            $rules['document'] = 'required|url|max:500';
+            $rules['document_url'] = 'required|url|max:500';
             $rules['filename'] = 'nullable|string|max:255';
             $rules['caption'] = 'nullable|string|max:1024';
         } elseif ($messageType === 'poll') {
@@ -177,17 +177,17 @@ class SendMessageRequest extends FormRequest
             'message.required_without' => 'Message content is required for text messages (or use "text" field).',
             'message.string' => 'Message content must be a string.',
             'message.max' => 'Message content must not exceed 4096 characters.',
-            'image.required' => 'Image URL is required for image messages.',
-            'image.url' => 'Image must be a valid URL.',
-            'image.max' => 'Image URL must not exceed 500 characters.',
-            'video.required' => 'Video URL is required for video messages.',
-            'video.url' => 'Video must be a valid URL.',
-            'video.max' => 'Video URL must not exceed 500 characters.',
+            'image_url.required' => 'Image URL is required for image messages.',
+            'image_url.url' => 'Image URL must be a valid URL.',
+            'image_url.max' => 'Image URL must not exceed 500 characters.',
+            'video_url.required' => 'Video URL is required for video messages.',
+            'video_url.url' => 'Video URL must be a valid URL.',
+            'video_url.max' => 'Video URL must not exceed 500 characters.',
             'as_note.boolean' => 'as_note must be a boolean value.',
             'convert.boolean' => 'convert must be a boolean value.',
-            'document.required' => 'Document URL is required for document messages.',
-            'document.url' => 'Document must be a valid URL.',
-            'document.max' => 'Document URL must not exceed 500 characters.',
+            'document_url.required' => 'Document URL is required for document messages.',
+            'document_url.url' => 'Document URL must be a valid URL.',
+            'document_url.max' => 'Document URL must not exceed 500 characters.',
             'filename.string' => 'Filename must be a string.',
             'filename.max' => 'Filename must not exceed 255 characters.',
             'caption.string' => 'Caption must be a string.',

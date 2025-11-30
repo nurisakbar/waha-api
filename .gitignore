@@ -1,5 +1,6 @@
 # Vendor directories (Composer)
 /vendor/
+frontend/frankenphp
 /tests/*
 frontend/vendor/
 

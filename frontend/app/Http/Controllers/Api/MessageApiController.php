@@ -244,10 +244,10 @@ class MessageApiController extends Controller
                 case 'image':
                     // Handle template for image messages
                     if ($template) {
-                        $imageUrl = $processedTemplate['metadata']['image_url'] ?? $request->image;
+                        $imageUrl = $processedTemplate['metadata']['image_url'] ?? $request->image_url;
                         $caption = $processedTemplate['content'] ?? $request->caption;
                     } else {
-                        $imageUrl = $request->image;
+                        $imageUrl = $request->image_url;
                         $caption = $request->caption;
                     }
                     
@@ -326,11 +326,13 @@ class MessageApiController extends Controller
                         throw new \Exception('Insufficient quota or balance. Please purchase quota first.');
                     }
                     
+                    $videoUrl = $request->video_url;
+                    
                     \Log::info('API: Sending video message', [
                         'session_id' => $session->session_id,
                         'chat_id' => $chatId,
                         'user_id' => $request->user->id,
-                        'video_url' => $request->video,
+                        'video_url' => $videoUrl,
                         'has_caption' => !empty($request->caption),
                         'as_note' => $request->as_note ?? false,
                         'convert' => $request->convert ?? false,
@@ -340,7 +342,7 @@ class MessageApiController extends Controller
                     $result = $this->wahaService->sendVideoByUrl(
                         $session->session_id,
                         $chatId,
-                        $request->video,
+                        $videoUrl,
                         $request->caption,
                         $request->as_note ?? false,
                         $request->convert ?? false
@@ -357,7 +359,7 @@ class MessageApiController extends Controller
                         'data' => $result['data'] ?? null,
                     ]);
                     
-                    $messageData['media_url'] = $request->video;
+                    $messageData['media_url'] = $videoUrl;
                     $messageData['caption'] = $request->caption;
                     break;
 
@@ -384,17 +386,21 @@ class MessageApiController extends Controller
                         throw new \Exception('Insufficient quota or balance. Please purchase quota first.');
                     }
                     
+                    $documentUrl = $request->document_url;
+                    
                     \Log::info('API: Sending document message', [
                         'session_id' => $session->session_id,
                         'chat_id' => $chatId,
                         'user_id' => $request->user->id,
+                        'document_url' => $documentUrl,
+                        'filename' => $request->filename,
                         'quota_type' => $quotaType,
                     ]);
                     
                     $result = $this->wahaService->sendDocumentByUrl(
                         $session->session_id,
                         $chatId,
-                        $request->document,
+                        $documentUrl,
                         $request->filename
                     );
                     
@@ -403,7 +409,7 @@ class MessageApiController extends Controller
                         'error' => $result['error'] ?? null,
                     ]);
                     
-                    $messageData['media_url'] = $request->document;
+                    $messageData['media_url'] = $documentUrl;
                     $messageData['caption'] = $request->caption;
                     break;
 

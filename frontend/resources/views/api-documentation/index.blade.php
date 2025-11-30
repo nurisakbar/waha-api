@@ -390,7 +390,7 @@ if response.status_code == 200:
                     <div class="endpoint-item">
                         <div class="d-flex align-items-center mb-2">
                             <span class="endpoint-method-badge badge-post">POST</span>
-                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/messages</span>
+                        <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/messages</span>
                         </div>
                         <p class="endpoint-description mb-3">{{ __('Mengirim pesan WhatsApp. Mendukung berbagai jenis pesan.') }}</p>
 
@@ -508,7 +508,7 @@ if response.status_code == 200:
     "device_id": "YOUR_DEVICE_ID",
     "message_type": "image",
     "to": "6281234567890",
-    "image": "https://example.com/image.jpg",
+    "image_url": "https://example.com/image.jpg",
     "caption": "Halo, ini gambar dari API"
   }'</code></div>
                         </div>
@@ -521,7 +521,7 @@ $data = [
     'device_id' => 'YOUR_DEVICE_ID',
     'message_type' => 'image',
     'to' => '6281234567890',
-    'image' => 'https://example.com/image.jpg',
+    'image_url' => 'https://example.com/image.jpg',
     'caption' => 'Halo, ini gambar dari API'
 ];
 
@@ -557,7 +557,7 @@ data = {
     'device_id': 'YOUR_DEVICE_ID',
     'message_type': 'image',
     'to': '6281234567890',
-    'image': 'https://example.com/image.jpg',
+    'image_url': 'https://example.com/image.jpg',
     'caption': 'Halo, ini gambar dari API'
 }
 
@@ -575,7 +575,7 @@ if response.status_code == 200:
   "device_id": "YOUR_DEVICE_ID",
   "message_type": "image",
   "to": "6281234567890",
-  "image": "https://example.com/image.jpg",
+  "image_url": "https://example.com/image.jpg",
   "caption": "Halo, ini gambar dari API"
 }</code></div>
 
@@ -585,7 +585,7 @@ if response.status_code == 200:
   "device_id": "YOUR_DEVICE_ID",
   "message_type": "video",
   "to": "6281234567890",
-  "video": "https://example.com/video.mp4",
+  "video_url": "https://example.com/video.mp4",
   "caption": "Tonton video ini!",
   "as_note": false,
   "convert": false
@@ -598,7 +598,7 @@ if response.status_code == 200:
   "device_id": "YOUR_DEVICE_ID",
   "message_type": "document",
   "to": "6281234567890",
-  "document": "https://example.com/invoice.pdf",
+  "document_url": "https://example.com/invoice.pdf",
   "filename": "invoice.pdf",
   "caption": "Ini adalah dokumen"
 }</code></div>
@@ -741,9 +741,9 @@ if response.status_code == 200:
                         <li><span class="api-inline-code">message_type</span> – {{ __('Jenis pesan (required): "text", "image", "video", "document", "poll", "button", atau "list".') }}</li>
                         <li><span class="api-inline-code">to</span> – {{ __('Nomor tujuan (required, string, max 20 karakter). Format: 08xxxxxxxxxx atau 628xxxxxxxxxx (akan dinormalisasi otomatis).') }}</li>
                         <li><span class="api-inline-code">message</span> – {{ __('Isi pesan teks (required jika message_type="text", string, maks 4096 karakter).') }}</li>
-                        <li><span class="api-inline-code">image</span> – {{ __('URL gambar (required jika message_type="image", valid URL, maks 500 karakter).') }}</li>
-                        <li><span class="api-inline-code">video</span> – {{ __('URL video (required jika message_type="video", valid URL, maks 500 karakter).') }}</li>
-                        <li><span class="api-inline-code">document</span> – {{ __('URL file (required jika message_type="document", valid URL, maks 500 karakter).') }}</li>
+                        <li><span class="api-inline-code">image_url</span> – {{ __('URL gambar (required jika message_type="image", valid URL, maks 500 karakter).') }}</li>
+                        <li><span class="api-inline-code">video_url</span> – {{ __('URL video (required jika message_type="video", valid URL, maks 500 karakter).') }}</li>
+                        <li><span class="api-inline-code">document_url</span> – {{ __('URL file (required jika message_type="document", valid URL, maks 500 karakter).') }}</li>
                         <li><span class="api-inline-code">filename</span> – {{ __('Nama file (opsional, string, max 255 karakter, untuk document).') }}</li>
                         <li><span class="api-inline-code">caption</span> – {{ __('Caption/teks tambahan (opsional, string, maks 1024 karakter, untuk image, video, dan document).') }}</li>
                         <li><span class="api-inline-code">as_note</span> – {{ __('Kirim sebagai video note/rounded video (opsional, boolean, default: false, hanya untuk video).') }}</li>
@@ -799,7 +799,7 @@ if response.status_code == 200:
                         </ul>
                     </div>
 
-                        <p class="mt-3 mb-1"><strong>{{ __('Response Error (422 - Validation Failed)') }}</strong></p>
+                    <p class="mt-3 mb-1"><strong>{{ __('Response Error (422 - Validation Failed)') }}</strong></p>
                         <div class="api-code mb-0"><code>{
   "success": false,
   "error": "Validation failed",
@@ -809,12 +809,12 @@ if response.status_code == 200:
     "to": ["Recipient number is required."]
   }
 }</code></div>
-                    </div>
+                </div>
                     <div class="endpoint-item">
                         <div class="d-flex align-items-center mb-2">
                             <span class="endpoint-method-badge badge-get">GET</span>
                             <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/messages</span>
-                        </div>
+            </div>
                         <p class="endpoint-description mb-3">{{ __('Mendapatkan daftar pesan yang telah dikirim atau diterima.') }}</p>
                         
                         <!-- Code Examples -->
@@ -881,16 +881,16 @@ if response.status_code == 200:
         for message in data['data']:
             print(f"Pesan: {message['content']}")</code></div>
                             </div>
-                        </div>
+                </div>
                         
                         <p class="mt-3 mb-2"><strong>{{ __('Query Parameters') }}</strong></p>
-                        <div class="api-code mb-3"><code>device_id=YOUR_DEVICE_ID&per_page=20&page=1</code></div>
-                        <p class="mb-1"><strong>{{ __('Keterangan parameter') }}</strong></p>
+                    <div class="api-code mb-3"><code>device_id=YOUR_DEVICE_ID&per_page=20&page=1</code></div>
+                    <p class="mb-1"><strong>{{ __('Keterangan parameter') }}</strong></p>
                         <ul class="api-list mb-0">
-                            <li><span class="api-inline-code">device_id</span> – {{ __('ID device WhatsApp (required).') }}</li>
-                            <li><span class="api-inline-code">per_page</span> – {{ __('Jumlah pesan per halaman (opsional, default: 20).') }}</li>
-                            <li><span class="api-inline-code">page</span> – {{ __('Nomor halaman (opsional, default: 1).') }}</li>
-                        </ul>
+                        <li><span class="api-inline-code">device_id</span> – {{ __('ID device WhatsApp (required).') }}</li>
+                        <li><span class="api-inline-code">per_page</span> – {{ __('Jumlah pesan per halaman (opsional, default: 20).') }}</li>
+                        <li><span class="api-inline-code">page</span> – {{ __('Nomor halaman (opsional, default: 1).') }}</li>
+                    </ul>
                     </div>
                     <div class="endpoint-item">
                         <div class="d-flex align-items-center mb-2">
@@ -1173,7 +1173,7 @@ if response.status_code == 200 and data['success']:
                     <div class="endpoint-item">
                         <div class="d-flex align-items-center mb-2">
                             <span class="endpoint-method-badge badge-get">GET</span>
-                            <span class="api-endpoint-url">{{ $baseUrl }}/api/health</span>
+                        <span class="api-endpoint-url">{{ $baseUrl }}/api/health</span>
                         </div>
                         <p class="endpoint-description mb-3">{{ __('Memeriksa status kesehatan API. Endpoint ini tidak memerlukan autentikasi.') }}</p>
                         <p class="mb-2"><strong>{{ __('Response Example') }}</strong></p>
