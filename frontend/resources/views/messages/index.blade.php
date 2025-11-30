@@ -8,13 +8,52 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>{{ __('Messages') }}</span>
-                    <a href="{{ route('messages.create') }}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus"></i> {{ __('Send Message') }}
-                    </a>
+                    <div class="d-flex align-items-center gap-3">
+                        <span>{{ __('Messages') }}</span>
+                        <!-- Auto Sync Toggle -->
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" 
+                                   type="checkbox" 
+                                   id="autoSyncToggle" 
+                                   {{ $autoSyncEnabled ? 'checked' : '' }}
+                                   style="cursor: pointer;">
+                            <label class="form-check-label" for="autoSyncToggle" style="cursor: pointer;">
+                                <small>
+                                    <i class="fas fa-sync-alt"></i> {{ __('Auto Sync Pesan Masuk') }}
+                                </small>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" id="btnSyncIncoming" class="btn btn-info btn-sm">
+                            <i class="fas fa-sync"></i> {{ __('Sync Pesan Masuk') }}
+                        </button>
+                        <button type="button" id="btnUpdateStatus" class="btn btn-warning btn-sm">
+                            <i class="fas fa-refresh"></i> {{ __('Update Status') }}
+                        </button>
+                        <a href="{{ route('messages.create') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> {{ __('Send Message') }}
+                        </a>
+                    </div>
                 </div>
 
                 <div class="card-body">
+                    <!-- Info about built-in webhook -->
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle"></i> 
+                        <strong>Fitur Utama - Built-in Webhook:</strong> Sistem secara otomatis menerima dan menyimpan pesan masuk secara real-time melalui webhook built-in. 
+                        Tidak perlu setup webhook manual - webhook dikonfigurasi otomatis saat device dibuat dan terhubung.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    
+                    <!-- Info about manual sync (optional) -->
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Sync Manual (Opsional):</strong> Fitur "Sync Pesan Masuk" digunakan untuk mengambil pesan historis yang mungkin terlewat. 
+                        Untuk pesan baru, sistem akan otomatis menerima melalui webhook built-in.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    
                     @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             {{ session('success') }}
@@ -216,6 +255,156 @@ $(document).ready(function() {
     $('#filter_session_id, #filter_direction').on('change', function() {
         table.ajax.reload();
     });
+
+    // Auto Sync Toggle
+    $('#autoSyncToggle').on('change', function() {
+        const enabled = $(this).is(':checked');
+        
+        $.ajax({
+            url: '{{ route('messages.toggleAutoSync') }}',
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            data: {
+                enabled: enabled
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Show success message
+                    const alert = $('<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                        response.message +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                        '</div>');
+                    $('.card-body').prepend(alert);
+                    setTimeout(() => alert.fadeOut(), 3000);
+                    
+                    // If enabled, trigger sync
+                    if (enabled) {
+                        syncIncomingMessages();
+                    }
+                }
+            },
+            error: function(xhr) {
+                const message = xhr.responseJSON?.message || 'Gagal mengubah setting';
+                alert(message);
+                // Revert toggle
+                $('#autoSyncToggle').prop('checked', !enabled);
+            }
+        });
+    });
+
+    // Sync Incoming Messages Button
+    $('#btnSyncIncoming').on('click', function() {
+        const btn = $(this);
+        const originalHtml = btn.html();
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Syncing...');
+        
+        syncIncomingMessages(function() {
+            btn.prop('disabled', false).html(originalHtml);
+        });
+    });
+
+    // Update Pending Status Button
+    $('#btnUpdateStatus').on('click', function() {
+        const btn = $(this);
+        const originalHtml = btn.html();
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Updating...');
+        
+        $.ajax({
+            url: '{{ route('messages.updatePendingStatus') }}',
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            success: function(response) {
+                if (response.success) {
+                    const alert = $('<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                        response.message +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                        '</div>');
+                    $('.card-body').prepend(alert);
+                    setTimeout(() => alert.fadeOut(), 3000);
+                    
+                    // Reload table
+                    table.ajax.reload();
+                }
+            },
+            error: function(xhr) {
+                const message = xhr.responseJSON?.message || 'Gagal update status';
+                alert(message);
+            },
+            complete: function() {
+                btn.prop('disabled', false).html(originalHtml);
+            }
+        });
+    });
+
+    // Sync Incoming Messages Function
+    function syncIncomingMessages(callback) {
+        $.ajax({
+            url: '{{ route('messages.syncIncoming') }}',
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            success: function(response) {
+                if (response.success) {
+                    const alert = $('<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                        response.message +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                        '</div>');
+                    $('.card-body').prepend(alert);
+                    setTimeout(() => alert.fadeOut(), 3000);
+                    
+                    // Reload table
+                    table.ajax.reload();
+                }
+            },
+            error: function(xhr) {
+                const message = xhr.responseJSON?.message || 'Gagal sync pesan masuk';
+                alert(message);
+            },
+            complete: function() {
+                if (callback) callback();
+            }
+        });
+    }
+
+    // Auto sync on page load if enabled
+    @if($autoSyncEnabled)
+    $(document).ready(function() {
+        // Wait a bit before syncing to let page load first
+        setTimeout(function() {
+            syncIncomingMessages();
+            // Also update pending status
+            $('#btnUpdateStatus').trigger('click');
+        }, 1000);
+    });
+    @endif
+
+    // Auto update status every 30 seconds
+    setInterval(function() {
+        if ($('#autoSyncToggle').is(':checked')) {
+            $.ajax({
+                url: '{{ route('messages.updatePendingStatus') }}',
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                success: function(response) {
+                    if (response.success && response.data.updated > 0) {
+                        // Reload table if any messages were updated
+                        table.ajax.reload(null, false); // false = don't reset pagination
+                    }
+                }
+            });
+        }
+    }, 30000); // Every 30 seconds
 });
 </script>
 @endpush

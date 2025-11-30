@@ -31,6 +31,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/sessions/{session}/check-status', [App\Http\Controllers\SessionController::class, 'checkStatus'])
         ->middleware('throttle:30,1') // Max 30 status checks per minute
         ->name('sessions.check-status');
+    Route::post('/sessions/{session}/update-webhook', [App\Http\Controllers\SessionController::class, 'updateWebhook'])
+        ->name('sessions.updateWebhook');
     Route::post('/sessions/{session}/refresh-qr', [App\Http\Controllers\SessionController::class, 'refreshQrCode'])
         ->middleware('throttle:10,1') // Max 10 QR refreshes per minute
         ->name('sessions.refresh-qr');
@@ -43,10 +45,14 @@ Route::middleware('auth')->group(function () {
     // Messages - DataTables route must be before resource route
     Route::get('messages/data', [App\Http\Controllers\MessageController::class, 'index'])->name('messages.data');
     Route::post('messages/bulk', [App\Http\Controllers\MessageController::class, 'storeBulk'])->name('messages.storeBulk');
+    Route::post('messages/toggle-auto-sync', [App\Http\Controllers\MessageController::class, 'toggleAutoSync'])->name('messages.toggleAutoSync');
+    Route::post('messages/sync-incoming', [App\Http\Controllers\MessageController::class, 'syncIncoming'])->name('messages.syncIncoming');
+    Route::post('messages/update-pending-status', [App\Http\Controllers\MessageController::class, 'updatePendingStatus'])->name('messages.updatePendingStatus');
     Route::resource('messages', App\Http\Controllers\MessageController::class)->except(['edit', 'update']);
     
     // Webhooks
     Route::resource('webhooks', App\Http\Controllers\WebhookController::class);
+    Route::post('/webhooks/{webhook}/test', [App\Http\Controllers\WebhookController::class, 'test'])->name('webhooks.test');
     
     // Templates
     Route::resource('templates', App\Http\Controllers\TemplateController::class);

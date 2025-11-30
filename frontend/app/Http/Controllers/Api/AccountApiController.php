@@ -16,27 +16,52 @@ class AccountApiController extends Controller
     }
 
     /**
-     * Get account information
+     * Get account information with quota details
      */
     public function show(Request $request)
     {
         $startTime = microtime(true);
         
         $user = $request->user;
+        $quota = $user->getQuota();
         $subscription = $user->activeSubscription;
+        $subscriptionPlan = $user->subscriptionPlan;
+        
+        // Get statistics
+        $totalMessages = $user->messages()->count();
+        $totalSessions = $user->whatsappSessions()->count();
+        $connectedSessions = $user->whatsappSessions()->where('status', 'connected')->count();
 
         $this->usageService->log($request, 200, $startTime);
 
         return response()->json([
             'success' => true,
             'data' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'created_at' => $user->created_at->toIso8601String(),
+                ],
+                'quota' => [
+                    'balance' => (float) $quota->balance,
+                    'text_quota' => (int) $quota->text_quota,
+                    'multimedia_quota' => (int) $quota->multimedia_quota,
+                    'free_text_quota' => (int) $quota->free_text_quota,
+                    'total_text_quota' => (int) ($quota->text_quota + $quota->free_text_quota),
+                ],
                 'subscription' => $subscription ? [
-                    'plan' => $subscription->plan->name ?? null,
+                    'plan_name' => $subscriptionPlan->name ?? null,
+                    'plan_id' => $subscriptionPlan->id ?? null,
                     'status' => $subscription->status,
+                    'expires_at' => $subscription->expires_at ? $subscription->expires_at->toIso8601String() : null,
                 ] : null,
+                'statistics' => [
+                    'total_messages' => $totalMessages,
+                    'total_sessions' => $totalSessions,
+                    'connected_sessions' => $connectedSessions,
+                ],
             ],
         ]);
     }

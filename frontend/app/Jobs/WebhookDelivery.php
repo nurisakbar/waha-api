@@ -27,11 +27,11 @@ class WebhookDelivery implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(int $webhookId, array $payload, string $event)
+    public function __construct(string $webhookId, string $event, array $payload)
     {
         $this->webhookId = $webhookId;
-        $this->payload = $payload;
         $this->event = $event;
+        $this->payload = $payload;
     }
 
     /**

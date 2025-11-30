@@ -57,6 +57,113 @@
     .api-list li {
         margin-bottom: .3rem;
     }
+    .endpoint-group {
+        margin-bottom: 2rem;
+    }
+    .endpoint-group-header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem 0.5rem 0 0;
+        font-weight: 700;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .endpoint-group-header i {
+        font-size: 1.25rem;
+    }
+    .endpoint-group-body {
+        border: 1px solid #e5e7eb;
+        border-top: none;
+        border-radius: 0 0 0.5rem 0.5rem;
+        padding: 0;
+    }
+    .endpoint-item {
+        border-bottom: 1px solid #e5e7eb;
+        padding: 1.5rem;
+    }
+    .endpoint-item:last-child {
+        border-bottom: none;
+    }
+    .endpoint-method-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.25rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        margin-right: 0.75rem;
+    }
+    .badge-get {
+        background-color: #3b82f6;
+        color: white;
+    }
+    .badge-post {
+        background-color: #10b981;
+        color: white;
+    }
+    .badge-put {
+        background-color: #f59e0b;
+        color: white;
+    }
+    .badge-patch {
+        background-color: #f59e0b;
+        color: white;
+    }
+    .badge-delete {
+        background-color: #ef4444;
+        color: white;
+    }
+    .endpoint-description {
+        color: #6b7280;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+    }
+    .code-tabs {
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-top: 1rem;
+    }
+    .code-tabs-header {
+        display: flex;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .code-tab {
+        padding: 0.75rem 1.5rem;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #6b7280;
+        transition: all 0.2s;
+        border-bottom: 2px solid transparent;
+    }
+    .code-tab:hover {
+        background: #f3f4f6;
+        color: #374151;
+    }
+    .code-tab.active {
+        color: #10b981;
+        border-bottom-color: #10b981;
+        background: white;
+    }
+    .code-tab-content {
+        display: none;
+    }
+    .code-tab-content.active {
+        display: block;
+    }
+    .code-example-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
 </style>
 @endpush
 
@@ -117,19 +224,254 @@
                 </div>
             </div>
 
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span class="api-section-title">{{ __('Kirim Pesan') }}</span>
-                    <span class="badge bg-success api-badge">POST</span>
+            <!-- Sessions Endpoints Group -->
+            <div class="endpoint-group">
+                <div class="endpoint-group-header">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>{{ __('Sessions / Devices') }}</span>
                 </div>
-                <div class="card-body">
-                    <p><strong>{{ __('Endpoint') }}</strong></p>
-                    <p class="api-endpoint mb-3">
-                        <span class="api-endpoint-method">POST</span>
-                        <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/messages</span>
-                    </p>
+                <div class="endpoint-group-body">
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-get">GET</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/sessions</span>
+                        </div>
+                        <p class="endpoint-description mb-3">{{ __('Mendapatkan daftar semua device WhatsApp yang terhubung.') }}</p>
+                        
+                        <!-- Code Examples -->
+                        <div class="code-tabs">
+                            <div class="code-tabs-header">
+                                <button class="code-tab active" onclick="switchCodeTab(this, 'sessions-curl')">cURL</button>
+                                <button class="code-tab" onclick="switchCodeTab(this, 'sessions-php')">PHP</button>
+                                <button class="code-tab" onclick="switchCodeTab(this, 'sessions-python')">Python</button>
+                            </div>
+                            <div id="sessions-curl" class="code-tab-content active">
+                                <div class="api-code mb-0"><code>curl -X GET "{{ $baseUrl }}/api/v1/sessions" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json"</code></div>
+                            </div>
+                            <div id="sessions-php" class="code-tab-content">
+                                <div class="api-code mb-0"><code>&lt;?php
+$apiKey = 'YOUR_API_KEY';
+$url = '{{ $baseUrl }}/api/v1/sessions';
 
-                    <p class="mb-3"><strong>{{ __('Jenis Pesan yang Didukung') }}</strong></p>
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'X-Api-Key: ' . $apiKey,
+    'Content-Type: application/json'
+]);
+
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
+
+$data = json_decode($response, true);
+if ($httpCode === 200 && $data['success']) {
+    foreach ($data['data'] as $session) {
+        echo "Session: " . $session['name'] . "\n";
+    }
+}</code></div>
+                            </div>
+                            <div id="sessions-python" class="code-tab-content">
+                                <div class="api-code mb-0"><code>import requests
+
+api_key = 'YOUR_API_KEY'
+url = '{{ $baseUrl }}/api/v1/sessions'
+
+headers = {
+    'X-Api-Key': api_key,
+    'Content-Type': 'application/json'
+}
+
+response = requests.get(url, headers=headers)
+
+if response.status_code == 200:
+    data = response.json()
+    if data['success']:
+        for session in data['data']:
+            print(f"Session: {session['name']}")</code></div>
+                            </div>
+                        </div>
+                        
+                        <p class="mt-3 mb-2"><strong>{{ __('Response Example') }}</strong></p>
+                        <div class="api-code mb-0"><code>{
+  "success": true,
+  "data": [
+    {
+      "id": "session_123",
+      "name": "My Session",
+      "status": "connected",
+      "created_at": "2025-11-28T12:00:00Z"
+    }
+  ]
+}</code></div>
+                    </div>
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-get">GET</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/sessions/{session_id}</span>
+                        </div>
+                        <p class="endpoint-description mb-3">{{ __('Mendapatkan detail device WhatsApp berdasarkan ID.') }}</p>
+                    </div>
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-get">GET</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/sessions/{session_id}/status</span>
+                        </div>
+                        <p class="endpoint-description mb-3">{{ __('Mendapatkan status koneksi device WhatsApp.') }}</p>
+                        
+                        <!-- Code Examples -->
+                        <div class="code-tabs">
+                            <div class="code-tabs-header">
+                                <button class="code-tab active" onclick="switchCodeTab(this, 'status-curl')">cURL</button>
+                                <button class="code-tab" onclick="switchCodeTab(this, 'status-php')">PHP</button>
+                                <button class="code-tab" onclick="switchCodeTab(this, 'status-python')">Python</button>
+                            </div>
+                            <div id="status-curl" class="code-tab-content active">
+                                <div class="api-code mb-0"><code>curl -X GET "{{ $baseUrl }}/api/v1/sessions/YOUR_SESSION_ID/status" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json"</code></div>
+                            </div>
+                            <div id="status-php" class="code-tab-content">
+                                <div class="api-code mb-0"><code>&lt;?php
+$apiKey = 'YOUR_API_KEY';
+$sessionId = 'YOUR_SESSION_ID';
+$url = '{{ $baseUrl }}/api/v1/sessions/' . $sessionId . '/status';
+
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'X-Api-Key: ' . $apiKey,
+    'Content-Type: application/json'
+]);
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+$data = json_decode($response, true);
+if ($data['success']) {
+    echo "Status: " . $data['data']['status'];
+    echo "Connected: " . ($data['data']['is_connected'] ? 'Yes' : 'No');
+}</code></div>
+                            </div>
+                            <div id="status-python" class="code-tab-content">
+                                <div class="api-code mb-0"><code>import requests
+
+api_key = 'YOUR_API_KEY'
+session_id = 'YOUR_SESSION_ID'
+url = f'{{ $baseUrl }}/api/v1/sessions/{session_id}/status'
+
+headers = {
+    'X-Api-Key': api_key,
+    'Content-Type': 'application/json'
+}
+
+response = requests.get(url, headers=headers)
+
+if response.status_code == 200:
+    data = response.json()
+    if data['success']:
+        print(f"Status: {data['data']['status']}")
+        print(f"Connected: {data['data']['is_connected']}")</code></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Endpoints Group -->
+            <div class="endpoint-group">
+                <div class="endpoint-group-header">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>{{ __('Messages') }}</span>
+                </div>
+                <div class="endpoint-group-body">
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-post">POST</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/messages</span>
+                        </div>
+                        <p class="endpoint-description mb-3">{{ __('Mengirim pesan WhatsApp. Mendukung berbagai jenis pesan.') }}</p>
+
+                        <!-- Code Examples for Send Message -->
+                        <p class="mb-2"><strong>{{ __('Contoh Kode - Kirim Pesan Teks') }}</strong></p>
+                        <div class="code-tabs">
+                            <div class="code-tabs-header">
+                                <button class="code-tab active" onclick="switchCodeTab(this, 'send-msg-curl')">cURL</button>
+                                <button class="code-tab" onclick="switchCodeTab(this, 'send-msg-php')">PHP</button>
+                                <button class="code-tab" onclick="switchCodeTab(this, 'send-msg-python')">Python</button>
+                            </div>
+                            <div id="send-msg-curl" class="code-tab-content active">
+                                <div class="api-code mb-0"><code>curl -X POST "{{ $baseUrl }}/api/v1/messages" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device_id": "YOUR_DEVICE_ID",
+    "message_type": "text",
+    "to": "6281234567890",
+    "message": "Halo, ini pesan dari API"
+  }'</code></div>
+                            </div>
+                            <div id="send-msg-php" class="code-tab-content">
+                                <div class="api-code mb-0"><code>&lt;?php
+$apiKey = 'YOUR_API_KEY';
+$url = '{{ $baseUrl }}/api/v1/messages';
+
+$data = [
+    'device_id' => 'YOUR_DEVICE_ID',
+    'message_type' => 'text',
+    'to' => '6281234567890',
+    'message' => 'Halo, ini pesan dari API'
+];
+
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'X-Api-Key: ' . $apiKey,
+    'Content-Type: application/json'
+]);
+
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
+
+$result = json_decode($response, true);
+if ($httpCode === 200 && $result['success']) {
+    echo "Pesan terkirim! ID: " . $result['data']['message_id'];
+}</code></div>
+                            </div>
+                            <div id="send-msg-python" class="code-tab-content">
+                                <div class="api-code mb-0"><code>import requests
+import json
+
+api_key = 'YOUR_API_KEY'
+url = '{{ $baseUrl }}/api/v1/messages'
+
+headers = {
+    'X-Api-Key': api_key,
+    'Content-Type': 'application/json'
+}
+
+data = {
+    'device_id': 'YOUR_DEVICE_ID',
+    'message_type': 'text',
+    'to': '6281234567890',
+    'message': 'Halo, ini pesan dari API'
+}
+
+response = requests.post(url, headers=headers, json=data)
+
+if response.status_code == 200:
+    result = response.json()
+    if result['success']:
+        print(f"Pesan terkirim! ID: {result['data']['message_id']}")</code></div>
+                            </div>
+                        </div>
+
+                        <p class="mb-3 mt-3"><strong>{{ __('Jenis Pesan yang Didukung') }}</strong></p>
                     <ul class="api-list mb-4">
                         <li><span class="api-inline-code">text</span> – {{ __('Pesan teks') }}</li>
                         <li><span class="api-inline-code">image</span> – {{ __('Pesan gambar') }}</li>
@@ -150,7 +492,85 @@
 }</code></div>
 
                     <p class="mb-2"><strong>{{ __('2. Kirim Pesan Gambar') }}</strong></p>
-                    <p><strong>{{ __('Body (JSON)') }}</strong></p>
+                    
+                    <!-- Code Examples for Send Image -->
+                    <div class="code-tabs">
+                        <div class="code-tabs-header">
+                            <button class="code-tab active" onclick="switchCodeTab(this, 'send-img-curl')">cURL</button>
+                            <button class="code-tab" onclick="switchCodeTab(this, 'send-img-php')">PHP</button>
+                            <button class="code-tab" onclick="switchCodeTab(this, 'send-img-python')">Python</button>
+                        </div>
+                        <div id="send-img-curl" class="code-tab-content active">
+                            <div class="api-code mb-0"><code>curl -X POST "{{ $baseUrl }}/api/v1/messages" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device_id": "YOUR_DEVICE_ID",
+    "message_type": "image",
+    "to": "6281234567890",
+    "image": "https://example.com/image.jpg",
+    "caption": "Halo, ini gambar dari API"
+  }'</code></div>
+                        </div>
+                        <div id="send-img-php" class="code-tab-content">
+                            <div class="api-code mb-0"><code>&lt;?php
+$apiKey = 'YOUR_API_KEY';
+$url = '{{ $baseUrl }}/api/v1/messages';
+
+$data = [
+    'device_id' => 'YOUR_DEVICE_ID',
+    'message_type' => 'image',
+    'to' => '6281234567890',
+    'image' => 'https://example.com/image.jpg',
+    'caption' => 'Halo, ini gambar dari API'
+];
+
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'X-Api-Key: ' . $apiKey,
+    'Content-Type: application/json'
+]);
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+$result = json_decode($response, true);
+if ($result['success']) {
+    echo "Gambar terkirim!";
+}</code></div>
+                        </div>
+                        <div id="send-img-python" class="code-tab-content">
+                            <div class="api-code mb-0"><code>import requests
+
+api_key = 'YOUR_API_KEY'
+url = '{{ $baseUrl }}/api/v1/messages'
+
+headers = {
+    'X-Api-Key': api_key,
+    'Content-Type': 'application/json'
+}
+
+data = {
+    'device_id': 'YOUR_DEVICE_ID',
+    'message_type': 'image',
+    'to': '6281234567890',
+    'image': 'https://example.com/image.jpg',
+    'caption': 'Halo, ini gambar dari API'
+}
+
+response = requests.post(url, headers=headers, json=data)
+
+if response.status_code == 200:
+    result = response.json()
+    if result['success']:
+        print("Gambar terkirim!")</code></div>
+                        </div>
+                    </div>
+                    
+                    <p class="mt-3 mb-2"><strong>{{ __('Body (JSON)') }}</strong></p>
                     <div class="api-code mb-3"><code>{
   "device_id": "YOUR_DEVICE_ID",
   "message_type": "image",
@@ -379,8 +799,8 @@
                         </ul>
                     </div>
 
-                    <p class="mt-3 mb-1"><strong>{{ __('Response Error (422 - Validation Failed)') }}</strong></p>
-                    <div class="api-code mb-3"><code>{
+                        <p class="mt-3 mb-1"><strong>{{ __('Response Error (422 - Validation Failed)') }}</strong></p>
+                        <div class="api-code mb-0"><code>{
   "success": false,
   "error": "Validation failed",
   "errors": {
@@ -389,63 +809,407 @@
     "to": ["Recipient number is required."]
   }
 }</code></div>
+                    </div>
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-get">GET</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/messages</span>
+                        </div>
+                        <p class="endpoint-description mb-3">{{ __('Mendapatkan daftar pesan yang telah dikirim atau diterima.') }}</p>
+                        
+                        <!-- Code Examples -->
+                        <div class="code-tabs">
+                            <div class="code-tabs-header">
+                                <button class="code-tab active" onclick="switchCodeTab(this, 'get-msg-curl')">cURL</button>
+                                <button class="code-tab" onclick="switchCodeTab(this, 'get-msg-php')">PHP</button>
+                                <button class="code-tab" onclick="switchCodeTab(this, 'get-msg-python')">Python</button>
+                            </div>
+                            <div id="get-msg-curl" class="code-tab-content active">
+                                <div class="api-code mb-0"><code>curl -X GET "{{ $baseUrl }}/api/v1/messages?device_id=YOUR_DEVICE_ID&per_page=20&page=1" \
+  -H "X-Api-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json"</code></div>
+                            </div>
+                            <div id="get-msg-php" class="code-tab-content">
+                                <div class="api-code mb-0"><code>&lt;?php
+$apiKey = 'YOUR_API_KEY';
+$deviceId = 'YOUR_DEVICE_ID';
+$url = '{{ $baseUrl }}/api/v1/messages?' . http_build_query([
+    'device_id' => $deviceId,
+    'per_page' => 20,
+    'page' => 1
+]);
+
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'X-Api-Key: ' . $apiKey,
+    'Content-Type: application/json'
+]);
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+$data = json_decode($response, true);
+if ($data['success']) {
+    foreach ($data['data'] as $message) {
+        echo "Pesan: " . $message['content'] . "\n";
+    }
+}</code></div>
+                            </div>
+                            <div id="get-msg-python" class="code-tab-content">
+                                <div class="api-code mb-0"><code>import requests
+
+api_key = 'YOUR_API_KEY'
+url = '{{ $baseUrl }}/api/v1/messages'
+
+headers = {
+    'X-Api-Key': api_key,
+    'Content-Type': 'application/json'
+}
+
+params = {
+    'device_id': 'YOUR_DEVICE_ID',
+    'per_page': 20,
+    'page': 1
+}
+
+response = requests.get(url, headers=headers, params=params)
+
+if response.status_code == 200:
+    data = response.json()
+    if data['success']:
+        for message in data['data']:
+            print(f"Pesan: {message['content']}")</code></div>
+                            </div>
+                        </div>
+                        
+                        <p class="mt-3 mb-2"><strong>{{ __('Query Parameters') }}</strong></p>
+                        <div class="api-code mb-3"><code>device_id=YOUR_DEVICE_ID&per_page=20&page=1</code></div>
+                        <p class="mb-1"><strong>{{ __('Keterangan parameter') }}</strong></p>
+                        <ul class="api-list mb-0">
+                            <li><span class="api-inline-code">device_id</span> – {{ __('ID device WhatsApp (required).') }}</li>
+                            <li><span class="api-inline-code">per_page</span> – {{ __('Jumlah pesan per halaman (opsional, default: 20).') }}</li>
+                            <li><span class="api-inline-code">page</span> – {{ __('Nomor halaman (opsional, default: 1).') }}</li>
+                        </ul>
+                    </div>
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-get">GET</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/messages/{message_id}</span>
+                        </div>
+                        <p class="endpoint-description mb-0">{{ __('Mendapatkan detail pesan berdasarkan ID.') }}</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span class="api-section-title">{{ __('Daftar Pesan') }}</span>
-                    <span class="badge bg-primary api-badge">GET</span>
+            <!-- Account Endpoints Group -->
+            <div class="endpoint-group">
+                <div class="endpoint-group-header">
+                    <i class="fas fa-user-circle"></i>
+                    <span>{{ __('Account') }}</span>
                 </div>
-                <div class="card-body">
-                    <p><strong>{{ __('Endpoint') }}</strong></p>
-                    <p class="api-endpoint mb-3">
-                        <span class="api-endpoint-method">GET</span>
-                        <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/messages</span>
-                    </p>
+                <div class="endpoint-group-body">
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-get">GET</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/account</span>
+                            <span class="badge bg-secondary ms-2">Get Profile</span>
+                        </div>
+                        <p class="endpoint-description mb-3">{{ __('Mendapatkan informasi profil pengguna (profile) beserta detail quota, subscription, dan statistik akun.') }}</p>
+                        
+                        <div class="code-tabs mt-3">
+                            <div class="code-tab-buttons">
+                                <button class="code-tab-button active" onclick="switchCodeTab(this, 'account-curl')">cURL</button>
+                                <button class="code-tab-button" onclick="switchCodeTab(this, 'account-php')">PHP</button>
+                                <button class="code-tab-button" onclick="switchCodeTab(this, 'account-python')">Python</button>
+                            </div>
+                            <div id="account-curl" class="code-tab-content active">
+                                <div class="api-code mb-0"><code>curl -X GET '{{ $baseUrl }}/api/v1/account' \
+  -H 'X-Api-Key: YOUR_API_KEY' \
+  -H 'Accept: application/json'</code></div>
+                            </div>
+                            <div id="account-php" class="code-tab-content">
+                                <div class="api-code mb-0"><code>&lt;?php
+$apiKey = 'YOUR_API_KEY';
+$baseUrl = '{{ $baseUrl }}';
+$url = $baseUrl . '/api/v1/account';
 
-                    <p><strong>{{ __('Query Parameters') }}</strong></p>
-                    <div class="api-code mb-3"><code>device_id=YOUR_DEVICE_ID&per_page=20&page=1</code></div>
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'X-Api-Key: ' . $apiKey,
+    'Accept: application/json'
+]);
 
-                    <p class="mb-1"><strong>{{ __('Keterangan parameter') }}</strong></p>
-                    <ul class="api-list">
-                        <li><span class="api-inline-code">device_id</span> – {{ __('ID device WhatsApp (required).') }}</li>
-                        <li><span class="api-inline-code">per_page</span> – {{ __('Jumlah pesan per halaman (opsional, default: 20).') }}</li>
-                        <li><span class="api-inline-code">page</span> – {{ __('Nomor halaman (opsional, default: 1).') }}</li>
-                    </ul>
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
+
+$data = json_decode($response, true);
+if ($httpCode === 200 && $data['success']) {
+    // Profile Information
+    $user = $data['data']['user'];
+    echo "Profile Information:\n";
+    echo "  Name: " . $user['name'] . "\n";
+    echo "  Email: " . $user['email'] . "\n";
+    echo "  Phone: " . $user['phone'] . "\n";
+    echo "  Created: " . $user['created_at'] . "\n\n";
+    
+    // Quota Information
+    $quota = $data['data']['quota'];
+    echo "Quota Information:\n";
+    echo "  Balance: " . $quota['balance'] . "\n";
+    echo "  Text Quota: " . $quota['text_quota'] . "\n";
+    echo "  Multimedia Quota: " . $quota['multimedia_quota'] . "\n";
+    echo "  Free Text Quota: " . $quota['free_text_quota'] . "\n";
+    echo "  Total Text Quota: " . $quota['total_text_quota'] . "\n\n";
+    
+    // Subscription Information
+    if (isset($data['data']['subscription'])) {
+        $subscription = $data['data']['subscription'];
+        echo "Subscription:\n";
+        echo "  Plan: " . $subscription['plan_name'] . "\n";
+        echo "  Status: " . $subscription['status'] . "\n";
+        echo "  Expires: " . ($subscription['expires_at'] ?? 'N/A') . "\n\n";
+    }
+    
+    // Statistics
+    if (isset($data['data']['statistics'])) {
+        $stats = $data['data']['statistics'];
+        echo "Statistics:\n";
+        echo "  Total Messages: " . $stats['total_messages'] . "\n";
+        echo "  Total Sessions: " . $stats['total_sessions'] . "\n";
+        echo "  Connected Sessions: " . $stats['connected_sessions'] . "\n";
+    }
+}
+?&gt;</code></div>
+                            </div>
+                            <div id="account-python" class="code-tab-content">
+                                <div class="api-code mb-0"><code>import requests
+
+api_key = 'YOUR_API_KEY'
+base_url = '{{ $baseUrl }}'
+url = f"{base_url}/api/v1/account"
+
+headers = {
+    'X-Api-Key': api_key,
+    'Accept': 'application/json'
+}
+
+response = requests.get(url, headers=headers)
+data = response.json()
+
+if response.status_code == 200 and data['success']:
+    # Profile Information
+    user = data['data']['user']
+    print("Profile Information:")
+    print(f"  Name: {user['name']}")
+    print(f"  Email: {user['email']}")
+    print(f"  Phone: {user['phone']}")
+    print(f"  Created: {user['created_at']}\n")
+    
+    # Quota Information
+    quota = data['data']['quota']
+    print("Quota Information:")
+    print(f"  Balance: {quota['balance']}")
+    print(f"  Text Quota: {quota['text_quota']}")
+    print(f"  Multimedia Quota: {quota['multimedia_quota']}")
+    print(f"  Free Text Quota: {quota['free_text_quota']}")
+    print(f"  Total Text Quota: {quota['total_text_quota']}\n")
+    
+    # Subscription Information
+    if 'subscription' in data['data'] and data['data']['subscription']:
+        subscription = data['data']['subscription']
+        print("Subscription:")
+        print(f"  Plan: {subscription['plan_name']}")
+        print(f"  Status: {subscription['status']}")
+        print(f"  Expires: {subscription.get('expires_at', 'N/A')}\n")
+    
+    # Statistics
+    if 'statistics' in data['data']:
+        stats = data['data']['statistics']
+        print("Statistics:")
+        print(f"  Total Messages: {stats['total_messages']}")
+        print(f"  Total Sessions: {stats['total_sessions']}")
+        print(f"  Connected Sessions: {stats['connected_sessions']}")</code></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <p class="small mb-2"><strong>{{ __('Response Example:') }}</strong></p>
+                            <pre class="api-code mb-0"><code>{
+  "success": true,
+  "data": {
+    "user": {
+      "id": "uuid",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "6281234567890",
+      "created_at": "2025-11-30T00:00:00Z"
+    },
+    "quota": {
+      "balance": 100000.00,
+      "text_quota": 500,
+      "multimedia_quota": 200,
+      "free_text_quota": 100,
+      "total_text_quota": 600
+    },
+    "subscription": {
+      "plan_name": "Premium",
+      "plan_id": "uuid",
+      "status": "active",
+      "expires_at": "2025-12-30T00:00:00Z"
+    },
+    "statistics": {
+      "total_messages": 1250,
+      "total_sessions": 3,
+      "connected_sessions": 2
+    }
+  }
+}</code></pre>
+                        </div>
+                    </div>
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-get">GET</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/account/usage</span>
+                        </div>
+                        <p class="endpoint-description mb-0">{{ __('Mendapatkan informasi penggunaan quota dan statistik akun.') }}</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span class="api-section-title">{{ __('4. Daftar Devices') }}</span>
-                    <span class="badge bg-primary api-badge">SESSIONS</span>
+            <!-- Templates Endpoints Group -->
+            <div class="endpoint-group">
+                <div class="endpoint-group-header">
+                    <i class="fas fa-file-alt"></i>
+                    <span>{{ __('Templates') }}</span>
                 </div>
-                <div class="card-body">
-                    <p><strong>{{ __('Endpoint') }}</strong></p>
-                    <p class="api-endpoint mb-3">
-                        <span class="api-endpoint-method">GET</span>
-                        <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/sessions</span>
-                    </p>
+                <div class="endpoint-group-body">
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-get">GET</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/templates</span>
+                        </div>
+                        <p class="endpoint-description mb-0">{{ __('Mendapatkan daftar semua template pesan.') }}</p>
+                    </div>
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-post">POST</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/templates</span>
+                        </div>
+                        <p class="endpoint-description mb-0">{{ __('Membuat template pesan baru.') }}</p>
+                    </div>
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-get">GET</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/templates/{template_id}</span>
+                        </div>
+                        <p class="endpoint-description mb-0">{{ __('Mendapatkan detail template berdasarkan ID.') }}</p>
+                    </div>
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-put">PUT</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/templates/{template_id}</span>
+                        </div>
+                        <p class="endpoint-description mb-0">{{ __('Memperbarui template pesan.') }}</p>
+                    </div>
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-delete">DELETE</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/templates/{template_id}</span>
+                        </div>
+                        <p class="endpoint-description mb-0">{{ __('Menghapus template pesan.') }}</p>
+                    </div>
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-post">POST</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/templates/{template_id}/preview</span>
+                        </div>
+                        <p class="endpoint-description mb-0">{{ __('Preview template dengan data contoh.') }}</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span class="api-section-title">{{ __('5. Health Check') }}</span>
-                    <span class="badge bg-success api-badge">PUBLIC</span>
+            <!-- OTP Endpoints Group -->
+            <div class="endpoint-group">
+                <div class="endpoint-group-header">
+                    <i class="fas fa-key"></i>
+                    <span>{{ __('OTP (One Time Password)') }}</span>
                 </div>
-                <div class="card-body">
-                    <p><strong>{{ __('Endpoint') }}</strong></p>
-                    <p class="api-endpoint mb-3">
-                        <span class="api-endpoint-method">GET</span>
-                        <span class="api-endpoint-url">{{ $baseUrl }}/api/health</span>
-                    </p>
-                    <p class="text-muted mb-0">{{ __('Endpoint ini tidak memerlukan autentikasi.') }}</p>
+                <div class="endpoint-group-body">
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-post">POST</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/messages/otp</span>
+                        </div>
+                        <p class="endpoint-description mb-0">{{ __('Mengirim kode OTP ke nomor tujuan.') }}</p>
+                    </div>
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-post">POST</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/messages/verify-otp</span>
+                        </div>
+                        <p class="endpoint-description mb-0">{{ __('Memverifikasi kode OTP yang telah dikirim.') }}</p>
+                    </div>
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-get">GET</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/v1/messages/otp/{otp_id}/status</span>
+                        </div>
+                        <p class="endpoint-description mb-0">{{ __('Mendapatkan status OTP berdasarkan ID.') }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Health Check Endpoint -->
+            <div class="endpoint-group">
+                <div class="endpoint-group-header" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>{{ __('Health Check') }}</span>
+                    <span class="badge bg-light text-dark ms-auto">{{ __('PUBLIC') }}</span>
+                </div>
+                <div class="endpoint-group-body">
+                    <div class="endpoint-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="endpoint-method-badge badge-get">GET</span>
+                            <span class="api-endpoint-url">{{ $baseUrl }}/api/health</span>
+                        </div>
+                        <p class="endpoint-description mb-3">{{ __('Memeriksa status kesehatan API. Endpoint ini tidak memerlukan autentikasi.') }}</p>
+                        <p class="mb-2"><strong>{{ __('Response Example') }}</strong></p>
+                        <div class="api-code mb-0"><code>{
+  "status": "ok",
+  "timestamp": "2025-11-28T12:00:00Z"
+}</code></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+function switchCodeTab(button, tabId) {
+    // Get parent code-tabs container
+    const tabsContainer = button.closest('.code-tabs');
+    
+    // Remove active class from all tabs and contents
+    tabsContainer.querySelectorAll('.code-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    tabsContainer.querySelectorAll('.code-tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Add active class to clicked tab and corresponding content
+    button.classList.add('active');
+    const targetContent = tabsContainer.querySelector('#' + tabId);
+    if (targetContent) {
+        targetContent.classList.add('active');
+    }
+}
+</script>
+@endpush
 @endsection
 

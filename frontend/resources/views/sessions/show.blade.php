@@ -109,6 +109,32 @@
                                                 @endif
                                             </td>
                                         </tr>
+                                        @if ($session->status === 'connected')
+                                        <tr>
+                                            <th class="text-muted">Webhook URL</th>
+                                            <td>
+                                                <div class="input-group">
+                                                    <input type="text" 
+                                                           class="form-control font-monospace" 
+                                                           id="webhookUrlInput" 
+                                                           value="{{ config('app.url', 'http://localhost:8000') }}/webhook/receive/{{ $session->session_id }}" 
+                                                           readonly
+                                                           style="background-color: #f8f9fa; font-size: 0.85rem;">
+                                                    <button class="btn btn-outline-secondary" 
+                                                            type="button" 
+                                                            onclick="copyWebhookUrl()"
+                                                            data-bs-toggle="tooltip" 
+                                                            data-bs-placement="top" 
+                                                            title="Salin Webhook URL">
+                                                        <i class="fas fa-copy"></i>
+                                                    </button>
+                                                </div>
+                                                <small class="text-muted mt-1 d-block">
+                                                    <i class="fas fa-info-circle"></i> Webhook ini dikonfigurasi otomatis untuk menerima pesan masuk secara real-time
+                                                </small>
+                                            </td>
+                                        </tr>
+                                        @endif
                                         <tr>
                                             <th class="text-muted">Aktivitas Terakhir</th>
                                             <td>
@@ -197,6 +223,11 @@
                                             <i class="fas fa-stop"></i> Hentikan Device
                                         </button>
                                     </form>
+                                    
+                                    <!-- Update Webhook Button -->
+                                    <button type="button" class="btn btn-info w-100" onclick="updateWebhook()">
+                                        <i class="fas fa-sync"></i> Update Webhook
+                                    </button>
                                 @else
                                     <!-- Hubungkan Ulang Button for disconnected or failed status -->
                                     <a href="{{ route('sessions.pair', $session) }}" class="btn btn-primary w-100">
@@ -466,6 +497,76 @@ function saveSessionName(event) {
         }
         saveBtn.disabled = false;
         saveBtn.innerHTML = originalBtnHtml;
+    });
+}
+
+// Copy Webhook URL function
+function copyWebhookUrl() {
+    const input = document.getElementById('webhookUrlInput');
+    input.select();
+    input.setSelectionRange(0, 99999); // For mobile devices
+    document.execCommand('copy');
+    
+    // Show feedback
+    const btn = event.target.closest('button');
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check"></i>';
+    btn.classList.remove('btn-outline-secondary');
+    btn.classList.add('btn-success');
+    
+    setTimeout(() => {
+        btn.innerHTML = originalHtml;
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-outline-secondary');
+    }, 2000);
+    
+    if (typeof showToast === 'function') {
+        showToast('Webhook URL berhasil disalin', 'success');
+    } else {
+        alert('Webhook URL berhasil disalin');
+    }
+}
+
+// Update Webhook function
+function updateWebhook() {
+    if (!confirm('Update webhook akan memperbarui konfigurasi webhook untuk menerima pesan masuk secara real-time. Lanjutkan?')) {
+        return;
+    }
+    
+    const btn = event.target.closest('button');
+    const originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+    
+    fetch('{{ route("sessions.updateWebhook", $session) }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const webhookUrl = data.webhook_url || '{{ config("app.url", "http://localhost:8000") }}/webhook/receive/{{ $session->session_id }}';
+            document.getElementById('webhookUrlInput').value = webhookUrl;
+            
+            alert('Webhook URL: ' + webhookUrl + '\n\nCatatan:\n- Pastikan URL ini dapat diakses dari WAHA server\n- Jika WAHA berjalan di Docker, gunakan host.docker.internal atau IP host\n- Webhook dikonfigurasi otomatis saat session dibuat');
+            if (typeof showToast === 'function') {
+                showToast('Webhook berhasil diupdate', 'success');
+            }
+        } else {
+            throw new Error(data.message || 'Gagal update webhook');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error: ' + error.message);
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
     });
 }
 </script>

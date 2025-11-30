@@ -38,7 +38,478 @@ class MessageController extends Controller
         }
 
         $sessions = Auth::user()->whatsappSessions()->where('status', 'connected')->get();
-        return view('messages.index', compact('sessions'));
+        $autoSyncEnabled = Auth::user()->auto_sync_incoming_messages ?? true;
+        
+        return view('messages.index', compact('sessions', 'autoSyncEnabled'));
+    }
+
+    /**
+     * Toggle auto sync incoming messages setting
+     */
+    public function toggleAutoSync(Request $request)
+    {
+        $request->validate([
+            'enabled' => 'required|boolean',
+        ]);
+
+        Auth::user()->update([
+            'auto_sync_incoming_messages' => $request->enabled,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => $request->enabled ? 'Auto sync pesan masuk diaktifkan' : 'Auto sync pesan masuk dinonaktifkan',
+        ]);
+    }
+
+    /**
+     * Sync incoming messages from WAHA API
+     */
+    public function syncIncoming(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $sessions = $user->whatsappSessions()->where('status', 'connected')->get();
+            
+            if ($sessions->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak ada device yang terhubung',
+                ], 400);
+            }
+
+            $totalSynced = 0;
+            $totalSkipped = 0;
+            $errors = [];
+
+            foreach ($sessions as $session) {
+                try {
+                    \Log::info('Syncing incoming messages for session', [
+                        'session_id' => $session->session_id,
+                        'user_id' => $user->id,
+                    ]);
+
+                    // Strategy: Try multiple methods to get messages
+                    // 1. Try to get contacts first (usually works without store)
+                    // 2. Use contacts to get chatIds and fetch messages
+                    // 3. Fallback to chats if available
+                    
+                    $allMessages = [];
+                    $contacts = [];
+                    
+                    // Method 1: Try to get contacts
+                    \Log::info('Trying to get contacts for session', [
+                        'session_id' => $session->session_id,
+                    ]);
+                    
+                    $contactsResult = $this->wahaService->getContacts($session->session_id);
+                    if ($contactsResult['success'] && isset($contactsResult['data']) && is_array($contactsResult['data'])) {
+                        $contacts = $contactsResult['data'];
+                        \Log::info('Found contacts for session', [
+                            'session_id' => $session->session_id,
+                            'contacts_count' => count($contacts),
+                        ]);
+                    }
+                    
+                    // Method 2: Try to get chats (might require store)
+                    $chats = [];
+                    if (empty($contacts)) {
+                        \Log::info('No contacts found, trying to get chats', [
+                            'session_id' => $session->session_id,
+                        ]);
+                        
+                        $chatsResult = $this->wahaService->getChats($session->session_id);
+                        if ($chatsResult['success'] && isset($chatsResult['data']) && is_array($chatsResult['data'])) {
+                            $chats = $chatsResult['data'];
+                            \Log::info('Found chats for session', [
+                                'session_id' => $session->session_id,
+                                'chats_count' => count($chats),
+                            ]);
+                        } else {
+                            $errorMsg = $chatsResult['error'] ?? 'Unknown error';
+                            \Log::warning('Failed to get chats', [
+                                'session_id' => $session->session_id,
+                                'error' => $errorMsg,
+                            ]);
+                        }
+                    }
+                    
+                    // Get messages from contacts or chats
+                    $sources = !empty($contacts) ? $contacts : $chats;
+                    
+                    if (empty($sources)) {
+                        // No contacts or chats available
+                        $errors[] = "Session {$session->session_name}: Tidak dapat mendapatkan daftar kontak atau chat. Pastikan device sudah terhubung dan memiliki kontak/chat.";
+                        continue;
+                    }
+                    
+                    // Get messages from each contact/chat
+                    foreach ($sources as $source) {
+                        $chatId = $source['id'] ?? null;
+                        if (!$chatId) {
+                            continue;
+                        }
+                        
+                        try {
+                            $chatResult = $this->wahaService->getMessages($session->session_id, $chatId, 20);
+                            
+                            if ($chatResult['success'] && isset($chatResult['data']) && is_array($chatResult['data'])) {
+                                $chatMessages = $chatResult['data'];
+                                foreach ($chatMessages as $msg) {
+                                    $allMessages[] = $msg;
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            \Log::warning('Error getting messages for chat', [
+                                'chat_id' => $chatId,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+                    }
+                    
+                    if (empty($allMessages)) {
+                        \Log::info('No messages found from contacts/chats', [
+                            'session_id' => $session->session_id,
+                        ]);
+                        $errors[] = "Session {$session->session_name}: Tidak ada pesan yang ditemukan dari kontak/chat yang tersedia.";
+                        continue;
+                    }
+                    
+                    $messages = $allMessages;
+                    \Log::info('Successfully got messages from contacts/chats', [
+                        'session_id' => $session->session_id,
+                        'messages_count' => count($messages),
+                    ]);
+                    
+                    foreach ($messages as $wahaMessage) {
+                        try {
+                            // Skip outgoing messages (only sync incoming)
+                            if (!empty($wahaMessage['fromMe']) && $wahaMessage['fromMe'] === true) {
+                                $totalSkipped++;
+                                continue;
+                            }
+
+                            $whatsappMessageId = $wahaMessage['id'] ?? null;
+                            if (!$whatsappMessageId) {
+                                $totalSkipped++;
+                                continue;
+                            }
+
+                            // Check if message already exists
+                            $existingMessage = Message::where('whatsapp_message_id', $whatsappMessageId)
+                                ->where('session_id', $session->id)
+                                ->first();
+
+                            if ($existingMessage) {
+                                $totalSkipped++;
+                                continue;
+                            }
+
+                            // Extract phone numbers
+                            $from = $wahaMessage['from'] ?? null;
+                            $to = $wahaMessage['to'] ?? null;
+                            $fromNumber = $this->extractPhoneNumber($from);
+                            $toNumber = $this->extractPhoneNumber($to);
+
+                            // Determine message type
+                            $messageType = $this->determineMessageType($wahaMessage);
+                            
+                            // Extract content
+                            $content = $wahaMessage['body'] ?? null;
+                            $mediaUrl = null;
+                            $mediaMimeType = null;
+                            $mediaSize = null;
+                            $caption = null;
+
+                            if (!empty($wahaMessage['hasMedia']) && !empty($wahaMessage['media'])) {
+                                $media = $wahaMessage['media'];
+                                $mediaUrl = $media['url'] ?? null;
+                                $mediaMimeType = $media['mimetype'] ?? null;
+                                $mediaSize = $media['size'] ?? null;
+                                $caption = $wahaMessage['caption'] ?? null;
+                                
+                                // Convert relative URL to absolute
+                                if ($mediaUrl && !filter_var($mediaUrl, FILTER_VALIDATE_URL)) {
+                                    $mediaUrl = rtrim($this->wahaService->getBaseUrl(), '/') . '/' . ltrim($mediaUrl, '/');
+                                }
+                            }
+
+                            // Determine chat type
+                            $chatType = 'personal';
+                            if (str_contains($from ?? '', '@g.us') || str_contains($to ?? '', '@g.us')) {
+                                $chatType = 'group';
+                            }
+
+                            // Get timestamp
+                            $timestamp = $wahaMessage['timestamp'] ?? time();
+                            $createdAt = \Carbon\Carbon::createFromTimestamp($timestamp);
+
+                            // Create message record
+                            Message::create([
+                                'user_id' => $user->id,
+                                'session_id' => $session->id,
+                                'whatsapp_message_id' => $whatsappMessageId,
+                                'from_number' => $fromNumber,
+                                'to_number' => $toNumber,
+                                'message_type' => $messageType,
+                                'content' => $content,
+                                'media_url' => $mediaUrl,
+                                'media_mime_type' => $mediaMimeType,
+                                'media_size' => $mediaSize,
+                                'caption' => $caption,
+                                'chat_type' => $chatType,
+                                'direction' => 'incoming',
+                                'status' => 'delivered',
+                                'sent_at' => $createdAt,
+                                'created_at' => $createdAt,
+                                'updated_at' => $createdAt,
+                            ]);
+
+                            $totalSynced++;
+                        } catch (\Exception $e) {
+                            \Log::error('Error syncing individual message', [
+                                'error' => $e->getMessage(),
+                                'message_id' => $wahaMessage['id'] ?? null,
+                            ]);
+                            $totalSkipped++;
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Error syncing messages for session', [
+                        'session_id' => $session->session_id,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+                    $errorMsg = $e->getMessage();
+                    if (is_array($errorMsg)) {
+                        $errorMsg = json_encode($errorMsg);
+                    }
+                    $errors[] = "Session {$session->session_name}: " . $errorMsg;
+                }
+            }
+
+            $message = "Sync selesai. {$totalSynced} pesan baru, {$totalSkipped} dilewati.";
+            
+            // Add warning if no messages synced and there are errors about store
+            if ($totalSynced === 0 && !empty($errors)) {
+                $hasStoreError = false;
+                foreach ($errors as $error) {
+                    if (str_contains(strtolower($error), 'store') || str_contains(strtolower($error), 'webhook')) {
+                        $hasStoreError = true;
+                        break;
+                    }
+                }
+                
+                if ($hasStoreError) {
+                    $message .= " Catatan: Sync manual memerlukan konfigurasi store di WAHA. Pesan masuk akan otomatis tersimpan melalui webhook real-time saat ada pesan baru.";
+                }
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'data' => [
+                    'synced' => $totalSynced,
+                    'skipped' => $totalSkipped,
+                    'errors' => $errors,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error syncing incoming messages', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update status of pending messages
+     * This method checks messages that are older than 5 seconds and updates their status
+     * Since WAHA doesn't provide direct status check, we update based on time elapsed
+     */
+    public function updatePendingStatus(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            
+            // Get pending outgoing messages that are older than 5 seconds
+            // Messages that are older than 5 seconds are likely already sent
+            $pendingMessages = $user->messages()
+                ->where('direction', 'outgoing')
+                ->where('status', 'pending')
+                ->whereNotNull('whatsapp_message_id')
+                ->where('created_at', '<', now()->subSeconds(5))
+                ->with('session')
+                ->limit(100)
+                ->get();
+
+            if ($pendingMessages->isEmpty()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Tidak ada pesan pending untuk diupdate',
+                    'data' => [
+                        'updated' => 0,
+                    ],
+                ]);
+            }
+
+            $updated = 0;
+            $errors = [];
+
+            foreach ($pendingMessages as $message) {
+                try {
+                    if (!$message->session || $message->session->status !== 'connected') {
+                        continue;
+                    }
+
+                    // Try to get message from WAHA to verify it exists
+                    $chatId = ($message->to_number ?? '') . '@c.us';
+                    if ($message->chat_type === 'group') {
+                        $chatId = ($message->to_number ?? '') . '@g.us';
+                    }
+
+                    // Get recent messages from WAHA to check if our message is there
+                    $result = $this->wahaService->getMessages($message->session->session_id, $chatId, 20);
+                    
+                    if ($result['success'] && isset($result['data'])) {
+                        $wahaMessages = $result['data'];
+                        $found = false;
+                        
+                        // Check if our message exists in WAHA messages
+                        foreach ($wahaMessages as $wahaMessage) {
+                            if (isset($wahaMessage['id']) && $wahaMessage['id'] === $message->whatsapp_message_id) {
+                                // Message found in WAHA, it was sent successfully
+                                // Check if it's fromMe (outgoing)
+                                if (!empty($wahaMessage['fromMe']) && $wahaMessage['fromMe'] === true) {
+                                    $message->update([
+                                        'status' => 'sent',
+                                        'updated_at' => now(),
+                                    ]);
+                                    $updated++;
+                                    $found = true;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        // If message not found but it's older than 30 seconds, assume it was sent
+                        // (might have been deleted from WAHA history or not in recent messages)
+                        if (!$found && $message->created_at < now()->subSeconds(30)) {
+                            $message->update([
+                                'status' => 'sent',
+                                'updated_at' => now(),
+                            ]);
+                            $updated++;
+                        }
+                    } else {
+                        // If we can't get messages but message is old enough, assume sent
+                        if ($message->created_at < now()->subSeconds(30)) {
+                            $message->update([
+                                'status' => 'sent',
+                                'updated_at' => now(),
+                            ]);
+                            $updated++;
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Error updating message status', [
+                        'message_id' => $message->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    $errors[] = "Message {$message->id}: " . $e->getMessage();
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Update status selesai. {$updated} pesan diupdate.",
+                'data' => [
+                    'updated' => $updated,
+                    'errors' => $errors,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error updating pending message status', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Extract phone number from WAHA format
+     */
+    protected function extractPhoneNumber(?string $value): ?string
+    {
+        if (!$value) {
+            return null;
+        }
+
+        // Remove @c.us or @g.us suffix
+        $number = preg_replace('/@[cg]\.us$/', '', $value);
+        
+        // Remove + prefix if exists
+        $number = ltrim($number, '+');
+        
+        return $number ?: null;
+    }
+
+    /**
+     * Determine message type from WAHA payload
+     */
+    protected function determineMessageType(array $payload): string
+    {
+        if (!empty($payload['poll'])) {
+            return 'poll';
+        }
+        
+        if (!empty($payload['buttons']) || !empty($payload['interactiveMessage'])) {
+            return 'button';
+        }
+        
+        if (!empty($payload['list'])) {
+            return 'list';
+        }
+        
+        if (!empty($payload['location'])) {
+            return 'location';
+        }
+        
+        if (!empty($payload['contact'])) {
+            return 'contact';
+        }
+        
+        if (!empty($payload['sticker'])) {
+            return 'sticker';
+        }
+        
+        if (!empty($payload['voice'])) {
+            return 'voice';
+        }
+        
+        if (!empty($payload['video'])) {
+            return 'video';
+        }
+        
+        if (!empty($payload['image'])) {
+            return 'image';
+        }
+        
+        if (!empty($payload['document'])) {
+            return 'document';
+        }
+        
+        return 'text';
     }
 
     /**

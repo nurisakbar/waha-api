@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('webhook_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('webhook_id')->constrained()->onDelete('cascade');
+            $table->uuid('webhook_id');
             $table->string('event_type', 100);
             $table->json('payload');
             $table->integer('response_status')->nullable();
@@ -23,6 +23,8 @@ return new class extends Migration
             $table->index('webhook_id');
             $table->index('event_type');
             $table->index('triggered_at');
+            
+            $table->foreign('webhook_id')->references('id')->on('webhooks')->onDelete('cascade');
         });
     }
 

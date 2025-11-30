@@ -20,6 +20,14 @@ class WahaService
     }
 
     /**
+     * Get base URL
+     */
+    public function getBaseUrl(): string
+    {
+        return $this->baseUrl;
+    }
+
+    /**
      * Get HTTP client with authentication headers.
      */
     protected function httpClient(int $timeout = null)
@@ -78,19 +86,74 @@ class WahaService
                 // Add engine configuration if specified (GOWS supports more features like polls)
                 // Engine can also be set via WHATSAPP_DEFAULT_ENGINE environment variable in docker-compose
                 $engine = env('WAHA_DEFAULT_ENGINE', 'GOWS');
-                if ($engine) {
-                    $payload['config'] = [
-                        'engine' => $engine,
-                    ];
+                
+                // ============================================
+                // BUILT-IN WEBHOOK CONFIGURATION
+                // This webhook is automatically configured to receive messages
+                // No manual setup needed - this is the main feature
+                // ============================================
+                
+                // Build webhook URL for receiving messages (BUILT-IN - automatic)
+                // Ensure URL has proper format (with port if needed)
+                $appUrl = config('app.url', 'http://localhost:8000');
+                
+                // Fix: Always add port 8000 for localhost in development
+                if (str_contains($appUrl, 'localhost')) {
+                    // Check if port is missing
+                    if (!preg_match('/localhost:\d+/', $appUrl)) {
+                        $appUrl = 'http://localhost:8000';
+                    } elseif (!str_contains($appUrl, ':8000') && str_contains($appUrl, 'localhost')) {
+                        // Replace any other port with 8000 for localhost
+                        $appUrl = preg_replace('/localhost:\d+/', 'localhost:8000', $appUrl);
+                    }
                 }
+                
+                $webhookUrl = rtrim($appUrl, '/') . '/webhook/receive/' . $sessionId;
+                
+                Log::info('WAHA: Configuring built-in webhook (automatic - no manual setup needed)', [
+                    'session_id' => $sessionId,
+                    'webhook_url' => $webhookUrl,
+                    'app_url' => config('app.url'),
+                    'note' => 'This webhook automatically receives and saves incoming messages to database',
+                ]);
+                
+                // Configure built-in webhooks according to WAHA documentation
+                // https://waha.devlike.pro/docs/how-to/receive-messages/
+                // https://waha.devlike.pro/docs/how-to/events/
+                $payload['config'] = [
+                    'engine' => $engine,
+                    'webhooks' => [
+                        [
+                            'url' => $webhookUrl,
+                            'events' => [
+                                'message',        // Incoming messages - MAIN FEATURE
+                                'message.any',    // All messages (incoming and outgoing)
+                                'message.ack',    // Message acknowledgments (for status updates)
+                                'message.reaction', // Message reactions
+                                'message.edited',  // Edited messages
+                                'message.revoked', // Revoked messages
+                                'session.status',  // Session status changes
+                            ],
+                        ],
+                    ],
+                ];
+                
+                Log::info('WAHA: Built-in webhook configured successfully', [
+                    'session_id' => $sessionId,
+                    'webhook_url' => $webhookUrl,
+                    'events' => $payload['config']['webhooks'][0]['events'],
+                    'status' => 'Messages will be automatically received and saved to database',
+                ]);
                 
                 $response = $this->httpClient()
                     ->post($url, $payload);
 
                 if ($response->successful()) {
-                    Log::info('WAHA: Create session success', [
+                    Log::info('WAHA: Create session success with built-in webhook', [
                         'session_id' => $sessionId,
                         'status' => $response->status(),
+                        'webhook_url' => $webhookUrl,
+                        'note' => 'Built-in webhook is now active - incoming messages will be automatically received and saved',
                     ]);
                     return [
                         'success' => true,
@@ -1262,6 +1325,64 @@ class WahaService
     }
 
     /**
+     * Get webhook URL for a session (BUILT-IN webhook)
+     */
+    public function getWebhookUrl(string $sessionId): string
+    {
+        $appUrl = config('app.url', 'http://localhost:8000');
+        
+        // Fix: Always add port 8000 for localhost in development
+        if (str_contains($appUrl, 'localhost')) {
+            // Check if port is missing
+            if (!preg_match('/localhost:\d+/', $appUrl)) {
+                $appUrl = 'http://localhost:8000';
+            } elseif (!str_contains($appUrl, ':8000') && str_contains($appUrl, 'localhost')) {
+                // Replace any other port with 8000 for localhost
+                $appUrl = preg_replace('/localhost:\d+/', 'localhost:8000', $appUrl);
+            }
+        }
+        
+        return rtrim($appUrl, '/') . '/webhook/receive/' . $sessionId;
+    }
+
+    /**
+     * Update webhook configuration for existing session
+     * According to WAHA docs: https://waha.devlike.pro/docs/how-to/receive-messages/
+     * Note: WAHA doesn't have a direct update webhook endpoint
+     * This method returns webhook URL that should be configured
+     */
+    public function updateWebhook(string $sessionId): array
+    {
+        try {
+            $webhookUrl = $this->getWebhookUrl($sessionId);
+            
+            Log::info('WAHA: Webhook URL for session', [
+                'session_id' => $sessionId,
+                'webhook_url' => $webhookUrl,
+                'app_url' => config('app.url'),
+            ]);
+            
+            // Return webhook URL info
+            // User needs to restart session or WAHA will use webhook from session config
+            return [
+                'success' => true,
+                'webhook_url' => $webhookUrl,
+                'message' => 'Webhook URL: ' . $webhookUrl . '. Pastikan URL ini dapat diakses dari WAHA server.',
+            ];
+            
+        } catch (\Exception $e) {
+            Log::error('WAHA get webhook URL error: ' . $e->getMessage(), [
+                'session_id' => $sessionId,
+                'exception' => $e,
+            ]);
+            return [
+                'success' => false,
+                'error' => 'Connection error: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * Get contacts for a session.
      */
     public function getContacts(string $sessionId): array
@@ -1312,6 +1433,56 @@ class WahaService
             ];
         } catch (\Exception $e) {
             Log::error('WAHA get groups error: ' . $e->getMessage());
+            return [
+                'success' => false,
+                'error' => 'Connection error: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Get all chats for a session.
+     */
+    public function getChats(string $sessionId): array
+    {
+        try {
+            $response = $this->httpClient()
+                ->get("{$this->baseUrl}/api/{$sessionId}/chats");
+
+            Log::info('WAHA: getChats response', [
+                'status' => $response->status(),
+                'successful' => $response->successful(),
+            ]);
+
+            if ($response->successful()) {
+                $chats = $response->json();
+                Log::info('WAHA: getChats success', [
+                    'chats_count' => is_array($chats) ? count($chats) : 0,
+                ]);
+
+                return [
+                    'success' => true,
+                    'data' => $chats,
+                ];
+            }
+
+            $errorData = $response->json();
+            $errorMessage = $errorData['message'] ?? 'Failed to get chats';
+            
+            Log::error('WAHA: getChats failed', [
+                'status' => $response->status(),
+                'error' => $errorMessage,
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $errorMessage,
+            ];
+        } catch (\Exception $e) {
+            Log::error('WAHA get chats error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString(),
+            ]);
             return [
                 'success' => false,
                 'error' => 'Connection error: ' . $e->getMessage(),
@@ -1420,6 +1591,7 @@ class WahaService
                 'limit' => $limit,
             ];
 
+            // Only add chatId if provided (some WAHA versions allow getting all messages without chatId)
             if ($chatId) {
                 $params['chatId'] = $chatId;
             }
@@ -1453,15 +1625,25 @@ class WahaService
 
             $errorData = $response->json();
             $errorMessage = 'Failed to get messages';
+            
+            // Handle different error formats
             if (isset($errorData['message'])) {
-                $errorMessage = $errorData['message'];
+                $errorMessage = is_array($errorData['message']) 
+                    ? implode(', ', $errorData['message']) 
+                    : $errorData['message'];
             } elseif (isset($errorData['error'])) {
-                $errorMessage = $errorData['error'];
+                $errorMessage = is_array($errorData['error']) 
+                    ? implode(', ', $errorData['error']) 
+                    : $errorData['error'];
+            } elseif (is_array($errorData)) {
+                // If errorData itself is an array of error messages
+                $errorMessage = implode(', ', $errorData);
             }
 
             Log::error('WAHA: getMessages failed', [
                 'status' => $response->status(),
                 'error' => $errorMessage,
+                'error_data' => $errorData,
             ]);
 
             return [

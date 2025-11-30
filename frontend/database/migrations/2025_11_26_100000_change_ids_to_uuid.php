@@ -95,6 +95,19 @@ return new class extends Migration
             DB::statement('ALTER TABLE messages MODIFY session_id CHAR(36) NOT NULL');
         }
 
+        // Change webhooks.id to UUID
+        if (Schema::hasTable('webhooks')) {
+            try {
+                Schema::table('webhooks', function (Blueprint $table) {
+                    $table->dropPrimary();
+                });
+                DB::statement('ALTER TABLE webhooks MODIFY id CHAR(36) NOT NULL');
+                DB::statement('ALTER TABLE webhooks ADD PRIMARY KEY (id)');
+            } catch (\Exception $e) {
+                // Primary key might not exist or already changed
+            }
+        }
+
         // Change all other user_id foreign keys to UUID
         foreach ($userForeignKeyTables as $table) {
             if ($table !== 'whatsapp_sessions' && $table !== 'messages' && Schema::hasTable($table)) {
@@ -139,6 +152,21 @@ return new class extends Migration
                     $table->foreign('session_id')->references('id')->on('whatsapp_sessions')->onDelete('cascade');
                 }
             });
+        }
+
+        // Fix webhook_logs.webhook_id to UUID
+        if (Schema::hasTable('webhook_logs')) {
+            try {
+                Schema::table('webhook_logs', function (Blueprint $table) {
+                    $table->dropForeign(['webhook_id']);
+                });
+                DB::statement('ALTER TABLE webhook_logs MODIFY webhook_id CHAR(36) NOT NULL');
+                Schema::table('webhook_logs', function (Blueprint $table) {
+                    $table->foreign('webhook_id')->references('id')->on('webhooks')->onDelete('cascade');
+                });
+            } catch (\Exception $e) {
+                // Foreign key might not exist or already changed
+            }
         }
 
         if (Schema::hasTable('api_keys')) {

@@ -5,57 +5,523 @@
 @section('content')
 <div class="container-fluid">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Create Webhook') }}</div>
-                <div class="card-body">
+        <div class="col-md-10">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-plus-circle text-primary"></i> {{ __('Buat Webhook Baru') }}
+                    </h2>
+                    <p class="text-muted mb-0">{{ __('Konfigurasi webhook untuk menerima notifikasi real-time dari WhatsApp') }}</p>
+                </div>
+                <a href="{{ route('webhooks.index') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> {{ __('Kembali') }}
+                </a>
+            </div>
+
+            <div class="row">
+                <!-- Main Form -->
+                <div class="col-md-8 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-cog"></i> {{ __('Konfigurasi Webhook') }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Webhook Information -->
+                            <div class="alert alert-info mb-4">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-lightbulb"></i> {{ __('Apa itu Webhook?') }}
+                                </h6>
+                                <p class="mb-2">
+                                    {{ __('Webhook adalah mekanisme untuk menerima notifikasi real-time dari sistem ketika terjadi event tertentu. Dengan webhook, aplikasi Anda dapat secara otomatis menerima informasi tentang pesan masuk, status pesan, dan perubahan device.') }}
+                                </p>
+                                <p class="mb-2">
+                                    <strong>{{ __('Cara Kerja:') }}</strong> {{ __('Ketika event terjadi, sistem akan mengirim HTTP POST request ke URL webhook yang Anda konfigurasi. Aplikasi Anda dapat memproses data tersebut untuk melakukan tindakan otomatis.') }}
+                                </p>
+                                <p class="mb-0">
+                                    <strong><i class="fas fa-exclamation-triangle text-warning"></i> {{ __('Penting:') }}</strong> 
+                                    {{ __('Pastikan URL webhook Anda dapat diakses dari internet (public URL). Untuk testing local, gunakan ngrok atau webhook.site.') }}
+                                </p>
+                            </div>
+
+                            @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <h6 class="alert-heading">
+                                        <i class="fas fa-exclamation-circle"></i> {{ __('Terjadi Kesalahan') }}
+                                    </h6>
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
                     <form method="POST" action="{{ route('webhooks.store') }}">
                         @csrf
+                        
+                        <!-- Webhook Name -->
                         <div class="mb-3">
-                            <label for="name" class="form-label">{{ __('Webhook Name') }}</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <label for="name" class="form-label">
+                                {{ __('Webhook Name') }} <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="name" name="name" required placeholder="{{ __('Contoh: Production Webhook, Test Webhook') }}">
+                            <small class="form-text text-muted">
+                                {{ __('Nama untuk mengidentifikasi webhook ini. Nama ini hanya untuk referensi Anda sendiri.') }}
+                            </small>
                         </div>
+
+                        <!-- Webhook URL -->
                         <div class="mb-3">
-                            <label for="url" class="form-label">{{ __('Webhook URL') }}</label>
+                            <label for="url" class="form-label">
+                                {{ __('Webhook URL') }} <span class="text-danger">*</span>
+                            </label>
                             <input type="url" class="form-control" id="url" name="url" required placeholder="https://example.com/webhook">
+                            <div class="mt-2">
+                                <div class="alert alert-light border mb-2">
+                                    <small class="fw-bold d-block mb-2">
+                                        <i class="fas fa-link text-primary"></i> {{ __('Contoh URL:') }}
+                                    </small>
+                                    <ul class="mb-0 small">
+                                        <li class="mb-1">
+                                            <strong>Production:</strong> 
+                                            <code class="text-primary">https://api.yourapp.com/webhook/whatsapp</code>
+                                        </li>
+                                        <li class="mb-1">
+                                            <strong>Testing (webhook.site):</strong> 
+                                            <code class="text-info">https://webhook.site/unique-id-here</code>
+                                            <a href="https://webhook.site" target="_blank" class="btn btn-sm btn-outline-info ms-2">
+                                                <i class="fas fa-external-link-alt"></i> Buka webhook.site
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <strong>Local (ngrok):</strong> 
+                                            <code class="text-warning">https://abc123.ngrok.io/webhook</code>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle"></i> 
+                                {{ __('URL endpoint yang akan menerima webhook. Harus menggunakan HTTPS (kecuali local dengan ngrok) dan dapat diakses dari internet.') }}
+                            </small>
                         </div>
+
+                        <!-- Device Selection -->
                         <div class="mb-3">
-                            <label for="session_id" class="form-label">{{ __('Device') }} <small class="text-muted">({{ __('Optional') }})</small></label>
+                            <label for="session_id" class="form-label">
+                                {{ __('Device') }} <small class="text-muted">({{ __('Optional') }})</small>
+                            </label>
                             <select class="form-select" id="session_id" name="session_id">
-                                <option value="">{{ __('All Devices') }}</option>
+                                <option value="">{{ __('All Devices') }} – {{ __('Menerima event dari semua device') }}</option>
                                 @foreach($sessions as $session)
-                                    <option value="{{ $session->id }}">{{ $session->session_name }}</option>
+                                    <option value="{{ $session->id }}">{{ $session->session_name }} ({{ $session->session_id }})</option>
                                 @endforeach
                             </select>
+                            <small class="form-text text-muted">
+                                {{ __('Pilih device spesifik untuk menerima event hanya dari device tersebut, atau biarkan kosong untuk menerima event dari semua device Anda.') }}
+                            </small>
                         </div>
+
+                        <!-- Events Selection -->
                         <div class="mb-3">
-                            <label class="form-label">{{ __('Events') }}</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="events[]" value="message" id="event_message">
-                                <label class="form-check-label" for="event_message">{{ __('Message Events') }}</label>
+                            <label class="form-label">
+                                {{ __('Events') }} <span class="text-danger">*</span>
+                            </label>
+                            <div class="border rounded p-3 bg-light">
+                                <div class="form-check mb-3 p-3 bg-white rounded border">
+                                    <input class="form-check-input" type="checkbox" name="events[]" value="message" id="event_message" required>
+                                    <label class="form-check-label w-100" for="event_message">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="badge bg-primary px-3 py-2 me-2">
+                                                <i class="fas fa-envelope"></i> {{ __('Message Events') }}
+                                            </span>
+                                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary">
+                                                <i class="fas fa-comment-dots"></i> Pesan Masuk/Keluar
+                                            </span>
+                                        </div>
+                                        <p class="mb-2 text-muted">
+                                            {{ __('Menerima notifikasi ketika ada pesan masuk atau keluar, termasuk:') }}
+                                        </p>
+                                        <ul class="small text-muted mb-0">
+                                            <li>Pesan teks (text messages)</li>
+                                            <li>Pesan gambar (images)</li>
+                                            <li>Pesan video (videos)</li>
+                                            <li>Pesan dokumen (documents)</li>
+                                            <li>Pesan suara (voice notes)</li>
+                                            <li>Pesan lokasi, kontak, dan lainnya</li>
+                                        </ul>
+                                    </label>
+                                </div>
+                                <div class="form-check mb-3 p-3 bg-white rounded border">
+                                    <input class="form-check-input" type="checkbox" name="events[]" value="status" id="event_status">
+                                    <label class="form-check-label w-100" for="event_status">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="badge bg-warning text-dark px-3 py-2 me-2">
+                                                <i class="fas fa-info-circle"></i> {{ __('Status Events') }}
+                                            </span>
+                                            <span class="badge bg-warning bg-opacity-10 text-dark border border-warning">
+                                                <i class="fas fa-check-double"></i> Status Pesan
+                                            </span>
+                                        </div>
+                                        <p class="mb-2 text-muted">
+                                            {{ __('Menerima notifikasi tentang perubahan status pesan yang dikirim:') }}
+                                        </p>
+                                        <ul class="small text-muted mb-0">
+                                            <li><span class="badge bg-secondary">pending</span> - Pesan sedang dikirim</li>
+                                            <li><span class="badge bg-info">sent</span> - Pesan terkirim ke server</li>
+                                            <li><span class="badge bg-success">delivered</span> - Pesan terkirim ke penerima</li>
+                                            <li><span class="badge bg-primary">read</span> - Pesan dibaca oleh penerima</li>
+                                            <li><span class="badge bg-danger">failed</span> - Pesan gagal dikirim</li>
+                                        </ul>
+                                    </label>
+                                </div>
+                                <div class="form-check p-3 bg-white rounded border">
+                                    <input class="form-check-input" type="checkbox" name="events[]" value="session" id="event_session">
+                                    <label class="form-check-label w-100" for="event_session">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="badge bg-info px-3 py-2 me-2">
+                                                <i class="fas fa-mobile-alt"></i> {{ __('Device Events') }}
+                                            </span>
+                                            <span class="badge bg-info bg-opacity-10 text-info border border-info">
+                                                <i class="fas fa-link"></i> Status Device
+                                            </span>
+                                        </div>
+                                        <p class="mb-2 text-muted">
+                                            {{ __('Menerima notifikasi tentang perubahan status device/session:') }}
+                                        </p>
+                                        <ul class="small text-muted mb-0">
+                                            <li><span class="badge bg-success">connected</span> - Device terhubung</li>
+                                            <li><span class="badge bg-warning text-dark">pairing</span> - Sedang pairing (scan QR)</li>
+                                            <li><span class="badge bg-secondary">disconnected</span> - Device terputus</li>
+                                            <li><span class="badge bg-danger">failed</span> - Device gagal terhubung</li>
+                                        </ul>
+                                    </label>
+                                </div>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="events[]" value="status" id="event_status">
-                                <label class="form-check-label" for="event_status">{{ __('Status Events') }}</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="events[]" value="session" id="event_session">
-                                <label class="form-check-label" for="event_session">{{ __('Device Events') }}</label>
+                            <div class="alert alert-warning mb-0 mt-2">
+                                <small>
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <strong>{{ __('Penting:') }}</strong> {{ __('Pilih minimal satu event. Anda dapat memilih beberapa event sekaligus untuk menerima semua jenis notifikasi.') }}
+                                </small>
                             </div>
                         </div>
+
+                        <!-- Secret -->
                         <div class="mb-3">
-                            <label for="secret" class="form-label">{{ __('Secret') }} <small class="text-muted">({{ __('Optional') }})</small></label>
-                            <input type="text" class="form-control" id="secret" name="secret" placeholder="{{ __('Webhook secret for verification') }}">
+                            <label for="secret" class="form-label">
+                                {{ __('Secret Key') }} 
+                                <small class="text-muted">({{ __('Optional') }})</small>
+                                <span class="badge bg-warning text-dark ms-2">
+                                    <i class="fas fa-shield-alt"></i> {{ __('Direkomendasikan') }}
+                                </span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-key text-muted"></i>
+                                </span>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="secret" 
+                                       name="secret" 
+                                       placeholder="{{ __('Masukkan secret key untuk verifikasi webhook (minimal 16 karakter)') }}"
+                                       minlength="16">
+                                <button type="button" 
+                                        class="btn btn-outline-secondary" 
+                                        onclick="generateSecret()"
+                                        title="Generate random secret">
+                                    <i class="fas fa-random"></i> Generate
+                                </button>
+                            </div>
+                            <div class="mt-2">
+                                <div class="alert alert-light border">
+                                    <small class="fw-bold d-block mb-2">
+                                        <i class="fas fa-info-circle text-info"></i> {{ __('Tentang Secret Key:') }}
+                                    </small>
+                                    <ul class="mb-0 small">
+                                        <li class="mb-1">{{ __('Secret key digunakan untuk memverifikasi bahwa webhook request benar-benar berasal dari sistem kami') }}</li>
+                                        <li class="mb-1">{{ __('Secret akan di-hash dan disimpan dengan aman di database') }}</li>
+                                        <li class="mb-1">{{ __('Gunakan secret ini untuk memverifikasi signature webhook di aplikasi Anda') }}</li>
+                                        <li>{{ __('Panjang minimal 16 karakter. Disarankan menggunakan random string yang kuat.') }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-shield-alt text-warning"></i> 
+                                {{ __('Meskipun optional, sangat disarankan untuk menambahkan secret key untuk keamanan webhook Anda.') }}
+                            </small>
                         </div>
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ route('webhooks.index') }}" class="btn btn-secondary">{{ __('Cancel') }}</a>
-                            <button type="submit" class="btn btn-primary">{{ __('Create Webhook') }}</button>
+
+                        <!-- Active Status -->
+                        <div class="mb-3">
+                            <div class="card border-success">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="1" checked>
+                                        <label class="form-check-label w-100" for="is_active">
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge bg-success px-3 py-2 me-2">
+                                                    <i class="fas fa-check-circle"></i> {{ __('Aktifkan Webhook') }}
+                                                </span>
+                                                <span class="badge bg-success bg-opacity-10 text-success border border-success">
+                                                    <i class="fas fa-bolt"></i> {{ __('Akan Menerima Event') }}
+                                                </span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <small class="text-muted d-block mt-2">
+                                        <i class="fas fa-info-circle text-info"></i> 
+                                        {{ __('Webhook yang tidak aktif tidak akan menerima event. Anda dapat mengaktifkan atau menonaktifkan webhook kapan saja dari halaman detail webhook.') }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ route('webhooks.index') }}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> {{ __('Batal') }}
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> {{ __('Buat Webhook') }}
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+
+        <!-- Sidebar Information -->
+        <div class="col-md-4 mb-4">
+            <!-- Quick Guide -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-rocket"></i> {{ __('Quick Start') }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ol class="mb-0">
+                        <li class="mb-2">
+                            <strong>{{ __('Dapatkan URL Webhook') }}</strong>
+                            <ul class="small text-muted mt-1">
+                                <li>Gunakan <a href="https://webhook.site" target="_blank">webhook.site</a> untuk testing</li>
+                                <li>Atau setup endpoint di aplikasi Anda</li>
+                            </ul>
+                        </li>
+                        <li class="mb-2">
+                            <strong>{{ __('Pilih Events') }}</strong>
+                            <ul class="small text-muted mt-1">
+                                <li>Pilih event yang ingin Anda terima</li>
+                                <li>Dapat pilih beberapa event sekaligus</li>
+                            </ul>
+                        </li>
+                        <li class="mb-2">
+                            <strong>{{ __('Konfigurasi Device') }}</strong>
+                            <ul class="small text-muted mt-1">
+                                <li>Pilih device spesifik atau semua device</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>{{ __('Test Webhook') }}</strong>
+                            <ul class="small text-muted mt-1">
+                                <li>Kirim pesan WhatsApp</li>
+                                <li>Cek webhook logs untuk verifikasi</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Payload Examples -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-code"></i> {{ __('Contoh Payload') }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="fw-bold mb-2">
+                            <span class="badge bg-primary me-2">Message Event</span>
+                        </h6>
+                        <pre class="bg-dark text-light p-2 rounded" style="font-size: 0.7rem; overflow-x: auto; max-height: 200px;"><code>{
+  "event": "message",
+  "session": "session_id",
+  "payload": {
+    "id": "msg_123",
+    "from": "6281234567890@c.us",
+    "fromMe": false,
+    "to": "6289876543210@c.us",
+    "body": "Pesan masuk",
+    "hasMedia": false,
+    "timestamp": 1234567890
+  },
+  "timestamp": "2025-11-28T12:00:00Z"
+}</code></pre>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="fw-bold mb-2">
+                            <span class="badge bg-warning text-dark me-2">Status Event</span>
+                        </h6>
+                        <pre class="bg-dark text-light p-2 rounded" style="font-size: 0.7rem; overflow-x: auto; max-height: 150px;"><code>{
+  "event": "message.ack",
+  "session": "session_id",
+  "payload": {
+    "id": "msg_123",
+    "ack": 2,
+    "timestamp": 1234567890
+  },
+  "timestamp": "2025-11-28T12:00:00Z"
+}</code></pre>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-2">
+                            <span class="badge bg-info me-2">Device Event</span>
+                        </h6>
+                        <pre class="bg-dark text-light p-2 rounded" style="font-size: 0.7rem; overflow-x: auto; max-height: 150px;"><code>{
+  "event": "session",
+  "session": "session_id",
+  "payload": {
+    "status": "connected",
+    "timestamp": 1234567890
+  },
+  "timestamp": "2025-11-28T12:00:00Z"
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testing Tips -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-vial"></i> {{ __('Tips Testing') }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="fw-bold mb-2">
+                            <i class="fas fa-check-circle text-success"></i> {{ __('Untuk Testing:') }}
+                        </h6>
+                        <ul class="small mb-0">
+                            <li>Gunakan <strong>webhook.site</strong> untuk testing cepat</li>
+                            <li>Gunakan <strong>ngrok</strong> untuk testing local</li>
+                            <li>Pastikan device <strong>Connected</strong></li>
+                            <li>Cek webhook logs setelah testing</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-2">
+                            <i class="fas fa-shield-alt text-danger"></i> {{ __('Keamanan:') }}
+                        </h6>
+                        <ul class="small mb-0">
+                            <li>Gunakan <strong>HTTPS</strong> untuk production</li>
+                            <li>Tambahkan <strong>Secret Key</strong> untuk verifikasi</li>
+                            <li>Validasi signature di aplikasi Anda</li>
+                            <li>Jangan expose secret key</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best Practices -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-star"></i> {{ __('Best Practices') }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="small mb-0">
+                        <li class="mb-2">
+                            <strong>{{ __('Gunakan URL yang Stabil') }}</strong><br>
+                            <span class="text-muted">Pastikan URL webhook selalu dapat diakses</span>
+                        </li>
+                        <li class="mb-2">
+                            <strong>{{ __('Handle Error dengan Baik') }}</strong><br>
+                            <span class="text-muted">Return status 200 untuk request yang berhasil diproses</span>
+                        </li>
+                        <li class="mb-2">
+                            <strong>{{ __('Response Cepat') }}</strong><br>
+                            <span class="text-muted">Response dalam 10 detik untuk menghindari timeout</span>
+                        </li>
+                        <li>
+                            <strong>{{ __('Monitor Logs') }}</strong><br>
+                            <span class="text-muted">Cek webhook logs secara berkala untuk memastikan webhook berfungsi</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[action="{{ route('webhooks.store') }}"]');
+    const eventCheckboxes = document.querySelectorAll('input[name="events[]"]');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const checkedEvents = Array.from(eventCheckboxes).filter(cb => cb.checked);
+            
+            if (checkedEvents.length === 0) {
+                e.preventDefault();
+                alert('{{ __('Pilih minimal satu event untuk webhook.') }}');
+                return false;
+            }
+
+            // Validate URL
+            const urlInput = document.getElementById('url');
+            const url = urlInput.value.trim();
+            
+            if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+                e.preventDefault();
+                alert('{{ __('URL webhook harus dimulai dengan http:// atau https://') }}');
+                urlInput.focus();
+                return false;
+            }
+
+            // Validate secret if provided
+            const secretInput = document.getElementById('secret');
+            const secret = secretInput.value.trim();
+            
+            if (secret && secret.length < 16) {
+                e.preventDefault();
+                alert('{{ __('Secret key minimal 16 karakter') }}');
+                secretInput.focus();
+                return false;
+            }
+        });
+    }
+});
+
+function generateSecret() {
+    // Generate random secret (32 characters)
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let secret = '';
+    for (let i = 0; i < 32; i++) {
+        secret += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    
+    document.getElementById('secret').value = secret;
+    
+    // Show toast notification
+    const toast = document.createElement('div');
+    toast.className = 'alert alert-success position-fixed top-0 end-0 m-3';
+    toast.style.zIndex = '9999';
+    toast.innerHTML = '<i class="fas fa-check-circle"></i> Secret key berhasil di-generate!';
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+@endpush
 @endsection
 

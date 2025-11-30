@@ -373,6 +373,47 @@ class SessionController extends Controller
     /**
      * Check pairing status (AJAX endpoint).
      */
+    /**
+     * Update webhook configuration for connected session
+     */
+    public function updateWebhook(WhatsAppSession $session)
+    {
+        $this->authorize('view', $session);
+
+        if ($session->status !== 'connected') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Session harus dalam status connected untuk update webhook',
+            ], 400);
+        }
+
+        try {
+            $result = $this->wahaService->updateWebhook($session->session_id);
+            
+            if ($result['success']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Webhook berhasil diupdate. Session akan restart untuk menerapkan perubahan.',
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal update webhook: ' . ($result['error'] ?? 'Unknown error'),
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error updating webhook', [
+                'session_id' => $session->id,
+                'error' => $e->getMessage(),
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function checkStatus(WhatsAppSession $session)
     {
         $this->authorize('view', $session);

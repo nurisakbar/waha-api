@@ -69,6 +69,7 @@ class User extends Authenticatable
         'password',
         'phone',
         'avatar',
+        'auto_sync_incoming_messages',
         'role',
         'subscription_plan_id',
         'subscription_status',
@@ -100,6 +101,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'trial_ends_at' => 'datetime',
             'last_login_at' => 'datetime',
+            'auto_sync_incoming_messages' => 'boolean',
         ];
     }
 
