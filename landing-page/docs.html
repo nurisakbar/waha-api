@@ -988,7 +988,7 @@ axios.<span class="function">post</span>(url, data, {
                 </div>
 
                 <h3>2. Image Message</h3>
-                <p>Mengirim gambar dengan URL.</p>
+                <p>Mengirim gambar dengan URL. URL harus dapat diakses secara publik.</p>
                 <div class="code-tabs">
                     <div class="code-tabs-header">
                         <button class="code-tab active" onclick="switchCodeTab(this, 'image-msg-curl')">cURL</button>
@@ -1007,7 +1007,7 @@ axios.<span class="function">post</span>(url, data, {
     "device_id": "550e8400-e29b-41d4-a716-446655440000",
     "to": "6281234567890",
     "message_type": "image",
-    "image": "https://example.com/image.jpg",
+    "image_url": "https://example.com/image.jpg",
     "caption": "Caption gambar"
   }'</code>
                         </div>
@@ -1021,7 +1021,7 @@ axios.<span class="function">post</span>(url, data, {
     <span class="string">'device_id'</span> => <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
     <span class="string">'to'</span> => <span class="string">'6281234567890'</span>,
     <span class="string">'message_type'</span> => <span class="string">'image'</span>,
-    <span class="string">'image'</span> => <span class="string">'https://example.com/image.jpg'</span>,
+    <span class="string">'image_url'</span> => <span class="string">'https://example.com/image.jpg'</span>,
     <span class="string">'caption'</span> => <span class="string">'Caption gambar'</span>
 ];
 
@@ -1049,7 +1049,7 @@ axios.<span class="function">post</span>(url, data, {
         <span class="string">'device_id'</span>: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
         <span class="string">'to'</span>: <span class="string">'6281234567890'</span>,
         <span class="string">'message_type'</span>: <span class="string">'image'</span>,
-        <span class="string">'image'</span>: <span class="string">'https://example.com/image.jpg'</span>,
+        <span class="string">'image_url'</span>: <span class="string">'https://example.com/image.jpg'</span>,
         <span class="string">'caption'</span>: <span class="string">'Caption gambar'</span>
     }
 )</code>
@@ -1066,7 +1066,7 @@ axios.<span class="function">post</span>(url, data, {
     device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
     to: <span class="string">'6281234567890'</span>,
     message_type: <span class="string">'image'</span>,
-    image: <span class="string">'https://example.com/image.jpg'</span>,
+    image_url: <span class="string">'https://example.com/image.jpg'</span>,
     caption: <span class="string">'Caption gambar'</span>
 };
 
@@ -1087,7 +1087,7 @@ axios.<span class="function">post</span>(url, data, {
     device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
     to: <span class="string">'6281234567890'</span>,
     message_type: <span class="string">'image'</span>,
-    image: <span class="string">'https://example.com/image.jpg'</span>,
+    image_url: <span class="string">'https://example.com/image.jpg'</span>,
     caption: <span class="string">'Caption gambar'</span>
 };
 
@@ -1115,7 +1115,7 @@ axios.<span class="function">post</span>(url, data, {
     DeviceID    <span class="keyword">string</span> <span class="string">`json:"device_id"`</span>
     To          <span class="keyword">string</span> <span class="string">`json:"to"`</span>
     MessageType <span class="keyword">string</span> <span class="string">`json:"message_type"`</span>
-    Image       <span class="keyword">string</span> <span class="string">`json:"image"`</span>
+    ImageURL    <span class="keyword">string</span> <span class="string">`json:"image_url"`</span>
     Caption     <span class="keyword">string</span> <span class="string">`json:"caption"`</span>
 }
 
@@ -1127,7 +1127,7 @@ axios.<span class="function">post</span>(url, data, {
         DeviceID:    <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
         To:          <span class="string">"6281234567890"</span>,
         MessageType: <span class="string">"image"</span>,
-        Image:       <span class="string">"https://example.com/image.jpg"</span>,
+        ImageURL:    <span class="string">"https://example.com/image.jpg"</span>,
         Caption:     <span class="string">"Caption gambar"</span>,
     }
     
@@ -1144,7 +1144,7 @@ axios.<span class="function">post</span>(url, data, {
                 </div>
 
                 <h3>3. Video Message</h3>
-                <p>Mengirim video dengan URL.</p>
+                <p>Mengirim video dengan URL. URL harus dapat diakses secara publik.</p>
                 <div class="code-tabs">
                     <div class="code-tabs-header">
                         <button class="code-tab active" onclick="switchCodeTab(this, 'video-msg-curl')">cURL</button>
@@ -1163,8 +1163,10 @@ axios.<span class="function">post</span>(url, data, {
     "device_id": "550e8400-e29b-41d4-a716-446655440000",
     "to": "6281234567890",
     "message_type": "video",
-    "video": "https://example.com/video.mp4",
-    "caption": "Caption video"
+    "video_url": "https://example.com/video.mp4",
+    "caption": "Caption video",
+    "as_note": false,
+    "convert": false
   }'</code>
                         </div>
                     </div>
@@ -1177,8 +1179,10 @@ axios.<span class="function">post</span>(url, data, {
     <span class="string">'device_id'</span> => <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
     <span class="string">'to'</span> => <span class="string">'6281234567890'</span>,
     <span class="string">'message_type'</span> => <span class="string">'video'</span>,
-    <span class="string">'video'</span> => <span class="string">'https://example.com/video.mp4'</span>,
-    <span class="string">'caption'</span> => <span class="string">'Caption video'</span>
+    <span class="string">'video_url'</span> => <span class="string">'https://example.com/video.mp4'</span>,
+    <span class="string">'caption'</span> => <span class="string">'Caption video'</span>,
+    <span class="string">'as_note'</span> => <span class="keyword">false</span>,
+    <span class="string">'convert'</span> => <span class="keyword">false</span>
 ];
 
 <span class="keyword">$ch</span> = <span class="function">curl_init</span>(<span class="keyword">$url</span>);
@@ -1205,8 +1209,10 @@ axios.<span class="function">post</span>(url, data, {
         <span class="string">'device_id'</span>: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
         <span class="string">'to'</span>: <span class="string">'6281234567890'</span>,
         <span class="string">'message_type'</span>: <span class="string">'video'</span>,
-        <span class="string">'video'</span>: <span class="string">'https://example.com/video.mp4'</span>,
-        <span class="string">'caption'</span>: <span class="string">'Caption video'</span>
+        <span class="string">'video_url'</span>: <span class="string">'https://example.com/video.mp4'</span>,
+        <span class="string">'caption'</span>: <span class="string">'Caption video'</span>,
+        <span class="string">'as_note'</span>: <span class="keyword">False</span>,
+        <span class="string">'convert'</span>: <span class="keyword">False</span>
     }
 )</code>
                         </div>
@@ -1222,8 +1228,10 @@ axios.<span class="function">post</span>(url, data, {
     device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
     to: <span class="string">'6281234567890'</span>,
     message_type: <span class="string">'video'</span>,
-    video: <span class="string">'https://example.com/video.mp4'</span>,
-    caption: <span class="string">'Caption video'</span>
+    video_url: <span class="string">'https://example.com/video.mp4'</span>,
+    caption: <span class="string">'Caption video'</span>,
+    as_note: <span class="keyword">false</span>,
+    convert: <span class="keyword">false</span>
 };
 
 axios.<span class="function">post</span>(url, data, {
@@ -1243,8 +1251,10 @@ axios.<span class="function">post</span>(url, data, {
     device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
     to: <span class="string">'6281234567890'</span>,
     message_type: <span class="string">'video'</span>,
-    video: <span class="string">'https://example.com/video.mp4'</span>,
-    caption: <span class="string">'Caption video'</span>
+    video_url: <span class="string">'https://example.com/video.mp4'</span>,
+    caption: <span class="string">'Caption video'</span>,
+    as_note: <span class="keyword">false</span>,
+    convert: <span class="keyword">false</span>
 };
 
 <span class="function">fetch</span>(url, {
@@ -1271,8 +1281,10 @@ axios.<span class="function">post</span>(url, data, {
     DeviceID    <span class="keyword">string</span> <span class="string">`json:"device_id"`</span>
     To          <span class="keyword">string</span> <span class="string">`json:"to"`</span>
     MessageType <span class="keyword">string</span> <span class="string">`json:"message_type"`</span>
-    Video       <span class="keyword">string</span> <span class="string">`json:"video"`</span>
+    VideoURL    <span class="keyword">string</span> <span class="string">`json:"video_url"`</span>
     Caption     <span class="keyword">string</span> <span class="string">`json:"caption"`</span>
+    AsNote      <span class="keyword">bool</span>   <span class="string">`json:"as_note"`</span>
+    Convert     <span class="keyword">bool</span>   <span class="string">`json:"convert"`</span>
 }
 
 <span class="keyword">func</span> sendVideoMessage() {
@@ -1283,8 +1295,10 @@ axios.<span class="function">post</span>(url, data, {
         DeviceID:    <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
         To:          <span class="string">"6281234567890"</span>,
         MessageType: <span class="string">"video"</span>,
-        Video:       <span class="string">"https://example.com/video.mp4"</span>,
+        VideoURL:    <span class="string">"https://example.com/video.mp4"</span>,
         Caption:     <span class="string">"Caption video"</span>,
+        AsNote:      <span class="keyword">false</span>,
+        Convert:     <span class="keyword">false</span>,
     }
     
     jsonData, _ := json.<span class="function">Marshal</span>(data)
@@ -1300,7 +1314,7 @@ axios.<span class="function">post</span>(url, data, {
                 </div>
 
                 <h3>4. Document Message</h3>
-                <p>Mengirim dokumen (PDF, DOC, dll).</p>
+                <p>Mengirim dokumen (PDF, DOC, dll) dengan URL. URL harus dapat diakses secara publik.</p>
                 <div class="code-tabs">
                     <div class="code-tabs-header">
                         <button class="code-tab active" onclick="switchCodeTab(this, 'doc-msg-curl')">cURL</button>
@@ -1319,7 +1333,9 @@ axios.<span class="function">post</span>(url, data, {
     "device_id": "550e8400-e29b-41d4-a716-446655440000",
     "to": "6281234567890",
     "message_type": "document",
-    "document": "https://example.com/file.pdf"
+    "document_url": "https://example.com/file.pdf",
+    "filename": "document.pdf",
+    "caption": "Caption dokumen"
   }'</code>
                         </div>
                     </div>
@@ -1332,7 +1348,9 @@ axios.<span class="function">post</span>(url, data, {
     <span class="string">'device_id'</span> => <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
     <span class="string">'to'</span> => <span class="string">'6281234567890'</span>,
     <span class="string">'message_type'</span> => <span class="string">'document'</span>,
-    <span class="string">'document'</span> => <span class="string">'https://example.com/file.pdf'</span>
+    <span class="string">'document_url'</span> => <span class="string">'https://example.com/file.pdf'</span>,
+    <span class="string">'filename'</span> => <span class="string">'document.pdf'</span>,
+    <span class="string">'caption'</span> => <span class="string">'Caption dokumen'</span>
 ];
 
 <span class="keyword">$ch</span> = <span class="function">curl_init</span>(<span class="keyword">$url</span>);
@@ -1359,7 +1377,9 @@ axios.<span class="function">post</span>(url, data, {
         <span class="string">'device_id'</span>: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
         <span class="string">'to'</span>: <span class="string">'6281234567890'</span>,
         <span class="string">'message_type'</span>: <span class="string">'document'</span>,
-        <span class="string">'document'</span>: <span class="string">'https://example.com/file.pdf'</span>
+        <span class="string">'document_url'</span>: <span class="string">'https://example.com/file.pdf'</span>,
+        <span class="string">'filename'</span>: <span class="string">'document.pdf'</span>,
+        <span class="string">'caption'</span>: <span class="string">'Caption dokumen'</span>
     }
 )</code>
                         </div>
@@ -1375,7 +1395,9 @@ axios.<span class="function">post</span>(url, data, {
     device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
     to: <span class="string">'6281234567890'</span>,
     message_type: <span class="string">'document'</span>,
-    document: <span class="string">'https://example.com/file.pdf'</span>
+    document_url: <span class="string">'https://example.com/file.pdf'</span>,
+    filename: <span class="string">'document.pdf'</span>,
+    caption: <span class="string">'Caption dokumen'</span>
 };
 
 axios.<span class="function">post</span>(url, data, {
@@ -1395,7 +1417,9 @@ axios.<span class="function">post</span>(url, data, {
     device_id: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>,
     to: <span class="string">'6281234567890'</span>,
     message_type: <span class="string">'document'</span>,
-    document: <span class="string">'https://example.com/file.pdf'</span>
+    document_url: <span class="string">'https://example.com/file.pdf'</span>,
+    filename: <span class="string">'document.pdf'</span>,
+    caption: <span class="string">'Caption dokumen'</span>
 };
 
 <span class="function">fetch</span>(url, {
@@ -1422,7 +1446,9 @@ axios.<span class="function">post</span>(url, data, {
     DeviceID    <span class="keyword">string</span> <span class="string">`json:"device_id"`</span>
     To          <span class="keyword">string</span> <span class="string">`json:"to"`</span>
     MessageType <span class="keyword">string</span> <span class="string">`json:"message_type"`</span>
-    Document    <span class="keyword">string</span> <span class="string">`json:"document"`</span>
+    DocumentURL <span class="keyword">string</span> <span class="string">`json:"document_url"`</span>
+    Filename    <span class="keyword">string</span> <span class="string">`json:"filename"`</span>
+    Caption     <span class="keyword">string</span> <span class="string">`json:"caption"`</span>
 }
 
 <span class="keyword">func</span> sendDocumentMessage() {
@@ -1433,7 +1459,9 @@ axios.<span class="function">post</span>(url, data, {
         DeviceID:    <span class="string">"550e8400-e29b-41d4-a716-446655440000"</span>,
         To:          <span class="string">"6281234567890"</span>,
         MessageType: <span class="string">"document"</span>,
-        Document:    <span class="string">"https://example.com/file.pdf"</span>,
+        DocumentURL: <span class="string">"https://example.com/file.pdf"</span>,
+        Filename:    <span class="string">"document.pdf"</span>,
+        Caption:     <span class="string">"Caption dokumen"</span>,
     }
     
     jsonData, _ := json.<span class="function">Marshal</span>(data)

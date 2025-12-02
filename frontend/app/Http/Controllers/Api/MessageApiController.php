@@ -178,42 +178,43 @@ class MessageApiController extends Controller
                     $premiumPrice = $pricing->getPriceForMessageType('text', false);
                     $finalContent = $textContent;
                     
-                    // If watermark is free (price = 0), use watermark with free_text_quota
-                    if ($watermarkPrice == 0) {
-                        // Free message with watermark - deduct free_text_quota
-                        if ($userQuota->hasFreeTextQuota(1)) {
-                            if (!$userQuota->deductFreeTextQuota(1)) {
-                                throw new \Exception('Insufficient free text quota. Please wait until next month or purchase premium quota.');
-                            }
-                            $quotaDeducted = true;
-                            $quotaType = 'free_text_quota';
-                            $quotaAmount = 1;
-                            $finalContent = $watermarkService->addWatermark($textContent, $pricing->watermark_text);
-                        } else {
-                            throw new \Exception('Free text quota telah habis. Silakan beli Text Premium Quota atau tunggu reset bulan depan (tanggal 1).');
+                    // PRIORITAS: 1. text_quota (non-watermark), 2. free_text_quota (watermark), 3. balance
+                    
+                    // Prioritas 1: Cek text_quota (premium, tanpa watermark) terlebih dahulu
+                    if ($userQuota->text_quota > 0) {
+                        if (!$userQuota->deductTextQuota(1)) {
+                            throw new \Exception('Insufficient text quota');
                         }
+                        $quotaDeducted = true;
+                        $quotaType = 'text_quota';
+                        $quotaAmount = 1;
+                        // Tidak perlu watermark, gunakan content asli
+                        $finalContent = $textContent;
+                    }
+                    // Prioritas 2: Jika text_quota habis, cek free_text_quota (dengan watermark)
+                    elseif ($watermarkPrice == 0 && $userQuota->hasFreeTextQuota(1)) {
+                        if (!$userQuota->deductFreeTextQuota(1)) {
+                            throw new \Exception('Insufficient free text quota. Please wait until next month or purchase premium quota.');
+                        }
+                        $quotaDeducted = true;
+                        $quotaType = 'free_text_quota';
+                        $quotaAmount = 1;
+                        // Tambahkan watermark
+                        $finalContent = $watermarkService->addWatermark($textContent, $pricing->watermark_text);
+                    }
+                    // Prioritas 3: Jika keduanya habis, gunakan balance
+                    elseif ($userQuota->hasEnoughBalance($premiumPrice)) {
+                        if (!$userQuota->deductBalance($premiumPrice)) {
+                            throw new \Exception('Insufficient balance');
+                        }
+                        $quotaDeducted = true;
+                        $quotaType = 'balance';
+                        $quotaAmount = $premiumPrice;
+                        // Tidak perlu watermark, gunakan content asli
+                        $finalContent = $textContent;
                     } else {
-                        // Premium message - must deduct quota
-                        $price = $premiumPrice;
-                        
-                        // Check quota BEFORE sending
-                        if ($userQuota->text_quota > 0) {
-                            if (!$userQuota->deductTextQuota(1)) {
-                                throw new \Exception('Insufficient text quota');
-                            }
-                            $quotaDeducted = true;
-                            $quotaType = 'text_quota';
-                            $quotaAmount = 1;
-                        } elseif ($userQuota->hasEnoughBalance($price)) {
-                            if (!$userQuota->deductBalance($price)) {
-                                throw new \Exception('Insufficient balance');
-                            }
-                            $quotaDeducted = true;
-                            $quotaType = 'balance';
-                            $quotaAmount = $price;
-                        } else {
-                            throw new \Exception('Insufficient quota or balance. Please purchase quota first.');
-                        }
+                        // Semua quota habis
+                        throw new \Exception('Insufficient quota or balance. Please purchase quota first.');
                     }
                     
                     // Log the request details for debugging

@@ -104,7 +104,7 @@
                 </div>
                 <div class="card-body">
                     <p>
-                        {{ __('Gunakan endpoint di bawah ini untuk mengirim pesan WhatsApp menggunakan WAHA melalui API.') }}
+                        {{ __('Gunakan endpoint di bawah ini untuk mengirim pesan WhatsApp menggunakan WACLoud melalui API.') }}
                     </p>
                     <p class="mb-1"><strong>{{ __('Base URL') }}</strong></p>
                     <div class="api-code mb-3"><code>{{ $baseUrl }}/api/v1</code></div>

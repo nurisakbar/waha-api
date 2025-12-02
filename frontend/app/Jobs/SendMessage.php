@@ -106,41 +106,66 @@ class SendMessage implements ShouldQueue
                     $watermarkPrice = $pricing->getPriceForMessageType('text', true);
                     $premiumPrice = $pricing->getPriceForMessageType('text', false);
                     
-                    // If watermark is free (price = 0), use watermark with free_text_quota
-                    if ($watermarkPrice == 0) {
-                        // Free message with watermark - deduct free_text_quota
+                    // PRIORITAS: 1. text_quota (non-watermark), 2. free_text_quota (watermark), 3. balance
+                    
+                    // Prioritas 1: Cek text_quota (premium, tanpa watermark) terlebih dahulu
+                    if ($userQuota->text_quota > 0) {
+                        // Use text quota first
+                        if (!$userQuota->deductTextQuota(1)) {
+                            throw new \Exception('Insufficient text quota');
+                        }
+                        $quotaDeducted = true;
+                        $quotaType = 'text_quota';
+                        $quotaAmount = 1;
+                        $price = 0; // Tidak ada biaya karena menggunakan quota
+                        $withWatermark = false;
+                        
+                        // Log quota usage
+                        QuotaUsageLog::create([
+                            'user_id' => $message->user_id,
+                            'message_id' => $this->messageId,
+                            'quota_type' => 'text_quota',
+                            'amount' => 1,
+                            'message_type' => 'text',
+                            'description' => 'Premium text message (without watermark)',
+                        ]);
+                        
+                        Log::info('SendMessage Job: Text quota deducted', [
+                            'message_id' => $this->messageId,
+                            'remaining_quota' => $userQuota->fresh()->text_quota,
+                        ]);
+                        
+                        // Tidak perlu watermark, gunakan content asli
+                        $finalContent = $this->content;
+                    }
+                    // Prioritas 2: Jika text_quota habis, cek free_text_quota (dengan watermark)
+                    elseif ($watermarkPrice == 0 && $userQuota->hasFreeTextQuota(1)) {
+                        // Deduct free text quota
+                        if (!$userQuota->deductFreeTextQuota(1)) {
+                            throw new \Exception('Insufficient free text quota. Please wait until next month or purchase premium quota.');
+                        }
+                        $quotaDeducted = true;
+                        $quotaType = 'free_text_quota';
+                        $quotaAmount = 1;
                         $price = 0;
                         $withWatermark = true;
                         
-                        // Check if user has free text quota
-                        if ($userQuota->hasFreeTextQuota(1)) {
-                            // Deduct free text quota
-                            if (!$userQuota->deductFreeTextQuota(1)) {
-                                throw new \Exception('Insufficient free text quota. Please wait until next month or purchase premium quota.');
-                            }
-                            $quotaDeducted = true;
-                            $quotaType = 'free_text_quota';
-                            $quotaAmount = 1;
-                            
-                            // Log quota usage
-                            QuotaUsageLog::create([
-                                'user_id' => $message->user_id,
-                                'message_id' => $this->messageId,
-                                'quota_type' => 'free_text_quota',
-                                'amount' => 1,
-                                'message_type' => 'text',
-                                'description' => 'Free text message with watermark',
-                            ]);
-                            
-                            Log::info('SendMessage Job: Free text quota deducted', [
-                                'message_id' => $this->messageId,
-                                'remaining_free_quota' => $userQuota->fresh()->free_text_quota,
-                            ]);
-                        } else {
-                            // No free quota left, suggest premium
-                            throw new \Exception('Free text quota telah habis. Silakan beli Text Premium Quota atau tunggu reset bulan depan (tanggal 1).');
-                        }
+                        // Log quota usage
+                        QuotaUsageLog::create([
+                            'user_id' => $message->user_id,
+                            'message_id' => $this->messageId,
+                            'quota_type' => 'free_text_quota',
+                            'amount' => 1,
+                            'message_type' => 'text',
+                            'description' => 'Free text message with watermark',
+                        ]);
                         
+                        Log::info('SendMessage Job: Free text quota deducted', [
+                            'message_id' => $this->messageId,
+                            'remaining_free_quota' => $userQuota->fresh()->free_text_quota,
+                        ]);
+                        
+                        // Tambahkan watermark
                         $finalContent = $watermarkService->addWatermark($this->content, $pricing->watermark_text);
                         // Update message content in database
                         $message->update(['content' => $finalContent]);
@@ -148,62 +173,40 @@ class SendMessage implements ShouldQueue
                         Log::info('SendMessage Job: Using free text message with watermark', [
                             'message_id' => $this->messageId,
                         ]);
-                    } else {
-                        // Premium message - must deduct quota
+                    }
+                    // Prioritas 3: Jika keduanya habis, gunakan balance
+                    elseif ($userQuota->hasEnoughBalance($premiumPrice)) {
+                        // Use balance
+                        if (!$userQuota->deductBalance($premiumPrice)) {
+                            throw new \Exception('Insufficient balance');
+                        }
+                        $quotaDeducted = true;
+                        $quotaType = 'balance';
+                        $quotaAmount = $premiumPrice;
                         $price = $premiumPrice;
                         $withWatermark = false;
                         
-                        // Check quota BEFORE sending
-                        if ($userQuota->text_quota > 0) {
-                            // Use text quota first
-                            if (!$userQuota->deductTextQuota(1)) {
-                                throw new \Exception('Insufficient text quota');
-                            }
-                            $quotaDeducted = true;
-                            $quotaType = 'text_quota';
-                            $quotaAmount = 1;
-                            
-                            // Log quota usage
-                            QuotaUsageLog::create([
-                                'user_id' => $message->user_id,
-                                'message_id' => $this->messageId,
-                                'quota_type' => 'text_quota',
-                                'amount' => 1,
-                                'message_type' => 'text',
-                                'description' => 'Premium text message (without watermark)',
-                            ]);
-                            
-                            Log::info('SendMessage Job: Text quota deducted', [
-                                'message_id' => $this->messageId,
-                                'remaining_quota' => $userQuota->fresh()->text_quota,
-                            ]);
-                        } elseif ($userQuota->hasEnoughBalance($price)) {
-                            // Use balance
-                            if (!$userQuota->deductBalance($price)) {
-                                throw new \Exception('Insufficient balance');
-                            }
-                            $quotaDeducted = true;
-                            $quotaType = 'balance';
-                            $quotaAmount = $price;
-                            
-                            // Log quota usage
-                            QuotaUsageLog::create([
-                                'user_id' => $message->user_id,
-                                'message_id' => $this->messageId,
-                                'quota_type' => 'balance',
-                                'amount' => $price,
-                                'message_type' => 'text',
-                                'description' => 'Premium text message paid with balance',
-                            ]);
-                            
-                            Log::info('SendMessage Job: Balance deducted for premium text', [
-                                'message_id' => $this->messageId,
-                                'price' => $price,
-                                'remaining_balance' => $userQuota->fresh()->balance,
-                            ]);
-                        } else {
-                            throw new \Exception('Insufficient quota or balance. Please purchase quota first.');
-                        }
+                        // Log quota usage
+                        QuotaUsageLog::create([
+                            'user_id' => $message->user_id,
+                            'message_id' => $this->messageId,
+                            'quota_type' => 'balance',
+                            'amount' => $premiumPrice,
+                            'message_type' => 'text',
+                            'description' => 'Premium text message paid with balance',
+                        ]);
+                        
+                        Log::info('SendMessage Job: Balance deducted for premium text', [
+                            'message_id' => $this->messageId,
+                            'price' => $premiumPrice,
+                            'remaining_balance' => $userQuota->fresh()->balance,
+                        ]);
+                        
+                        // Tidak perlu watermark, gunakan content asli
+                        $finalContent = $this->content;
+                    } else {
+                        // Semua quota habis
+                        throw new \Exception('Insufficient quota or balance. Please purchase quota first.');
                     }
 
                     Log::info('SendMessage Job: Sending text message', [
